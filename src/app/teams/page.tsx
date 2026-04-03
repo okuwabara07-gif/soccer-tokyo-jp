@@ -17,6 +17,8 @@ function TeamsContent() {
   const [type, setType] = useState(searchParams.get('type')||'全て')
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
+  const [suggestions, setSuggestions] = useState<Team[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
 
   useEffect(()=>{
     async function fetch() {
@@ -25,7 +27,9 @@ function TeamsContent() {
       if(pref!=='全て') q = q.eq('prefecture', pref)
       if(cat!=='全て') q = q.eq('category', cat)
       if(type!=='全て') q = q.eq('type', type)
-      if(search) q = q.ilike('name', `%${search}%`)
+      if(search) {
+        q = q.or(`name.ilike.%${search}%,area.ilike.%${search}%,prefecture.ilike.%${search}%,block.ilike.%${search}%,category.ilike.%${search}%,type.ilike.%${search}%,description.ilike.%${search}%`)
+      }
       const {data} = await q
       setTeams(data||[])
       setLoading(false)
@@ -41,10 +45,47 @@ function TeamsContent() {
           <h1 className="text-lg font-medium">チームを探す</h1>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl px-3 py-2 flex items-center gap-2 mb-4">
-          <span className="text-gray-400 text-sm">🔍</span>
-          <input value={search} onChange={e=>setSearch(e.target.value)}
-            placeholder="チーム名・地域で検索..." className="flex-1 text-sm outline-none bg-transparent"/>
+        <div style={{position:'relative',marginBottom:16}}>
+          <div style={{background:'white',border:'1px solid #e8e8e4',borderRadius:24,padding:'8px 14px',display:'flex',alignItems:'center',gap:8}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#bbb" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input value={search}
+              onChange={e=>{
+                setSearch(e.target.value)
+                if(e.target.value.length>=1){
+                  supabase.from('teams').select('id,name,area,prefecture,category,type')
+                    .or(`name.ilike.%${e.target.value}%,area.ilike.%${e.target.value}%`)
+                    .limit(6)
+                    .then(({data})=>{setSuggestions(data as Team[]||[]);setShowSuggestions(true)})
+                } else {
+                  setSuggestions([]);setShowSuggestions(false)
+                }
+              }}
+              onBlur={()=>setTimeout(()=>setShowSuggestions(false),200)}
+              onFocus={()=>search.length>=1 && setShowSuggestions(true)}
+              placeholder="チーム名・地域・カテゴリで検索..."
+              style={{flex:1,border:'none',background:'transparent',fontSize:12,outline:'none',color:'#333'}}/>
+            {search && <button onClick={()=>{setSearch('');setSuggestions([]);setShowSuggestions(false)}}
+              style={{border:'none',background:'none',cursor:'pointer',color:'#999',fontSize:14,padding:0}}>✕</button>}
+          </div>
+          {showSuggestions && suggestions.length>0 && (
+            <div style={{position:'absolute',top:'100%',left:0,right:0,background:'white',borderRadius:12,border:'1px solid #e8e8e4',boxShadow:'0 4px 12px rgba(0,0,0,0.08)',zIndex:100,marginTop:4,overflow:'hidden'}}>
+              {suggestions.map(s=>(
+                <button key={s.id}
+                  onMouseDown={()=>{setSearch(s.name);setShowSuggestions(false)}}
+                  style={{width:'100%',padding:'10px 14px',border:'none',background:'white',textAlign:'left',cursor:'pointer',borderBottom:'1px solid #f5f5f5',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                  <div>
+                    <p style={{fontSize:12,fontWeight:500,color:'#1a1a1a',marginBottom:1}}>{s.name}</p>
+                    <p style={{fontSize:10,color:'#999'}}>{s.prefecture} {s.area}</p>
+                  </div>
+                  <span style={{fontSize:9,padding:'2px 7px',borderRadius:8,background:s.type==='J下部'?'#0a0a0a':'#f0f0ec',color:s.type==='J下部'?'white':'#666',flexShrink:0}}>{s.type}</span>
+                </button>
+              ))}
+              <button onMouseDown={()=>setShowSuggestions(false)}
+                style={{width:'100%',padding:'8px 14px',border:'none',background:'#f8f8f6',textAlign:'center',cursor:'pointer',fontSize:11,color:'#185FA5'}}>
+                「{search}」で全件検索 →
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="mb-3">
