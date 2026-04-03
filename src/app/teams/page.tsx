@@ -1,179 +1,293 @@
-'use client'
-import { useState, useEffect } from 'react'
-import { supabase, Team } from '@/lib/supabase'
-import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
+"use client";
 
-const PREFS = ['全て','東京都','神奈川県','埼玉県','千葉県']
-const CATS = ['全て','ジュニアユース','U12','U10','U8']
-const TYPES = ['全て','J下部','街クラブ','スクール']
+import { useState, useEffect, useRef, useCallback } from "react";
+import { createClient } from "@supabase/supabase-js";
+import Link from "next/link";
 
-function TeamsContent() {
-  const searchParams = useSearchParams()
-  const [teams, setTeams] = useState<Team[]>([])
-  const [pref, setPref] = useState(searchParams.get('pref')||'全て')
-  const [cat, setCat] = useState(searchParams.get('cat')||'全て')
-  const [type, setType] = useState(searchParams.get('type')||'全て')
-  const [search, setSearch] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [allTeams, setAllTeams] = useState<Team[]>([])
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
-  const normalize = (str: string) => str
-    .toLowerCase()
-    .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
-    .replace(/[ァ-ヶ]/g, s => String.fromCharCode(s.charCodeAt(0) - 0x60))
-    .replace(/[ぁ-ゖ]/g, s => String.fromCharCode(s.charCodeAt(0) + 0x60))
-    .replace(/\s+/g, '')
-    .replace(/[・.．]/g, '')
-  const [suggestions, setSuggestions] = useState<Team[]>([])
-  const [showSuggestions, setShowSuggestions] = useState(false)
+type Team = {
+  id: number; name: string; category: string; area: string;
+  prefecture: string; city: string; lat?: number; lng?: number;
+  website?: string; instagram?: string; twitter?: string; facebook?: string;
+  description?: string; founded?: number; members?: number;
+};
 
-  useEffect(()=>{
-    async function fetch() {
-      setLoading(true)
-      let q = supabase.from('teams').select('*')
-      if(pref!=='全て') q = q.eq('prefecture', pref)
-      if(cat!=='全て') q = q.eq('category', cat)
-      if(type!=='全て') q = q.eq('type', type)
-      if(search) {
-        q = q.or(`name.ilike.%${search}%,area.ilike.%${search}%,prefecture.ilike.%${search}%,block.ilike.%${search}%,category.ilike.%${search}%,type.ilike.%${search}%,description.ilike.%${search}%`)
-      }
-      const {data} = await q
-      setTeams(data||[])
-      setLoading(false)
+const toKatakana = (s: string) => s.replace(/[\u3041-\u3096]/g, c => String.fromCharCode(c.charCodeAt(0)+0x60));
+const toHiragana = (s: string) => s.replace(/[\u30a1-\u30f6]/g, c => String.fromCharCode(c.charCodeAt(0)-0x60));
+const fuzzyMatch = (text: string, q: string) => {
+  if (!q) return true;
+  const variants = [q, toKatakana(q), toHiragana(q)];
+  return variants.some(v => text.toLowerCase().includes(v.toLowerCase()));
+};
+
+const CATEGORIES = [
+  { key:"all", label:"すべて", color:"#1a1a2e" },
+  { key:"ジュニアユース", label:"ジュニアユース", color:"#e63946" },
+  { key:"ジュニア", label:"ジュニア", color:"#457b9d" },
+  { key:"アカデミー", label:"アカデミー", color:"#2d6a4f" },
+  { key:"社会人", label:"社会人", color:"#6d4c41" },
+];
+
+declare global { interface Window { initMap: () => void; google: any; } }
+
+const MapView = ({ teams, selectedTeam, onSelectTeam }: {
+  teams: Team[]; selectedTeam: Team | null; onSelectTeam: (t: Team) => void;
+}) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
+  const infoWindowRef = useRef<any>(null);
+
+  useEffect(() => {
+    const init = () => {
+      if (!mapRef.current || !window.google) return;
+      mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
+        center: { lat: 35.6895, lng: 139.6917 }, zoom: 11,
+        mapTypeControl: false, streetViewControl: false, fullscreenControl: false,
+      });
+      infoWindowRef.current = new window.google.maps.InfoWindow();
+    };
+    if (window.google?.maps) { init(); }
+    else {
+      window.initMap = init;
+      const s = document.createElement("script");
+      s.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&callback=initMap&language=ja`;
+      s.async = true; s.defer = true; document.head.appendChild(s);
+      return () => { try { document.head.removeChild(s); } catch(e){} };
     }
-    fetch()
-  },[pref,cat,type,search])
+  }, []);
+
+  useEffect(() => {
+    if (!mapInstanceRef.current || !window.google) return;
+    markersRef.current.forEach(m => m.setMap(null));
+    markersRef.current = [];
+    const bounds = new window.google.maps.LatLngBounds();
+    let hasPin = false;
+    teams.forEach(team => {
+      if (!team.lat || !team.lng) return;
+      hasPin = true;
+      const color = CATEGORIES.find(c => c.key === team.category)?.color ?? "#888";
+      const isSel = selectedTeam?.id === team.id;
+      const marker = new window.google.maps.Marker({
+        position: { lat: team.lat, lng: team.lng },
+        map: mapInstanceRef.current, title: team.name,
+        icon: { path: window.google.maps.SymbolPath.CIRCLE, scale: isSel?12:8,
+          fillColor: color, fillOpacity: 1, strokeColor: "#fff", strokeWeight: isSel?3:2 },
+        zIndex: isSel?100:1,
+      });
+      marker.addListener("click", () => {
+        onSelectTeam(team);
+        infoWindowRef.current.setContent(`<div style="padding:8px;max-width:180px"><b>${team.name}</b><br/><small>${team.category} | ${team.city||team.area}</small></div>`);
+        infoWindowRef.current.open(mapInstanceRef.current, marker);
+      });
+      markersRef.current.push(marker);
+      bounds.extend({ lat: team.lat, lng: team.lng });
+    });
+    if (hasPin) mapInstanceRef.current.fitBounds(bounds, { padding: 60 });
+  }, [teams, selectedTeam, onSelectTeam]);
+
+  useEffect(() => {
+    if (!mapInstanceRef.current || !selectedTeam?.lat || !selectedTeam?.lng) return;
+    mapInstanceRef.current.panTo({ lat: selectedTeam.lat, lng: selectedTeam.lng });
+    mapInstanceRef.current.setZoom(14);
+  }, [selectedTeam]);
+
+  return <div ref={mapRef} style={{ width:"100%", height:"100%", borderRadius:"16px", background:"#e8eaf0" }} />;
+};
+
+export default function TeamsPage() {
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+  const [view, setView] = useState<"map"|"list">("map");
+  const [teamCounts, setTeamCounts] = useState<Record<string,number>>({});
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      const { data } = await supabase.from("teams").select("*").order("name");
+      if (data) {
+        setTeams(data);
+        const c: Record<string,number> = {};
+        data.forEach(t => { c[t.category] = (c[t.category]??0)+1; });
+        setTeamCounts(c);
+      }
+      setLoading(false);
+    })();
+  }, []);
+
+  const filtered = teams.filter(t => {
+    const mc = category==="all" || t.category===category;
+    const ms = fuzzyMatch(t.name, search) || fuzzyMatch(t.area??"", search) || fuzzyMatch(t.city??"", search);
+    return mc && ms;
+  });
+
+  const handleSelect = useCallback((t: Team) => setSelectedTeam(t), []);
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-lg mx-auto px-4 py-6">
-        <div className="flex items-center gap-3 mb-4">
-          <Link href="/" className="text-gray-400 text-sm">← 戻る</Link>
-          <h1 className="text-lg font-medium">チームを探す</h1>
+    <div style={{ fontFamily:"'Noto Sans JP',sans-serif", background:"#f5f6fa", minHeight:"100vh" }}>
+      <div style={{ position:"relative", height:"240px", overflow:"hidden",
+        background:"linear-gradient(135deg,#0a0e27,#0057b8)" }}>
+        <div style={{ position:"absolute", bottom:"24px", left:"24px", color:"#fff", zIndex:2 }}>
+          <div style={{ fontSize:"11px", letterSpacing:"4px", color:"#7ab3ff", marginBottom:"6px" }}>TOKYO & KANTO</div>
+          <h1 style={{ fontSize:"clamp(24px,5vw,42px)", fontWeight:900, margin:0 }}>チームを探す</h1>
+          <p style={{ fontSize:"13px", color:"rgba(255,255,255,0.7)", marginTop:"6px" }}>{teams.length.toLocaleString()} チーム登録中</p>
         </div>
+      </div>
 
-        <div style={{position:'relative',marginBottom:16}}>
-          <div style={{background:'white',border:'1px solid #e8e8e4',borderRadius:24,padding:'8px 14px',display:'flex',alignItems:'center',gap:8}}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#bbb" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input value={search}
-              onChange={e=>{
-                setSearch(e.target.value)
-                if(e.target.value.length>=1){
-                  supabase.from('teams').select('id,name,area,prefecture,category,type')
-                    .or(`name.ilike.%${e.target.value}%,area.ilike.%${e.target.value}%`)
-                    .limit(6)
-                    .then(({data})=>{setSuggestions(data as Team[]||[]);setShowSuggestions(true)})
-                } else {
-                  setSuggestions([]);setShowSuggestions(false)
-                }
-              }}
-              onBlur={()=>setTimeout(()=>setShowSuggestions(false),200)}
-              onFocus={()=>search.length>=1 && setShowSuggestions(true)}
-              placeholder="チーム名・地域・カテゴリで検索..."
-              style={{flex:1,border:'none',background:'transparent',fontSize:12,outline:'none',color:'#333'}}/>
-            {search && <button onClick={()=>{setSearch('');setSuggestions([]);setShowSuggestions(false)}}
-              style={{border:'none',background:'none',cursor:'pointer',color:'#999',fontSize:14,padding:0}}>✕</button>}
+      <div style={{ background:"#fff", borderBottom:"1px solid #e8eaf0", padding:"14px 16px",
+        position:"sticky", top:0, zIndex:100, boxShadow:"0 2px 8px rgba(0,0,0,0.08)" }}>
+        <div style={{ maxWidth:"1200px", margin:"0 auto" }}>
+          <div style={{ position:"relative", marginBottom:"10px" }}>
+            <span style={{ position:"absolute", left:"12px", top:"50%", transform:"translateY(-50%)" }}>🔍</span>
+            <input value={search} onChange={e=>setSearch(e.target.value)}
+              placeholder="チーム名・地区（ひらがな・カタカナ・英語対応）"
+              style={{ width:"100%", padding:"10px 12px 10px 38px", fontSize:"14px",
+                border:"2px solid #e8eaf0", borderRadius:"10px", outline:"none", boxSizing:"border-box" }} />
           </div>
-          {showSuggestions && suggestions.length>0 && (
-            <div style={{position:'absolute',top:'100%',left:0,right:0,background:'white',borderRadius:12,border:'1px solid #e8e8e4',boxShadow:'0 4px 12px rgba(0,0,0,0.08)',zIndex:100,marginTop:4,overflow:'hidden'}}>
-              {suggestions.map(s=>(
-                <button key={s.id}
-                  onMouseDown={()=>{setSearch(s.name);setShowSuggestions(false)}}
-                  style={{width:'100%',padding:'10px 14px',border:'none',background:'white',textAlign:'left',cursor:'pointer',borderBottom:'1px solid #f5f5f5',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                  <div>
-                    <p style={{fontSize:12,fontWeight:500,color:'#1a1a1a',marginBottom:1}}>{s.name}</p>
-                    <p style={{fontSize:10,color:'#999'}}>{s.prefecture} {s.area}</p>
-                  </div>
-                  <span style={{fontSize:9,padding:'2px 7px',borderRadius:8,background:s.type==='J下部'?'#0a0a0a':'#f0f0ec',color:s.type==='J下部'?'white':'#666',flexShrink:0}}>{s.type}</span>
+          <div style={{ display:"flex", gap:"6px", flexWrap:"wrap", justifyContent:"space-between", alignItems:"center" }}>
+            <div style={{ display:"flex", gap:"6px", flexWrap:"wrap" }}>
+              {CATEGORIES.map(cat => {
+                const count = cat.key==="all" ? teams.length : (teamCounts[cat.key]??0);
+                const active = category===cat.key;
+                return (
+                  <button key={cat.key} onClick={()=>setCategory(cat.key)}
+                    style={{ padding:"5px 12px", borderRadius:"20px", border:"none", cursor:"pointer",
+                      fontWeight: active?700:500, fontSize:"12px",
+                      background: active?cat.color:"#f0f2f8", color: active?"#fff":"#555" }}>
+                    {cat.label} <span style={{ fontSize:"11px", opacity:0.8 }}>({count})</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div style={{ display:"flex", gap:"4px", background:"#f0f2f8", borderRadius:"8px", padding:"3px" }}>
+              {(["map","list"] as const).map(v => (
+                <button key={v} onClick={()=>setView(v)}
+                  style={{ padding:"5px 14px", borderRadius:"6px", border:"none", cursor:"pointer",
+                    fontSize:"12px", fontWeight:600,
+                    background: view===v?"#fff":"transparent", color: view===v?"#0057b8":"#888" }}>
+                  {v==="map"?"🗺 地図":"📋 一覧"}
                 </button>
               ))}
-              <button onMouseDown={()=>setShowSuggestions(false)}
-                style={{width:'100%',padding:'8px 14px',border:'none',background:'#f8f8f6',textAlign:'center',cursor:'pointer',fontSize:11,color:'#185FA5'}}>
-                「{search}」で全件検索 →
-              </button>
             </div>
-          )}
-        </div>
-
-        <div className="mb-3">
-          <div className="text-xs text-gray-500 mb-1">都県</div>
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {PREFS.map(p=>(
-              <button key={p} onClick={()=>setPref(p)}
-                className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full border transition-all ${pref===p?'bg-blue-500 text-white border-blue-500':'bg-white text-gray-600 border-gray-200'}`}>{p}</button>
-            ))}
           </div>
         </div>
+      </div>
 
-        <div className="mb-3">
-          <div className="text-xs text-gray-500 mb-1">カテゴリ</div>
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {CATS.map(c=>(
-              <button key={c} onClick={()=>setCat(c)}
-                className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full border transition-all ${cat===c?'bg-purple-500 text-white border-purple-500':'bg-white text-gray-600 border-gray-200'}`}>{c}</button>
-            ))}
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <div className="text-xs text-gray-500 mb-1">タイプ</div>
-          <div className="flex gap-2">
-            {TYPES.map(t=>(
-              <button key={t} onClick={()=>setType(t)}
-                className={`text-xs px-3 py-1.5 rounded-full border transition-all ${type===t?'bg-green-500 text-white border-green-500':'bg-white text-gray-600 border-gray-200'}`}>{t}</button>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 text-xs text-amber-700">
-          広告：サッカースパイク・用品はこちら →
-          <a href="https://hb.afl.rakuten.co.jp/hgc/5253b9ed.08f9d938.5253b9ee.e71aefe8/?pc=https%3A%2F%2Fsearch.rakuten.co.jp%2Fsearch%2Fmall%2F%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%E3%82%B9%E3%83%91%E3%82%A4%E3%82%AF%2F" target="_blank" rel="noopener noreferrer sponsored" className="underline ml-1">楽天で見る</a>
-        </div>
-
+      <div style={{ maxWidth:"1200px", margin:"0 auto", padding:"14px 14px 40px" }}>
         {loading ? (
-          <div className="text-center text-gray-400 py-8">読み込み中...</div>
-        ) : teams.length === 0 ? (
-          <div className="text-center text-gray-400 py-8">該当するチームが見つかりませんでした</div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            <div className="text-xs text-gray-500">{teams.length}件のチームが見つかりました</div>
-            {teams.map(team=>(
-              <div key={team.id} className="bg-white border border-gray-200 rounded-xl p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex gap-1 flex-wrap">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${team.is_jleague?'bg-blue-50 text-blue-800':'bg-purple-50 text-purple-800'}`}>{team.type}</span>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{team.category}</span>
+          <div style={{ textAlign:"center", padding:"60px", color:"#888" }}>⚽ 読み込み中...</div>
+        ) : view==="map" ? (
+          <div style={{ display:"grid", gridTemplateColumns:"340px 1fr", gap:"14px",
+            height:"calc(100vh - 260px)", minHeight:"480px" }}>
+            <div style={{ overflowY:"auto", display:"flex", flexDirection:"column", gap:"8px" }}>
+              <div style={{ fontSize:"12px", color:"#888", padding:"2px 0 6px", fontWeight:600 }}>{filtered.length} チーム</div>
+              {filtered.map(team => (
+                <div key={team.id} onClick={()=>handleSelect(team)}
+                  style={{ background: selectedTeam?.id===team.id?"#f0f7ff":"#fff",
+                    border: selectedTeam?.id===team.id?"2px solid #0057b8":"1px solid #e8eaf0",
+                    borderRadius:"10px", padding:"12px", cursor:"pointer" }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"4px" }}>
+                    <div style={{ fontWeight:700, fontSize:"13px", color:"#1a1a2e", flex:1 }}>{team.name}</div>
+                    <span style={{ background: CATEGORIES.find(c=>c.key===team.category)?.color??"#888",
+                      color:"#fff", fontSize:"10px", fontWeight:700, padding:"2px 7px",
+                      borderRadius:"20px", whiteSpace:"nowrap", marginLeft:"6px" }}>{team.category}</span>
                   </div>
-                  {team.selection_start && (
-                    <span className="text-xs text-amber-600 font-medium">受付中</span>
-                  )}
+                  <div style={{ fontSize:"11px", color:"#666" }}>📍 {team.city||team.area}</div>
                 </div>
-                <div className="font-medium text-sm mb-1">{team.name}</div>
-                <div className="text-xs text-gray-500 mb-2">{team.prefecture} {team.area}</div>
-                {team.description && <div className="text-xs text-gray-600 mb-2 leading-relaxed">{team.description}</div>}
-                <div className="flex flex-col gap-1 text-xs text-gray-500">
-                  {team.selection_start && <div>📅 セレクション：{team.selection_start}〜{team.selection_end}</div>}
-                  {team.practice_days && <div>⏰ 練習：{team.practice_days}</div>}
-                  {team.access && <div>📍 {team.access}</div>}
-                  {team.is_free && <div className="text-green-600 font-medium">✓ セレクション無料</div>}
+              ))}
+            </div>
+            <div style={{ position:"relative" }}>
+              <MapView teams={filtered} selectedTeam={selectedTeam} onSelectTeam={handleSelect} />
+              {selectedTeam && (
+                <div style={{ position:"absolute", bottom:"16px", left:"50%", transform:"translateX(-50%)",
+                  background:"#fff", borderRadius:"14px", padding:"14px 18px",
+                  boxShadow:"0 8px 24px rgba(0,0,0,0.15)", width:"300px", maxWidth:"calc(100% - 32px)", zIndex:10 }}>
+                  <div style={{ display:"flex", justifyContent:"space-between" }}>
+                    <div>
+                      <div style={{ fontWeight:800, fontSize:"15px" }}>{selectedTeam.name}</div>
+                      <div style={{ fontSize:"12px", color:"#666", marginTop:"2px" }}>{selectedTeam.category} ・ {selectedTeam.city||selectedTeam.area}</div>
+                    </div>
+                    <button onClick={()=>setSelectedTeam(null)}
+                      style={{ background:"none", border:"none", cursor:"pointer", fontSize:"16px", color:"#aaa" }}>✕</button>
+                  </div>
+                  <div style={{ display:"flex", gap:"6px", marginTop:"10px", flexWrap:"wrap" }}>
+                    {selectedTeam.website && <a href={selectedTeam.website} target="_blank" rel="noopener noreferrer"
+                      style={{ padding:"5px 12px", background:"#0057b8", color:"#fff", borderRadius:"7px", fontSize:"12px", fontWeight:600, textDecoration:"none" }}>🌐 公式サイト</a>}
+                    {selectedTeam.instagram && <a href={`https://instagram.com/${selectedTeam.instagram.replace("@","")}`} target="_blank" rel="noopener noreferrer"
+                      style={{ padding:"5px 12px", background:"#e1306c", color:"#fff", borderRadius:"7px", fontSize:"12px", fontWeight:600, textDecoration:"none" }}>Instagram</a>}
+                    {selectedTeam.twitter && <a href={`https://twitter.com/${selectedTeam.twitter.replace("@","")}`} target="_blank" rel="noopener noreferrer"
+                      style={{ padding:"5px 12px", background:"#1d9bf0", color:"#fff", borderRadius:"7px", fontSize:"12px", fontWeight:600, textDecoration:"none" }}>X</a>}
+                  </div>
                 </div>
-                {team.apply_url && (
-                  <a href={team.apply_url} target="_blank" rel="noopener noreferrer"
-                    className="mt-3 block text-center text-xs py-2 px-4 bg-blue-500 text-white rounded-lg">
-                    申込・詳細はこちら →
-                  </a>
-                )}
+              )}
+            </div>
+          </div>
+        ) : (
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))", gap:"12px" }}>
+            {filtered.map(team => (
+              <div key={team.id} style={{ background:"#fff", borderRadius:"12px", overflow:"hidden",
+                boxShadow:"0 2px 8px rgba(0,0,0,0.07)", borderLeft:`5px solid ${CATEGORIES.find(c=>c.key===team.category)?.color??"#888"}` }}>
+                <div style={{ padding:"14px 16px" }}>
+                  <div style={{ fontWeight:800, fontSize:"14px", color:"#1a1a2e", marginBottom:"4px" }}>{team.name}</div>
+                  <div style={{ fontSize:"12px", color:"#666", marginBottom:"10px" }}>📍 {team.city||team.area}</div>
+                  <div style={{ display:"flex", gap:"6px", flexWrap:"wrap" }}>
+                    {team.website && <a href={team.website} target="_blank" rel="noopener noreferrer"
+                      style={{ fontSize:"11px", color:"#0057b8", textDecoration:"none" }}>🌐 サイト</a>}
+                    {team.instagram && <a href={`https://instagram.com/${team.instagram.replace("@","")}`} target="_blank" rel="noopener noreferrer"
+                      style={{ fontSize:"11px", color:"#e1306c", textDecoration:"none" }}>Instagram</a>}
+                    {team.twitter && <a href={`https://twitter.com/${team.twitter.replace("@","")}`} target="_blank" rel="noopener noreferrer"
+                      style={{ fontSize:"11px", color:"#1d9bf0", textDecoration:"none" }}>X</a>}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
-    </main>
-  )
-}
 
-export default function TeamsPage() {
-  return <Suspense fallback={<div className="text-center py-8">読み込み中...</div>}><TeamsContent /></Suspense>
+      <div style={{ background:"#1a1a2e", color:"#fff", padding:"36px 20px", textAlign:"center" }}>
+        <div style={{ maxWidth:"560px", margin:"0 auto" }}>
+          <div style={{ fontSize:"13px", color:"#7ab3ff", marginBottom:"14px" }}>このページをシェア</div>
+          <div style={{ display:"flex", justifyContent:"center", gap:"10px", flexWrap:"wrap", marginBottom:"32px" }}>
+            {[
+              { label:"X でシェア", bg:"#1d9bf0", href:`https://twitter.com/intent/tweet?text=${encodeURIComponent("東京・関東のサッカーチームを地図で検索")}` },
+              { label:"LINE", bg:"#00b900", href:`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent("https://soccer-tokyo-jp.vercel.app/teams")}` },
+              { label:"Facebook", bg:"#1877f2", href:`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent("https://soccer-tokyo-jp.vercel.app/teams")}` },
+            ].map(s => (
+              <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
+                style={{ padding:"9px 20px", background:s.bg, color:"#fff", borderRadius:"9px",
+                  fontWeight:600, fontSize:"13px", textDecoration:"none" }}>{s.label}</a>
+            ))}
+          </div>
+          <div style={{ borderTop:"1px solid rgba(255,255,255,0.1)", paddingTop:"28px" }}>
+            <div style={{ fontSize:"11px", color:"#7ab3ff", letterSpacing:"2px", marginBottom:"14px" }}>SPONSOR</div>
+            <div style={{ display:"flex", gap:"10px", justifyContent:"center", flexWrap:"wrap" }}>
+              {[
+                { plan:"GOLD", color:"#ffd700", icon:"🥇" },
+                { plan:"SILVER", color:"#c0c0c0", icon:"🥈" },
+                { plan:"BRONZE", color:"#cd7f32", icon:"🥉" },
+              ].map(sp => (
+                <Link key={sp.plan} href="/member"
+                  style={{ padding:"12px 18px", border:`1px solid ${sp.color}40`, borderRadius:"10px",
+                    textDecoration:"none", color:"#fff", textAlign:"center",
+                    background:`${sp.color}15`, minWidth:"120px" }}>
+                  <div style={{ fontSize:"18px" }}>{sp.icon}</div>
+                  <div style={{ fontWeight:700, fontSize:"13px", color:sp.color }}>{sp.plan}</div>
+                  <div style={{ fontSize:"11px", color:"#aaa" }}>お問い合わせください</div>
+                </Link>
+              ))}
+            </div>
+            <p style={{ fontSize:"11px", color:"#555", marginTop:"10px" }}>スポンサーになるとチーム検索ページにロゴ・リンクが掲載されます</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
