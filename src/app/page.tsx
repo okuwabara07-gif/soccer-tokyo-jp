@@ -131,7 +131,7 @@ export default function Home() {
               <div style={{background:'#f0fff8',border:'1px solid #b2dfdb',borderRadius:12,padding:'12px 14px'}}>
                 <p style={{fontSize:10,fontWeight:500,color:'#085041',marginBottom:10}}>学年を選んでください</p>
                 <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:6,marginBottom:8}}>
-                  {[['小1','U8'],['小2','U8'],['小3','U10'],['小4','U10'],['小5','U12'],['小6','U12'],['中1','JY'],['中2','JY'],['中3','JY']].map(([g,cat])=>(
+                  {[['小1','U8'],['小2','U8'],['小3','U10'],['小4','U10'],['小5','U12'],['小6','U12'],].map(([g,cat])=>(
                     <Link key={g} href={`/teams?cat=${cat==='JY'?'ジュニアユース':cat}`}
                       style={{padding:'8px 4px',borderRadius:8,background:'white',border:'1px solid #b2dfdb',textAlign:'center',textDecoration:'none',display:'block'}}>
                       <p style={{fontSize:12,fontWeight:500,color:'#085041'}}>{g}</p>
@@ -209,18 +209,38 @@ export default function Home() {
             ))}
           </div>
 
-          <div style={{display:'flex',gap:8}}>
-            <a href="https://twitter.com/intent/tweet?text=関東ジュニアサッカー情報局%20-%20U8〜ジュニアユースのセレクション情報&url=https://soccer-tokyo-jp.vercel.app"
+          <p style={{fontSize:9,letterSpacing:'0.15em',color:'#999',marginBottom:8,textTransform:'uppercase'}}>シェアする</p>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:6}}>
+            <a href="https://twitter.com/intent/tweet?text=関東ジュニアサッカー情報局%20U8〜ジュニアユースのセレクション情報&url=https://soccer-tokyo-jp.vercel.app"
               target="_blank" rel="noopener noreferrer"
-              style={{flex:1,padding:'10px',borderRadius:10,background:'#1a1a1a',color:'white',fontSize:11,textAlign:'center',textDecoration:'none',display:'block'}}>
-              X(Twitter)でシェア
+              style={{padding:'10px 8px',borderRadius:10,background:'#1a1a1a',color:'white',fontSize:11,textAlign:'center',textDecoration:'none',display:'flex',alignItems:'center',justifyContent:'center',gap:4}}>
+              <span style={{fontSize:14}}>𝕏</span> X
             </a>
+            <a href="https://line.me/R/msg/text/?関東ジュニアサッカー情報局%0Ahttps://soccer-tokyo-jp.vercel.app"
+              target="_blank" rel="noopener noreferrer"
+              style={{padding:'10px 8px',borderRadius:10,background:'#06C755',color:'white',fontSize:11,textAlign:'center',textDecoration:'none',display:'flex',alignItems:'center',justifyContent:'center',gap:4}}>
+              <span style={{fontSize:14}}>💬</span> LINE
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://soccer-tokyo-jp.vercel.app"
+              target="_blank" rel="noopener noreferrer"
+              style={{padding:'10px 8px',borderRadius:10,background:'#1877F2',color:'white',fontSize:11,textAlign:'center',textDecoration:'none',display:'flex',alignItems:'center',justifyContent:'center',gap:4}}>
+              <span style={{fontSize:14}}>f</span> Facebook
+            </a>
+            <button onClick={share}
+              style={{padding:'10px 8px',borderRadius:10,background:'#f0f0ec',border:'none',color:'#666',fontSize:11,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:4}}>
+              <span style={{fontSize:14}}>📤</span> その他
+            </button>
           </div>
-          <a href="https://line.me/R/msg/text/?関東ジュニアサッカー情報局%0Ahttps://soccer-tokyo-jp.vercel.app"
-            target="_blank" rel="noopener noreferrer"
-            style={{display:'block',marginTop:6,padding:'10px',borderRadius:10,background:'#06C755',color:'white',fontSize:11,textAlign:'center',textDecoration:'none'}}>
-            LINEでシェア
-          </a>
+          <div style={{marginTop:6,padding:'10px 12px',borderRadius:10,background:'#f8f0ff',border:'1px solid #e0c8ff',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+            <div>
+              <p style={{fontSize:10,fontWeight:500,color:'#6b21a8',marginBottom:1}}>Instagramでシェア</p>
+              <p style={{fontSize:9,color:'#999'}}>URLをコピーしてInstagramのストーリーに貼付</p>
+            </div>
+            <button onClick={()=>navigator.clipboard.writeText('https://soccer-tokyo-jp.vercel.app')}
+              style={{padding:'6px 12px',borderRadius:8,background:'#6b21a8',border:'none',color:'white',fontSize:10,cursor:'pointer',flexShrink:0}}>
+              URLコピー
+            </button>
+          </div>
 
         </div>
       </div>
