@@ -17,6 +17,15 @@ function TeamsContent() {
   const [type, setType] = useState(searchParams.get('type')||'全て')
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
+  const [allTeams, setAllTeams] = useState<Team[]>([])
+
+  const normalize = (str: string) => str
+    .toLowerCase()
+    .replace(/[Ａ-Ｚａ-ｚ０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
+    .replace(/[ァ-ヶ]/g, s => String.fromCharCode(s.charCodeAt(0) - 0x60))
+    .replace(/[ぁ-ゖ]/g, s => String.fromCharCode(s.charCodeAt(0) + 0x60))
+    .replace(/\s+/g, '')
+    .replace(/[・.．]/g, '')
   const [suggestions, setSuggestions] = useState<Team[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
 
