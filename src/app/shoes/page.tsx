@@ -275,17 +275,27 @@ export default function ShoesPage() {
           )}
 
           {tab==='foot' && (
-            <>
+            <div>
+              <a href="/foot-camera"
+                style={{display:'flex',alignItems:'center',justifyContent:'space-between',background:'#0a0a0a',borderRadius:12,padding:'14px 16px',marginBottom:14,textDecoration:'none'}}>
+                <div>
+                  <p style={{fontSize:13,fontWeight:500,color:'white',marginBottom:2}}>📷 カメラで足型を診断する</p>
+                  <p style={{fontSize:11,color:'rgba(255,255,255,0.5)'}}>写真を撮るだけ・AIが最適シューズを提案</p>
+                </div>
+                <span style={{fontSize:16,color:'rgba(255,255,255,0.4)'}}>›</span>
+              </a>
+
               <div style={{background:'#1a1a1a',borderRadius:12,padding:'14px 16px',marginBottom:14}}>
                 <p style={{fontSize:12,fontWeight:500,color:'white',marginBottom:4}}>足型からシューズを選ぼう</p>
-                <p style={{fontSize:10,color:'rgba(255,255,255,0.4)',lineHeight:1.6}}>甲の高さ・幅によって合うブランドが大きく変わります。子どもの足に合ったシューズを選ぶことで怪我予防にも繋がります。</p>
+                <p style={{fontSize:10,color:'rgba(255,255,255,0.4)',lineHeight:1.6}}>甲の高さ・幅によって合うブランドが大きく変わります。</p>
               </div>
 
-              <p style={{fontSize:9,letterSpacing:'0.15em',color:'#999',marginBottom:10,textTransform:'uppercase'}}>お子さんの足型を選んでください</p>
+              <p style={{fontSize:10,color:'#999',letterSpacing:'0.15em',marginBottom:10}}>お子さんの足型を選んでください</p>
 
               {FOOT_TYPES.map(ft=>(
                 <button key={ft.id} onClick={()=>setFootType(ft.id)}
-                  style={{width:'100%',background:'white',borderRadius:12,border:`1px solid ${footType===ft.id?'#1a1a1a':'#eeeeea'}`,
+                  style={{width:'100%',background:'white',borderRadius:12,
+                    border:`1px solid ${footType===ft.id?'#1a1a1a':'#eeeeea'}`,
                     padding:'12px 14px',textAlign:'left',cursor:'pointer',marginBottom:8,
                     borderLeftWidth:footType===ft.id?4:1}}>
                   <p style={{fontSize:13,fontWeight:500,color:'#1a1a1a',marginBottom:3}}>{ft.label}</p>
@@ -297,7 +307,7 @@ export default function ShoesPage() {
                 <div style={{background:'#f0f7f0',borderRadius:12,border:'1px solid #c8e6c9',padding:'14px 16px',marginTop:4}}>
                   <p style={{fontSize:11,fontWeight:500,color:'#2d6a2d',marginBottom:8}}>おすすめブランド</p>
                   <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:10}}>
-                    {footType==='wide' && ['Mizuno','Asics'].map(b=>(
+                    {footType==='wide' && ['Mizuno','Asics','New Balance'].map(b=>(
                       <button key={b} onClick={()=>{setTab('brand');setSelectedBrand(BRANDS.find(br=>br.name===b))}}
                         style={{padding:'6px 14px',borderRadius:10,border:'none',background:'#2d6a2d',color:'white',fontSize:11,cursor:'pointer'}}>{b}</button>
                     ))}
@@ -318,7 +328,7 @@ export default function ShoesPage() {
                     style={{fontSize:11,color:'#2d6a2d',textDecoration:'none'}}>ランキングを見る →</Link>
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
       </div>
