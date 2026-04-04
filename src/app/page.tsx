@@ -31,8 +31,8 @@ export default function HomePage() {
 
   useEffect(() => {
     fetch('/api/team-counts').then(r=>r.ok?r.json():null).then(d=>d&&setCounts(d)).catch(()=>{});
-    supabase.from('teams').select('prefecture').then(({data}:any) => {
-      if(data){
+    supabase.from('teams').select('prefecture').then((res:any) => {
+      const data = res.data;
         const pc:any = {tokyo:0,kanagawa:0,saitama:0,chiba:0};
         data.forEach((t:any)=>{
           if(t.prefecture==='東京都') pc.tokyo++;
