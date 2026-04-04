@@ -41,7 +41,7 @@ export default function HomePage() {
     <div style={{ fontFamily:"'Noto Sans JP',sans-serif", background:'#0a0a0a', color:'#fff', overflowX:'hidden' }}>
 
       {/* ======= HERO ======= */}
-      <section style={{ position:'relative', height:'100svh', minHeight:640, overflow:'hidden' }}>
+      <section style={{ position:'relative', height:'45vh', minHeight:280, overflow:'hidden' }}>
         {/* パララックス背景: 試合写真 */}
         <div style={{ position:'absolute', inset:'-10%', ...parallax(0.3) }}>
           <img src={IMG_MATCH} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top' }} />
@@ -59,7 +59,10 @@ export default function HomePage() {
         </header>
 
         {/* HERO COPY */}
-        <div style={{ position:'absolute', bottom:'8%', left:0, right:0, padding:'0 28px', zIndex:10 }}>
+      </section>
+
+      <div style={{ background:"#0a0a0a", padding:"20px 16px" }}>
+        <div style={{ padding:'0 28px', zIndex:10 }}>
           <p style={{ color:'rgba(255,255,255,0.6)', fontSize:11, letterSpacing:5, marginBottom:12, textTransform:'uppercase' }}>TOKYO &amp; KANTO FOOTBALL DATABASE</p>
           <h1 style={{ fontSize:'clamp(40px,9vw,90px)', fontWeight:900, lineHeight:0.95, letterSpacing:-2, marginBottom:24, textShadow:'0 4px 32px rgba(0,0,0,0.6)' }}>
             東京のサッカーを、<br/>もっと身近に。
@@ -69,7 +72,7 @@ export default function HomePage() {
             <Link href="/body-check" style={{ background:'rgba(255,255,255,0.12)', color:'#fff', border:'1px solid rgba(255,255,255,0.4)', padding:'13px 32px', borderRadius:2, fontSize:14, textDecoration:'none', backdropFilter:'blur(6px)' }}>体格診断を試す</Link>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* ======= NAV (ヒーロー下) ======= */}
       <nav style={{ background:'#111', borderBottom:'1px solid rgba(255,255,255,0.08)', overflowX:'auto', WebkitOverflowScrolling:'touch' }}>
