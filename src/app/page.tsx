@@ -169,8 +169,6 @@ export default function HomePage() {
             {[
               { cat:'junior',       label:'ジュニア',       sub:'小学生以下', count:counts.junior||247,       col:'#3b82f6', img:IMG_FAMILY },
               { cat:'junior-youth', label:'ジュニアユース', sub:'中学生',     count:counts.juniorYouth||198, col:'#ec4899', img:IMG_MATCH },
-              { cat:'youth',        label:'ユース',         sub:'高校生',     count:counts.youth||153,        col:'#22c55e', img:IMG_FAMILY2 },
-              { cat:'general',      label:'一般・社会人',   sub:'大学生以上', count:counts.general||100,      col:'#f59e0b', img:IMG_EQUIPMENT },
             ].map(c => (
               <Link key={c.cat} href={`/teams?cat=${c.cat}`} style={{ textDecoration:'none', position:'relative', overflow:'hidden', aspectRatio:'3/4', display:'block' }}>
                 <img src={c.img} alt={c.label} style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', transition:'transform 0.5s' }}
