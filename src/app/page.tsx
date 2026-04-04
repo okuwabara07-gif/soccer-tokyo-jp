@@ -242,7 +242,7 @@ export default function HomePage() {
             { src:IMG_FAMILY2,   pos:'right center',h:'55vh', caption:'家族の絆' },
             { src:IMG_MATCH,     pos:'left 30%',    h:'55vh', caption:'ゴールへ' },
           ].map((p,i) => (
-            <div key={i} style={{ position:'relative', , width:'clamp(180px,30vw,320px)', height:p.h, overflow:'hidden', borderRadius:2, scrollSnapAlign:'start' }}>
+            <div key={i} style={{ position:'relative', width:'clamp(180px,30vw,320px)', height:p.h, overflow:'hidden', borderRadius:2, scrollSnapAlign:'start' }}>
               <img src={p.src} alt={p.caption} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:p.pos }} />
               <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)' }} />
               <p style={{ position:'absolute', bottom:14, left:14, fontSize:13, fontWeight:600 }}>{p.caption}</p>
