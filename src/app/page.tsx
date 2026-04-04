@@ -75,18 +75,6 @@ export default function HomePage() {
             <Link href="/member" style={{ background:"#b45309", display:"block", padding:"16px 8px", borderRadius:4, fontSize:14, fontWeight:700, textDecoration:"none", color:"#fff", textAlign:"center" }}>会員登録</Link>
             <Link href="/mypage" style={{ background:"#475569", display:"block", padding:"16px 8px", borderRadius:4, fontSize:14, fontWeight:700, textDecoration:"none", color:"#fff", textAlign:"center" }}>マイページ</Link>
           </div>
-            <Link href="/teams" style={{ background:'#16a34a', display:'block', width:'100%', padding:'16px 8px', borderRadius:4, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', textAlign:'center' as const, boxSizing:'border-box' as const }}>チームを探す</Link>
-            <Link href="/body-check" style={{ background:'#0057b8', display:'block', width:'100%', padding:'16px 8px', borderRadius:4, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', textAlign:'center' as const, boxSizing:'border-box' as const }}>体格診断</Link>
-            <Link href="/calendar" style={{ background:'#7c3aed', display:'block', width:'100%', padding:'16px 8px', borderRadius:4, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', textAlign:'center' as const, boxSizing:'border-box' as const }}>カレンダー</Link>
-            <Link href="/nutrition" style={{ background:'#ea580c', display:'block', width:'100%', padding:'16px 8px', borderRadius:4, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', textAlign:'center' as const, boxSizing:'border-box' as const }}>栄養管理</Link>
-            <Link href="/shoes" style={{ background:'#dc2626', display:'block', width:'100%', padding:'16px 8px', borderRadius:4, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', textAlign:'center' as const, boxSizing:'border-box' as const }}>シューズ</Link>
-            <Link href="/foot-camera" style={{ background:'#0891b2', display:'block', width:'100%', padding:'16px 8px', borderRadius:4, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', textAlign:'center' as const, boxSizing:'border-box' as const }}>AI足型診断</Link>
-            <Link href="/member" style={{ background:'#b45309', display:'block', width:'100%', padding:'16px 8px', borderRadius:4, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', textAlign:'center' as const, boxSizing:'border-box' as const }}>会員登録</Link>
-            <Link href="/mypage" style={{ background:'#475569', display:'block', width:'100%', padding:'16px 8px', borderRadius:4, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', textAlign:'center' as const, boxSizing:'border-box' as const }}>マイページ</Link>
-            <Link href="/foot-camera" style={{ background:'#0891b2', padding:'13px 24px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', whiteSpace:'nowrap' }}>AI足型診断</Link>
-            <Link href="/member" style={{ background:'#b45309', padding:'13px 24px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', whiteSpace:'nowrap' }}>会員登録</Link>
-            <Link href="/mypage" style={{ background:'#475569', padding:'13px 24px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', whiteSpace:'nowrap' }}>マイページ</Link>
-          </div>
         </div>
       </section>
 
