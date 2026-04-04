@@ -96,7 +96,7 @@ const MapView = ({ teams, selectedTeam, onSelectTeam }: {
     mapInstanceRef.current.setZoom(14);
   }, [selectedTeam]);
 
-  return <div ref={mapRef} style={{ width:"100%", height:"100%", borderRadius:"16px", background:"#e8eaf0" }} />;
+  return <div ref={mapRef} style={{ width:"100%", height:"400px", borderRadius:"16px", background:"#e8eaf0" }} />;
 };
 
 export default function TeamsPage() {
@@ -184,7 +184,7 @@ export default function TeamsPage() {
         {loading ? (
           <div style={{ textAlign:"center", padding:"60px", color:"#888" }}>⚽ 読み込み中...</div>
         ) : view==="map" ? (
-          <div style={{ display:"grid", gridTemplateColumns:"340px 1fr", gap:"14px",
+          <div style={{ display:"grid", gridTemplateColumns:"1fr", gap:"14px",
             height:"calc(100vh - 260px)", minHeight:"480px" }}>
             <div style={{ overflowY:"auto", display:"flex", flexDirection:"column", gap:"8px" }}>
               <div style={{ fontSize:"12px", color:"#888", padding:"2px 0 6px", fontWeight:600 }}>{filtered.length} チーム</div>
