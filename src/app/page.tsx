@@ -20,6 +20,7 @@ const NAV = [
 export default function HomePage() {
   const [scrollY, setScrollY] = useState(0);
   const [counts, setCounts] = useState({ junior:247, juniorYouth:198, youth:153, general:100, total:698 });
+  const [prefCounts, setPrefCounts] = useState({ tokyo:0, kanagawa:0, saitama:0, chiba:0 });
   const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -30,6 +31,19 @@ export default function HomePage() {
 
   useEffect(() => {
     fetch('/api/team-counts').then(r=>r.ok?r.json():null).then(d=>d&&setCounts(d)).catch(()=>{});
+          // pref counts
+          supabase.from('teams').select('prefecture').then(({data}) => {
+            if(data){
+              const pc = {tokyo:0,kanagawa:0,saitama:0,chiba:0};
+              data.forEach((t:any)=>{
+                if(t.prefecture==='東京都') pc.tokyo++;
+                else if(t.prefecture==='神奈川県') pc.kanagawa++;
+                else if(t.prefecture==='埼玉県') pc.saitama++;
+                else if(t.prefecture==='千葉県') pc.chiba++;
+              });
+              setPrefCounts(pc);
+            }
+          });
   }, []);
 
   const parallax = (factor: number) => ({
