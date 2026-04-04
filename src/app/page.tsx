@@ -74,17 +74,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ======= NAV (ヒーロー下) ======= */}
-      <nav style={{ background:'#111', borderBottom:'1px solid rgba(255,255,255,0.08)', overflowX:'auto', WebkitOverflowScrolling:'touch' }}>
-        <div style={{ display:'flex', minWidth:'max-content', maxWidth:960, margin:'0 auto', padding:'0 8px' }}>
-          {NAV.map(n => (
-            <Link key={n.href} href={n.href} style={{ color:'rgba(255,255,255,0.6)', padding:'15px 18px', fontSize:13, letterSpacing:0.5, textDecoration:'none', whiteSpace:'nowrap', display:'block', borderBottom:'2px solid transparent', transition:'all 0.2s' }}
-              onMouseEnter={e=>{ const el=e.currentTarget as HTMLAnchorElement; el.style.color='#22c55e'; el.style.borderBottomColor='#22c55e'; }}
-              onMouseLeave={e=>{ const el=e.currentTarget as HTMLAnchorElement; el.style.color='rgba(255,255,255,0.6)'; el.style.borderBottomColor='transparent'; }}
-            >{n.label}</Link>
-          ))}
-        </div>
-      </nav>
 
       {/* ======= STATS ======= */}
       <section style={{ background:'#111', borderBottom:'1px solid rgba(255,255,255,0.08)', padding:'28px 16px' }}>
