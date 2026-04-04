@@ -148,7 +148,7 @@ export default function HomePage() {
       {/* ======= MATCH FULLBLEED ======= */}
       <section style={{ position:'relative', height:'70vh', overflow:'hidden', marginTop:3 }}>
         <div style={{ position:'absolute', inset:'-15%', ...parallax(0.2) }}>
-          <img src={IMG_MATCH} alt="試合" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center 20%' }} />
+          <img src={IMG_FAMILY} alt="試合" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center 20%' }} />
         </div>
         <div style={{ position:'absolute', inset:0, background:'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%)' }} />
         <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'center', padding:'0 5%', zIndex:5 }}>
@@ -205,7 +205,7 @@ export default function HomePage() {
             { src:IMG_MATCH,     pos:'center 20%',  h:'55vh', caption:'試合の瞬間' },
             { src:IMG_EQUIPMENT, pos:'center 30%',  h:'55vh', caption:'チームの証' },
             { src:IMG_FAMILY2,   pos:'right center',h:'55vh', caption:'家族の絆' },
-            { src:IMG_MATCH,     pos:'left 30%',    h:'55vh', caption:'ゴールへ' },
+            { src:IMG_FAMILY2,     pos:'left 30%',    h:'55vh', caption:'ゴールへ' },
           ].map((p,i) => (
             <div key={i} style={{ position:'relative', flexShrink:0, width:'clamp(180px,30vw,320px)', height:p.h, overflow:'hidden', borderRadius:2, scrollSnapAlign:'start' }}>
               <img src={p.src} alt={p.caption} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:p.pos }} />
@@ -248,7 +248,7 @@ export default function HomePage() {
             </div>
           </div>
           <div style={{ position:'relative', aspectRatio:'4/5', overflow:'hidden', borderRadius:4 }}>
-            <img src={IMG_FAMILY2} alt="AIツール" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top' }} />
+            <img src={IMG_EQUIPMENT} alt="AIツール" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top' }} />
             <div style={{ position:'absolute', inset:0, background:'linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.8) 100%)' }} />
           </div>
         </div>
