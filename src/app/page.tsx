@@ -105,6 +105,19 @@ export default function HomePage() {
       </section>
 
 
+      {/* ======= PHOTO STORY ======= */}
+      <section style={{ background:'#0a0a0a', padding:'60px 16px' }}>
+        <div style={{ maxWidth:960, margin:'0 auto' }}>
+          <p style={{ fontSize:11, letterSpacing:5, color:'#555', marginBottom:10, textTransform:'uppercase' }}>Our Story</p>
+          <h2 style={{ fontSize:'clamp(24px,4vw,38px)', fontWeight:900, marginBottom:8, color:'#fff' }}>
+            真剣勝負が、<br/>人を育てる。
+          </h2>
+          <p style={{ color:'#555', fontSize:14, lineHeight:1.8 }}>
+            東京・関東698チームのリアルな記録。練習、試合、家族——サッカーを囲むすべての瞬間。
+          </p>
+        </div>
+      </section>
+
       {/* ======= AI TOOLS ======= */}
       <section style={{ position:'relative', overflow:'hidden', background:'#0a0a0a', padding:'80px 16px' }}>
         <div style={{ position:'absolute', top:-80, right:-80, width:360, height:360, borderRadius:'50%', background:'radial-gradient(circle, rgba(34,197,94,0.08) 0%, transparent 70%)' }} />
