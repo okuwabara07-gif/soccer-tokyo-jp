@@ -64,7 +64,7 @@ export default function HomePage() {
           <h1 style={{ fontSize:'clamp(40px,9vw,90px)', fontWeight:900, lineHeight:0.95, letterSpacing:-2, marginBottom:24, textShadow:'0 4px 32px rgba(0,0,0,0.6)' }}>
             東京のサッカーを、<br/>もっと身近に。
           </h1>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"10px", maxWidth:"560px" }}>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"10px", maxWidth:"780px" }}>
             <Link href="/teams" style={{ background:"#16a34a", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:"clamp(16px,2.5vw,22px)", fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center" }}>チームを探す</Link>
             <Link href="/body-check" style={{ background:"#0057b8", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:"clamp(16px,2.5vw,22px)", fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center" }}>体格診断</Link>
             <Link href="/mypage" style={{ background:"#475569", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:"clamp(16px,2.5vw,22px)", fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center", gridColumn:"3", gridRow:"1 / 3" }}>マイページ</Link>
