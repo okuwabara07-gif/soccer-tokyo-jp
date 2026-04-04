@@ -46,7 +46,7 @@ export default function HomePage() {
         <div style={{ position:'absolute', inset:0, background:'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.85) 100%)' }} />
 
         {/* TOP BAR */}
-        <header style={{ position:'absolute', top:0, left:0, right:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 28px', zIndex:20 }}>
+        <header style={{ position:'absolute', top:0, left:0, right:0, display:'flex', alignItems:'flex-start', justifyContent:'space-between', padding:'12px 20px't:'space-between', padding:'20px 28px', zIndex:20 }}>
           <div style={{ fontSize:20, fontWeight:700, letterSpacing:2, color:'#fff' }}>
             Soccer<span style={{ color:'#22c55e' }}>関東</span>
             <p style={{ fontSize:10, color:"rgba(255,255,255,0.55)", marginTop:4, lineHeight:1.7 }}>サッカーを、もっと楽しく。<br/>関東のチーム・選手・家族をつなぐプラットフォーム。<br/>登録無料。今すぐチームを探してみよう。</p>
