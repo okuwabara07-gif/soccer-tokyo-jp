@@ -65,11 +65,11 @@ export default function HomePage() {
             東京のサッカーを、<br/>もっと身近に。
           </h1>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"10px", maxWidth:"560px" }}>
-            <Link href="/teams" style={{ background:"#16a34a", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center" }}>チームを探す</Link>
-            <Link href="/body-check" style={{ background:"#0057b8", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center" }}>体格診断</Link>
-            <Link href="/mypage" style={{ background:"#475569", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center", gridColumn:"3", gridRow:"1 / 3" }}>マイページ</Link>
-            <Link href="/calendar" style={{ background:"#7c3aed", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center" }}>カレンダー</Link>
-            <Link href="/foot-camera" style={{ background:"#0891b2", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center" }}>AI足型診断</Link>
+            <Link href="/teams" style={{ background:"#16a34a", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:"clamp(16px,2.5vw,22px)", fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center" }}>チームを探す</Link>
+            <Link href="/body-check" style={{ background:"#0057b8", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:"clamp(16px,2.5vw,22px)", fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center" }}>体格診断</Link>
+            <Link href="/mypage" style={{ background:"#475569", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:"clamp(16px,2.5vw,22px)", fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center", gridColumn:"3", gridRow:"1 / 3" }}>マイページ</Link>
+            <Link href="/calendar" style={{ background:"#7c3aed", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:"clamp(16px,2.5vw,22px)", fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center" }}>カレンダー</Link>
+            <Link href="/foot-camera" style={{ background:"#0891b2", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:"clamp(16px,2.5vw,22px)", fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center" }}>AI足型診断</Link>
           </div>
         </div>
       </section>
