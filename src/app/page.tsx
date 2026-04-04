@@ -65,10 +65,15 @@ export default function HomePage() {
           <h1 style={{ fontSize:'clamp(40px,9vw,90px)', fontWeight:900, lineHeight:0.95, letterSpacing:-2, marginBottom:24, textShadow:'0 4px 32px rgba(0,0,0,0.6)' }}>
             東京のサッカーを、<br/>もっと身近に。
           </h1>
-          <div style={{ display:'flex', gap:12, flexWrap:'nowrap', alignItems:'center', overflowX:'auto' }}>
-            <Link href="/teams" style={{ background:'#16a34a', color:'#fff', padding:'13px 32px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', letterSpacing:0.5 }}>チームを探す</Link>
-            <Link href="/body-check" style={{ background:'rgba(255,255,255,0.12)', color:'#fff', border:'1px solid rgba(255,255,255,0.4)', padding:'13px 32px', borderRadius:2, fontSize:14, textDecoration:'none', backdropFilter:'blur(6px)' }}>体格診断を試す</Link>
-            {NAV.map(n => (<Link key={n.href} href={n.href} style={{ color:'rgba(255,255,255,0.7)', padding:'13px 20px', borderRadius:2, fontSize:13, fontWeight:500, textDecoration:'none', whiteSpace:'nowrap', background:'rgba(255,255,255,0.08)' }} onMouseEnter={e=>{(e.currentTarget as HTMLAnchorElement).style.background='rgba(255,255,255,0.15)'}} onMouseLeave={e=>{(e.currentTarget as HTMLAnchorElement).style.background='rgba(255,255,255,0.08)'}}>{n.label}</Link>))}
+          <div style={{ display:'flex', gap:10, flexWrap:'wrap', alignItems:'center' }}>
+            <Link href="/teams" style={{ background:'#16a34a', padding:'13px 24px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', whiteSpace:'nowrap' }}>チームを探す</Link>
+            <Link href="/body-check" style={{ background:'#0057b8', padding:'13px 24px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', whiteSpace:'nowrap' }}>体格診断</Link>
+            <Link href="/calendar" style={{ background:'#7c3aed', padding:'13px 24px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', whiteSpace:'nowrap' }}>カレンダー</Link>
+            <Link href="/nutrition" style={{ background:'#ea580c', padding:'13px 24px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', whiteSpace:'nowrap' }}>栄養管理</Link>
+            <Link href="/shoes" style={{ background:'#dc2626', padding:'13px 24px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', whiteSpace:'nowrap' }}>シューズ</Link>
+            <Link href="/foot-camera" style={{ background:'#0891b2', padding:'13px 24px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', whiteSpace:'nowrap' }}>AI足型診断</Link>
+            <Link href="/member" style={{ background:'#b45309', padding:'13px 24px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', whiteSpace:'nowrap' }}>会員登録</Link>
+            <Link href="/mypage" style={{ background:'#475569', padding:'13px 24px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', color:'#fff', whiteSpace:'nowrap' }}>マイページ</Link>
           </div>
         </div>
       </section>
