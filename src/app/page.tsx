@@ -48,7 +48,8 @@ export default function HomePage() {
         {/* TOP BAR */}
         <header style={{ position:'absolute', top:0, left:0, right:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 28px', zIndex:20 }}>
           <div style={{ fontSize:20, fontWeight:700, letterSpacing:2, color:'#fff' }}>
-            SOCCER<span style={{ color:'#22c55e' }}>TOKYO</span>
+            Soccer<span style={{ color:'#22c55e' }}>関東</span>
+            <p style={{ fontSize:10, color:"rgba(255,255,255,0.55)", marginTop:4, lineHeight:1.7 }}>サッカーを、もっと楽しく。<br/>関東のチーム・選手・家族をつなぐプラットフォーム。<br/>登録無料。今すぐチームを探してみよう。</p>
           </div>
           <Link href="/member" style={{ color:'#fff', border:'1px solid rgba(255,255,255,0.5)', padding:'8px 20px', borderRadius:2, fontSize:12, letterSpacing:1, textDecoration:'none', backdropFilter:'blur(6px)', background:'rgba(0,0,0,0.2)' }}>
             会員登録
