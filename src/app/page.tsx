@@ -41,7 +41,7 @@ export default function HomePage() {
     <div style={{ fontFamily:"'Noto Sans JP',sans-serif", background:'#0a0a0a', color:'#fff', overflowX:'hidden' }}>
 
       {/* ======= HERO ======= */}
-      <section style={{ position:'relative', height:'100svh', minHeight:640, overflow:'hidden' }}>
+      <section style={{ position:'relative', height:'50vh', minHeight:300, overflow:'hidden' }}>
         {/* パララックス背景: 試合写真 */}
         <div style={{ position:'absolute', inset:'-10%', ...parallax(0.3) }}>
           <img src={IMG_MATCH} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top' }} />
