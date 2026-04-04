@@ -41,7 +41,7 @@ export default function HomePage() {
     <div style={{ fontFamily:"'Noto Sans JP',sans-serif", background:'#0a0a0a', color:'#fff', overflowX:'hidden' }}>
 
       {/* ======= HERO ======= */}
-      <section style={{ position:'relative', height:'50vh', minHeight:300, overflow:'hidden' }}>
+      <section style={{ position:'relative', height:'100svh', minHeight:640, overflow:'hidden' }}>
         {/* パララックス背景: 試合写真 */}
         <div style={{ position:'absolute', inset:'-10%', ...parallax(0.3) }}>
           <img src={IMG_MATCH} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top' }} />
@@ -59,67 +59,17 @@ export default function HomePage() {
         </header>
 
         {/* HERO COPY */}
-        <div style={{ position:'absolute', bottom:'8%', left:0, right:0, padding:'0 16px', zIndex:10 }}>
+        <div style={{ position:'absolute', bottom:'8%', left:0, right:0, padding:'0 28px', zIndex:10 }}>
           <p style={{ color:'rgba(255,255,255,0.6)', fontSize:11, letterSpacing:5, marginBottom:12, textTransform:'uppercase' }}>TOKYO &amp; KANTO FOOTBALL DATABASE</p>
-          <h1 style={{ fontSize:'clamp(32px,8vw,90px)', fontWeight:900, lineHeight:0.95, letterSpacing:-2, marginBottom:24, textShadow:'0 4px 32px rgba(0,0,0,0.6)' }}>
-            東京のサッカーを、<br/>もっと身近に。
+          <h1 style={{ fontSize:'clamp(40px,9vw,90px)', fontWeight:900, lineHeight:0.95, letterSpacing:-2, marginBottom:24, textShadow:'0 4px 32px rgba(0,0,0,0.6)' }}>
             東京のサッカーを、<br/>もっと身近に。
           </h1>
-      </section>
-      <div style={{ background:"#0a0a0a", padding:"24px 16px" }}>
-          
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))", gap:"10px", width:"100%", maxWidth:"1200px" }}>
-            <a href="/teams" style={{ textDecoration:"none" }}>
-              <div style={{ background:"#16a34a", borderRadius:12, padding:"16px 12px", display:"flex", flexDirection:"column", gap:"6px" }}>
-                <span style={{ background:"#fff8e1", color:"#f9a825", fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:20, width:"fit-content" }}>一部会員限定</span>
-                <div style={{ fontWeight:800, fontSize:15, color:"#fff" }}>1 チームを探す</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,0.8)", lineHeight:1.5 }}>関東698チーム。地図・エリア・カテゴリーで検索</div>
-              </div>
-            </a>
-            <a href="/body-check" style={{ textDecoration:"none" }}>
-              <div style={{ background:"#0057b8", borderRadius:12, padding:"16px 12px", display:"flex", flexDirection:"column", gap:"6px" }}>
-                <span style={{ background:"#e8f5e9", color:"#43a047", fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:20, width:"fit-content" }}>無料</span>
-                <div style={{ fontWeight:800, fontSize:15, color:"#fff" }}>2 体格診断</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,0.8)", lineHeight:1.5 }}>年齢・身長・体重でBMI測定。成長をサポート</div>
-              </div>
-            </a>
-            <a href="/calendar" style={{ textDecoration:"none" }}>
-              <div style={{ background:"#7c3aed", borderRadius:12, padding:"16px 12px", display:"flex", flexDirection:"column", gap:"6px" }}>
-                <span style={{ background:"#fff8e1", color:"#f9a825", fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:20, width:"fit-content" }}>一部会員限定</span>
-                <div style={{ fontWeight:800, fontSize:15, color:"#fff" }}>3 カレンダー</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,0.8)", lineHeight:1.5 }}>セレクション・体験日・試合スケジュールを管理</div>
-              </div>
-            </a>
-            <a href="/foot-camera" style={{ textDecoration:"none" }}>
-              <div style={{ background:"#0891b2", borderRadius:12, padding:"16px 12px", display:"flex", flexDirection:"column", gap:"6px" }}>
-                <span style={{ background:"#e0f7fa", color:"#00897b", fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:20, width:"fit-content" }}>AI機能</span>
-                <div style={{ fontWeight:800, fontSize:15, color:"#fff" }}>4 AI足型診断</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,0.8)", lineHeight:1.5 }}>AIが足の形状から最適シューズを提案</div>
-              </div>
-            </a>
-            <a href="/rules" style={{ textDecoration:"none" }}>
-              <div style={{ background:"#dc2626", borderRadius:12, padding:"16px 12px", display:"flex", flexDirection:"column", gap:"6px" }}>
-                <span style={{ background:"#e8f5e9", color:"#43a047", fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:20, width:"fit-content" }}>無料</span>
-                <div style={{ fontWeight:800, fontSize:15, color:"#fff" }}>5 ルール＆戦術</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,0.8)", lineHeight:1.5 }}>最新ルール変更・ポジション別の動き方ガイド</div>
-              </div>
-            </a>
-            <a href="/wear" style={{ textDecoration:"none" }}>
-              <div style={{ background:"#be185d", borderRadius:12, padding:"16px 12px", display:"flex", flexDirection:"column", gap:"6px" }}>
-                <span style={{ background:"#e8f5e9", color:"#43a047", fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:20, width:"fit-content" }}>無料</span>
-                <div style={{ fontWeight:800, fontSize:15, color:"#fff" }}>6 ウェア管理</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,0.8)", lineHeight:1.5 }}>季節に応じたサポートアイテムをご提案</div>
-              </div>
-            </a>
-            <a href="/mypage" style={{ textDecoration:"none" }}>
-              <div style={{ background:"#475569", borderRadius:12, padding:"16px 12px", display:"flex", flexDirection:"column", gap:"6px" }}>
-                <span style={{ background:"#fce4ec", color:"#d81b60", fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:20, width:"fit-content" }}>会員限定</span>
-                <div style={{ fontWeight:800, fontSize:15, color:"#fff" }}>7 マイページ</div>
-                <div style={{ fontSize:11, color:"rgba(255,255,255,0.8)", lineHeight:1.5 }}>お気に入りチーム・診断結果・予定を保存</div>
-              </div>
-            </a>
+          <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
+            <Link href="/teams" style={{ background:'#16a34a', color:'#fff', padding:'13px 32px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', letterSpacing:0.5 }}>チームを探す</Link>
+            <Link href="/body-check" style={{ background:'rgba(255,255,255,0.12)', color:'#fff', border:'1px solid rgba(255,255,255,0.4)', padding:'13px 32px', borderRadius:2, fontSize:14, textDecoration:'none', backdropFilter:'blur(6px)' }}>体格診断を試す</Link>
           </div>
-      </div>
+        </div>
+      </section>
 
       {/* ======= NAV (ヒーロー下) ======= */}
       <nav style={{ background:'#111', borderBottom:'1px solid rgba(255,255,255,0.08)', overflowX:'auto', WebkitOverflowScrolling:'touch' }}>
@@ -252,7 +202,7 @@ export default function HomePage() {
             { src:IMG_FAMILY2,   pos:'right center',h:'55vh', caption:'家族の絆' },
             { src:IMG_MATCH,     pos:'left 30%',    h:'55vh', caption:'ゴールへ' },
           ].map((p,i) => (
-            <div key={i} style={{ position:'relative', width:'clamp(180px,30vw,320px)', height:p.h, overflow:'hidden', borderRadius:2, scrollSnapAlign:'start' }}>
+            <div key={i} style={{ position:'relative', flexShrink:0, width:'clamp(180px,30vw,320px)', height:p.h, overflow:'hidden', borderRadius:2, scrollSnapAlign:'start' }}>
               <img src={p.src} alt={p.caption} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:p.pos }} />
               <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)' }} />
               <p style={{ position:'absolute', bottom:14, left:14, fontSize:13, fontWeight:600 }}>{p.caption}</p>
