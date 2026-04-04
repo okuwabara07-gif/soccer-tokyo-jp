@@ -63,6 +63,9 @@ export default function HomePage() {
           <p style={{ color:'rgba(255,255,255,0.6)', fontSize:11, letterSpacing:5, marginBottom:12, textTransform:'uppercase' }}>TOKYO &amp; KANTO FOOTBALL DATABASE</p>
           <h1 style={{ fontSize:'clamp(32px,8vw,90px)', fontWeight:900, lineHeight:0.95, letterSpacing:-2, marginBottom:24, textShadow:'0 4px 32px rgba(0,0,0,0.6)' }}>
             東京のサッカーを、<br/>もっと身近に。
+        </div>
+      </section>
+      <div style={{ background:"#0a0a0a", padding:"24px 16px" }}>
           </h1>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))", gap:"10px", width:"100%", maxWidth:"1200px" }}>
             <a href="/teams" style={{ textDecoration:"none" }}>
@@ -115,8 +118,7 @@ export default function HomePage() {
               </div>
             </a>
           </div>
-        </div>
-      </section>
+      </div>
 
       {/* ======= NAV (ヒーロー下) ======= */}
       <nav style={{ background:'#111', borderBottom:'1px solid rgba(255,255,255,0.08)', overflowX:'auto', WebkitOverflowScrolling:'touch' }}>
