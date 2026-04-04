@@ -83,21 +83,26 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* ======= STATS ======= */}
       <section style={{ background:'#111', borderBottom:'1px solid rgba(255,255,255,0.08)', padding:'28px 16px' }}>
-        <div style={{ maxWidth:960, margin:'0 auto', display:'flex', justifyContent:'space-around', flexWrap:'wrap', gap:20 }}>
-          {[
-            { n: counts.total||698,  label:'登録チーム', unit:'チーム' },
-            { n: 23,                 label:'対応エリア', unit:'区市町村' },
-            { n: 4,                  label:'カテゴリー', unit:'種別' },
-          ].map((s,i) => (
-            <div key={i} style={{ textAlign:'center' }}>
-              <div style={{ fontSize:'clamp(32px,6vw,52px)', fontWeight:900, color:'#fff', lineHeight:1 }}>
-                {s.n.toLocaleString()}<span style={{ fontSize:14, color:'#666', marginLeft:4 }}>{s.unit}</span>
-              </div>
-              <div style={{ fontSize:12, color:'#555', marginTop:4, letterSpacing:1 }}>{s.label}</div>
-            </div>
-          ))}
+        <div style={{ maxWidth:960, margin:'0 auto' }}>
+          <div style={{ display:'flex', alignItems:'baseline', gap:8, marginBottom:12 }}>
+            <span style={{ fontSize:'clamp(32px,6vw,52px)', fontWeight:900, color:'#fff' }}>{counts.total||698}</span>
+            <span style={{ fontSize:14, color:'#666', marginLeft:4 }}>チーム</span>
+            <span style={{ fontSize:14, color:'#555', marginLeft:12 }}>登録チーム</span>
+          </div>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:'6px 20px' }}>
+            {[
+              { pref:'東京都',   count:350 },
+              { pref:'神奈川県', count:180 },
+              { pref:'埼玉県',   count:100 },
+              { pref:'千葉県',   count:68  },
+            ].map((p,i) => (
+              <span key={i} style={{ fontSize:13, color:'#888' }}>
+                <span style={{ color:'#22c55e', marginRight:4 }}>▪</span>
+                {p.pref} <span style={{ color:'#fff', fontWeight:700 }}>{p.count}</span>チーム
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 
