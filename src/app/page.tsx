@@ -64,9 +64,63 @@ export default function HomePage() {
           <h1 style={{ fontSize:'clamp(40px,9vw,90px)', fontWeight:900, lineHeight:0.95, letterSpacing:-2, marginBottom:24, textShadow:'0 4px 32px rgba(0,0,0,0.6)' }}>
             東京のサッカーを、<br/>もっと身近に。
           </h1>
-          <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
-            <Link href="/teams" style={{ background:'#16a34a', color:'#fff', padding:'13px 32px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', letterSpacing:0.5 }}>チームを探す</Link>
-            <Link href="/body-check" style={{ background:'rgba(255,255,255,0.12)', color:'#fff', border:'1px solid rgba(255,255,255,0.4)', padding:'13px 32px', borderRadius:2, fontSize:14, textDecoration:'none', backdropFilter:'blur(6px)' }}>体格診断を試す</Link>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(170px,1fr))", gap:"14px", maxWidth:"1300px", width:"100%" }}>
+            <a href="/teams" style={{ textDecoration:"none", color:"#333" }}>
+              <div style={{ background:"#fff", borderRadius:16, padding:"14px", boxShadow:"0 2px 10px rgba(0,0,0,0.08)", border:"1px solid #eee" }}>
+                <div style={{ marginBottom:"8px" }}><span style={{ background:"#fff8e1", color:"#f9a825", fontSize:10, fontWeight:700, padding:"3px 8px", borderRadius:20 }}>一部会員限定</span></div>
+                <div style={{ background:"#ffebee", borderRadius:10, padding:"8px", marginBottom:"8px", display:"flex", justifyContent:"center", alignItems:"center", height:"75px" }}><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="25" r="12" stroke="#333" strokeWidth="2"/><path d="M10 65c0-11 9-20 20-20s20 9 20 20" stroke="#333" strokeWidth="2"/><circle cx="58" cy="35" r="8" stroke="#e53935" strokeWidth="2"/><path d="M58 27v8l5 5" stroke="#e53935" strokeWidth="2" strokeLinecap="round"/></svg></div>
+                <div style={{ fontWeight:800, fontSize:13, marginBottom:3, color:"#1a1a2e" }}>チームを探す</div>
+                <div style={{ fontSize:10, color:"#888", lineHeight:1.5 }}>関東698チーム。地図・エリア・カテゴリーで検索</div>
+              </div>
+            </a>
+            <a href="/body-check" style={{ textDecoration:"none", color:"#333" }}>
+              <div style={{ background:"#fff", borderRadius:16, padding:"14px", boxShadow:"0 2px 10px rgba(0,0,0,0.08)", border:"1px solid #eee" }}>
+                <div style={{ marginBottom:"8px" }}><span style={{ background:"#e8f5e9", color:"#43a047", fontSize:10, fontWeight:700, padding:"3px 8px", borderRadius:20 }}>無料</span></div>
+                <div style={{ background:"#e3f2fd", borderRadius:10, padding:"8px", marginBottom:"8px", display:"flex", justifyContent:"center", alignItems:"center", height:"75px" }}><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="18" r="10" stroke="#1e88e5" strokeWidth="2"/><line x1="40" y1="28" x2="40" y2="55" stroke="#333" strokeWidth="2"/><line x1="25" y1="40" x2="55" y2="40" stroke="#333" strokeWidth="2"/><line x1="40" y1="55" x2="30" y2="70" stroke="#333" strokeWidth="2"/><line x1="40" y1="55" x2="50" y2="70" stroke="#333" strokeWidth="2"/></svg></div>
+                <div style={{ fontWeight:800, fontSize:13, marginBottom:3, color:"#1a1a2e" }}>体格診断</div>
+                <div style={{ fontSize:10, color:"#888", lineHeight:1.5 }}>年齢・身長・体重でBMI測定。成長をサポート</div>
+              </div>
+            </a>
+            <a href="/calendar" style={{ textDecoration:"none", color:"#333" }}>
+              <div style={{ background:"#fff", borderRadius:16, padding:"14px", boxShadow:"0 2px 10px rgba(0,0,0,0.08)", border:"1px solid #eee" }}>
+                <div style={{ marginBottom:"8px" }}><span style={{ background:"#fff8e1", color:"#f9a825", fontSize:10, fontWeight:700, padding:"3px 8px", borderRadius:20 }}>一部会員限定</span></div>
+                <div style={{ background:"#f3e5f5", borderRadius:10, padding:"8px", marginBottom:"8px", display:"flex", justifyContent:"center", alignItems:"center", height:"75px" }}><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="18" width="60" height="52" rx="6" stroke="#8e24aa" strokeWidth="2"/><line x1="10" y1="32" x2="70" y2="32" stroke="#8e24aa" strokeWidth="2"/><line x1="26" y1="10" x2="26" y2="24" stroke="#333" strokeWidth="2"/><line x1="54" y1="10" x2="54" y2="24" stroke="#333" strokeWidth="2"/><circle cx="26" cy="46" r="4" fill="#f06292"/><circle cx="40" cy="46" r="4" fill="#8e24aa"/></svg></div>
+                <div style={{ fontWeight:800, fontSize:13, marginBottom:3, color:"#1a1a2e" }}>カレンダー</div>
+                <div style={{ fontSize:10, color:"#888", lineHeight:1.5 }}>セレクション・体験日・試合スケジュールを管理</div>
+              </div>
+            </a>
+            <a href="/foot-camera" style={{ textDecoration:"none", color:"#333" }}>
+              <div style={{ background:"#fff", borderRadius:16, padding:"14px", boxShadow:"0 2px 10px rgba(0,0,0,0.08)", border:"1px solid #eee" }}>
+                <div style={{ marginBottom:"8px" }}><span style={{ background:"#e0f7fa", color:"#00897b", fontSize:10, fontWeight:700, padding:"3px 8px", borderRadius:20 }}>AI機能</span></div>
+                <div style={{ background:"#e0f7fa", borderRadius:10, padding:"8px", marginBottom:"8px", display:"flex", justifyContent:"center", alignItems:"center", height:"75px" }}><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="38" cy="50" rx="20" ry="25" stroke="#00897b" strokeWidth="2" transform="rotate(-10 38 50)"/><circle cx="62" cy="22" r="12" fill="#e0f7fa" stroke="#00897b" strokeWidth="1.5"/><text x="62" y="26" textAnchor="middle" fontSize="9" fill="#00897b" fontWeight="bold">AI</text></svg></div>
+                <div style={{ fontWeight:800, fontSize:13, marginBottom:3, color:"#1a1a2e" }}>AI足型診断</div>
+                <div style={{ fontSize:10, color:"#888", lineHeight:1.5 }}>AIが足の形状から最適シューズを提案</div>
+              </div>
+            </a>
+            <a href="/rules" style={{ textDecoration:"none", color:"#333" }}>
+              <div style={{ background:"#fff", borderRadius:16, padding:"14px", boxShadow:"0 2px 10px rgba(0,0,0,0.08)", border:"1px solid #eee" }}>
+                <div style={{ marginBottom:"8px" }}><span style={{ background:"#e8f5e9", color:"#43a047", fontSize:10, fontWeight:700, padding:"3px 8px", borderRadius:20 }}>無料</span></div>
+                <div style={{ background:"#fff8e1", borderRadius:10, padding:"8px", marginBottom:"8px", display:"flex", justifyContent:"center", alignItems:"center", height:"75px" }}><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="8" width="40" height="55" rx="4" stroke="#f9a825" strokeWidth="2"/><line x1="16" y1="22" x2="40" y2="22" stroke="#333" strokeWidth="1.5"/><line x1="16" y1="32" x2="40" y2="32" stroke="#333" strokeWidth="1.5"/><circle cx="60" cy="55" r="18" fill="#fff8e1" stroke="#f9a825" strokeWidth="1.5"/><path d="M51 55 L58 62 L69 45" stroke="#f9a825" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                <div style={{ fontWeight:800, fontSize:13, marginBottom:3, color:"#1a1a2e" }}>ルール＆戦術</div>
+                <div style={{ fontSize:10, color:"#888", lineHeight:1.5 }}>最新ルール変更・ポジション別の動き方ガイド</div>
+              </div>
+            </a>
+            <a href="/wear" style={{ textDecoration:"none", color:"#333" }}>
+              <div style={{ background:"#fff", borderRadius:16, padding:"14px", boxShadow:"0 2px 10px rgba(0,0,0,0.08)", border:"1px solid #eee" }}>
+                <div style={{ marginBottom:"8px" }}><span style={{ background:"#e8f5e9", color:"#43a047", fontSize:10, fontWeight:700, padding:"3px 8px", borderRadius:20 }}>無料</span></div>
+                <div style={{ background:"#fce4ec", borderRadius:10, padding:"8px", marginBottom:"8px", display:"flex", justifyContent:"center", alignItems:"center", height:"75px" }}><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M28 12 L15 30 L26 33 L26 68 L54 68 L54 33 L65 30 L52 12 Q44 22 40 22 Q36 22 28 12Z" stroke="#d81b60" strokeWidth="2" fill="none"/><circle cx="40" cy="38" r="3" fill="#f06292"/></svg></div>
+                <div style={{ fontWeight:800, fontSize:13, marginBottom:3, color:"#1a1a2e" }}>ウェア管理</div>
+                <div style={{ fontSize:10, color:"#888", lineHeight:1.5 }}>季節に応じたサポートアイテムをご提案</div>
+              </div>
+            </a>
+            <a href="/mypage" style={{ textDecoration:"none", color:"#333" }}>
+              <div style={{ background:"#fff", borderRadius:16, padding:"14px", boxShadow:"0 2px 10px rgba(0,0,0,0.08)", border:"1px solid #eee" }}>
+                <div style={{ marginBottom:"8px" }}><span style={{ background:"#fce4ec", color:"#d81b60", fontSize:10, fontWeight:700, padding:"3px 8px", borderRadius:20 }}>会員限定</span></div>
+                <div style={{ background:"#e8f5e9", borderRadius:10, padding:"8px", marginBottom:"8px", display:"flex", justifyContent:"center", alignItems:"center", height:"75px" }}><svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="25" r="14" stroke="#43a047" strokeWidth="2"/><path d="M14 72c0-14 12-26 26-26s26 12 26 26" stroke="#43a047" strokeWidth="2"/><path d="M30 60 L38 68 L52 52" stroke="#43a047" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                <div style={{ fontWeight:800, fontSize:13, marginBottom:3, color:"#1a1a2e" }}>マイページ</div>
+                <div style={{ fontSize:10, color:"#888", lineHeight:1.5 }}>お気に入りチーム・診断結果・予定を保存</div>
+              </div>
+            </a>
           </div>
         </div>
       </section>
