@@ -65,24 +65,13 @@ export default function HomePage() {
           <h1 style={{ fontSize:'clamp(40px,9vw,90px)', fontWeight:900, lineHeight:0.95, letterSpacing:-2, marginBottom:24, textShadow:'0 4px 32px rgba(0,0,0,0.6)' }}>
             東京のサッカーを、<br/>もっと身近に。
           </h1>
-          <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
+          <div style={{ display:'flex', gap:12, flexWrap:'nowrap', alignItems:'center', overflowX:'auto' }}>
             <Link href="/teams" style={{ background:'#16a34a', color:'#fff', padding:'13px 32px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', letterSpacing:0.5 }}>チームを探す</Link>
             <Link href="/body-check" style={{ background:'rgba(255,255,255,0.12)', color:'#fff', border:'1px solid rgba(255,255,255,0.4)', padding:'13px 32px', borderRadius:2, fontSize:14, textDecoration:'none', backdropFilter:'blur(6px)' }}>体格診断を試す</Link>
+            {NAV.map(n => (<Link key={n.href} href={n.href} style={{ color:'rgba(255,255,255,0.7)', padding:'13px 20px', borderRadius:2, fontSize:13, fontWeight:500, textDecoration:'none', whiteSpace:'nowrap', background:'rgba(255,255,255,0.08)' }} onMouseEnter={e=>{(e.currentTarget as HTMLAnchorElement).style.background='rgba(255,255,255,0.15)'}} onMouseLeave={e=>{(e.currentTarget as HTMLAnchorElement).style.background='rgba(255,255,255,0.08)'}}>{n.label}</Link>))}
           </div>
         </div>
       </section>
-
-      {/* ======= NAV (ヒーロー下) ======= */}
-      <nav style={{ background:'#111', borderBottom:'1px solid rgba(255,255,255,0.08)', overflowX:'auto', WebkitOverflowScrolling:'touch' }}>
-        <div style={{ display:'flex', minWidth:'max-content', maxWidth:960, margin:'0 auto', padding:'0 8px' }}>
-          {NAV.map(n => (
-            <Link key={n.href} href={n.href} style={{ color:'rgba(255,255,255,0.6)', padding:'15px 18px', fontSize:13, letterSpacing:0.5, textDecoration:'none', whiteSpace:'nowrap', display:'block', borderBottom:'2px solid transparent', transition:'all 0.2s' }}
-              onMouseEnter={e=>{ const el=e.currentTarget as HTMLAnchorElement; el.style.color='#22c55e'; el.style.borderBottomColor='#22c55e'; }}
-              onMouseLeave={e=>{ const el=e.currentTarget as HTMLAnchorElement; el.style.color='rgba(255,255,255,0.6)'; el.style.borderBottomColor='transparent'; }}
-            >{n.label}</Link>
-          ))}
-        </div>
-      </nav>
 
       {/* ======= STATS ======= */}
       <section style={{ background:'#111', borderBottom:'1px solid rgba(255,255,255,0.08)', padding:'28px 16px' }}>
