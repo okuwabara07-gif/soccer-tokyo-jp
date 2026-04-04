@@ -117,6 +117,7 @@ export default function HomePage() {
           <p style={{ color:'#555', fontSize:14, lineHeight:1.8 }}>
             東京・関東698チームのリアルな記録。練習、試合、家族——サッカーを囲むすべての瞬間。
           </div>
+        </div>
           </p>
         </div>
       </section>
