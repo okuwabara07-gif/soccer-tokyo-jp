@@ -62,7 +62,7 @@ export default function HomePage() {
         <div style={{ position:'absolute', bottom:'8%', left:0, right:0, padding:'0 28px', zIndex:10 }}>
           <p style={{ color:'rgba(255,255,255,0.6)', fontSize:11, letterSpacing:5, marginBottom:12, textTransform:'uppercase' }}>TOKYO &amp; KANTO FOOTBALL DATABASE</p>
           <h1 style={{ fontSize:'clamp(40px,9vw,90px)', fontWeight:900, lineHeight:0.95, letterSpacing:-2, marginBottom:24, textShadow:'0 4px 32px rgba(0,0,0,0.6)' }}>
-            東京のサッカーを、<br/>もっと身近に。
+            チームを探す。<br/>仲間と出会う。<br/>成長する。
           </h1>
           <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
             <Link href="/teams" style={{ background:'#16a34a', color:'#fff', padding:'13px 32px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', letterSpacing:0.5 }}>チームを探す</Link>
