@@ -106,7 +106,9 @@ export default function HomePage() {
 
 
       {/* ======= PHOTO STORY ======= */}
-      <section style={{ background:'#0a0a0a', padding:'60px 16px' }}>
+      <section style={{ position:'relative', overflow:'hidden', background:'#0a0a0a', padding:'60px 16px' }}>
+        <img src={IMG_EQUIPMENT} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', opacity:0.2 }} />
+        <div style={{ position:'relative', zIndex:1 }}>
         <div style={{ maxWidth:960, margin:'0 auto' }}>
           <p style={{ fontSize:11, letterSpacing:5, color:'#555', marginBottom:10, textTransform:'uppercase' }}>Our Story</p>
           <h2 style={{ fontSize:'clamp(24px,4vw,38px)', fontWeight:900, marginBottom:8, color:'#fff' }}>
@@ -114,6 +116,7 @@ export default function HomePage() {
           </h2>
           <p style={{ color:'#555', fontSize:14, lineHeight:1.8 }}>
             東京・関東698チームのリアルな記録。練習、試合、家族——サッカーを囲むすべての瞬間。
+          </div>
           </p>
         </div>
       </section>
