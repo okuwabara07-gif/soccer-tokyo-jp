@@ -64,9 +64,12 @@ export default function HomePage() {
           <h1 style={{ fontSize:'clamp(40px,9vw,90px)', fontWeight:900, lineHeight:0.95, letterSpacing:-2, marginBottom:24, textShadow:'0 4px 32px rgba(0,0,0,0.6)' }}>
             東京のサッカーを、<br/>もっと身近に。
           </h1>
-          <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
-            <Link href="/teams" style={{ background:'#16a34a', color:'#fff', padding:'13px 32px', borderRadius:2, fontSize:14, fontWeight:700, textDecoration:'none', letterSpacing:0.5 }}>チームを探す</Link>
-            <Link href="/body-check" style={{ background:'rgba(255,255,255,0.12)', color:'#fff', border:'1px solid rgba(255,255,255,0.4)', padding:'13px 32px', borderRadius:2, fontSize:14, textDecoration:'none', backdropFilter:'blur(6px)' }}>体格診断を試す</Link>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"10px", maxWidth:"560px" }}>
+            <Link href="/teams" style={{ background:"#16a34a", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"block" }}>チームを探す</Link>
+            <Link href="/body-check" style={{ background:"#0057b8", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"block" }}>体格診断</Link>
+            <Link href="/mypage" style={{ background:"#475569", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"block", gridRow:"1 / 3" }}>マイページ</Link>
+            <Link href="/calendar" style={{ background:"#7c3aed", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"block" }}>カレンダー</Link>
+            <Link href="/foot-camera" style={{ background:"#0891b2", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"block" }}>AI足型診断</Link>
           </div>
         </div>
       </section>
