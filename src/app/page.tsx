@@ -44,7 +44,7 @@ export default function HomePage() {
       <section style={{ position:'relative', height:'100svh', minHeight:640, overflow:'hidden' }}>
         {/* パララックス背景: 試合写真 */}
         <div style={{ position:'absolute', inset:'-10%', ...parallax(0.3) }}>
-          <img src={IMG_MATCH} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top' }} />
+          <img src={IMG_MATCH} alt="" style={{ width:'100%', height:'100%', objectFit:'contain', background:'#111' }} />
         </div>
         <div style={{ position:'absolute', inset:0, background:'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.85) 100%)' }} />
 
