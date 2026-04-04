@@ -73,6 +73,7 @@ export default function HomePage() {
             <Link href="/wear" style={{ flex:"1", minWidth:"130px", background:"#be185d", color:"#fff", padding:"16px 10px", borderRadius:12, fontSize:"clamp(12px,1.3vw,15px)", fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", flexDirection:"column", alignItems:"center", gap:"6px" }}><span>ウェア管理</span><span style={{ fontSize:"10px", fontWeight:400, opacity:0.85, lineHeight:1.4 }}>季節に応じたサポートアイテムをご提案</span></Link>
             <Link href="/mypage" style={{ flex:"1", minWidth:"130px", background:"#475569", color:"#fff", padding:"16px 10px", borderRadius:12, fontSize:"clamp(12px,1.3vw,15px)", fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", flexDirection:"column", alignItems:"center", gap:"6px" }}><span>マイページ</span><span style={{ fontSize:"10px", fontWeight:400, opacity:0.85, lineHeight:1.4 }}>お気に入りチーム・診断結果・予定を保存</span></Link>
           </div>
+        </div>
       </section>
 
 
