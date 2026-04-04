@@ -71,12 +71,6 @@ export default function HomePage() {
             <Link href="/calendar" style={{ background:"#7c3aed", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center" }}>カレンダー</Link>
             <Link href="/foot-camera" style={{ background:"#0891b2", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"flex", alignItems:"center", justifyContent:"center" }}>AI足型診断</Link>
           </div>
-            <Link href="/teams" style={{ background:"#16a34a", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"block" }}>チームを探す</Link>
-            <Link href="/body-check" style={{ background:"#0057b8", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"block" }}>体格診断</Link>
-            <Link href="/mypage" style={{ background:"#475569", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"block", gridRow:"1 / 3" }}>マイページ</Link>
-            <Link href="/calendar" style={{ background:"#7c3aed", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"block" }}>カレンダー</Link>
-            <Link href="/foot-camera" style={{ background:"#0891b2", color:"#fff", padding:"18px 8px", borderRadius:8, fontSize:14, fontWeight:700, textDecoration:"none", textAlign:"center", display:"block" }}>AI足型診断</Link>
-          </div>
         </div>
       </section>
 
