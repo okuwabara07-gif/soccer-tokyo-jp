@@ -105,6 +105,11 @@ export default function TeamsPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+  const [isPremium, setIsPremium] = useState(false);
+  useEffect(() => {
+    const plan = localStorage.getItem('memberPlan');
+    setIsPremium(!!plan);
+  }, []);
   const [view, setView] = useState<"map"|"list">("map");
   const [teamCounts, setTeamCounts] = useState<Record<string,number>>({});
 
