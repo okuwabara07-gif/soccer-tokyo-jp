@@ -8,6 +8,8 @@ export default function FootCameraPage() {
   const [loading, setLoading] = useState(false)
   const [showGuide, setShowGuide] = useState(true)
   const [selectedBrand, setSelectedBrand] = useState<string|null>(null)
+  const [loadingStars, setLoadingStars] = useState<{x:number,y:number,size:number,delay:number}[]>([])
+  const [loadingMsg, setLoadingMsg] = useState(0)
   const fileRef = useRef<HTMLInputElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -19,9 +21,30 @@ export default function FootCameraPage() {
     reader.readAsDataURL(file)
   }
 
+  const LOADING_MSGS = [
+    '足の幅を計測中...', '甲の高さを解析中...', 'アーチを確認中...',
+    'つま先の形を分析中...', 'ブランドをマッチング中...', '選手データと照合中...',
+    'おすすめを選定中...', 'もうすぐ完了...✨'
+  ]
+
   const analyze = async () => {
     if (!image) return
     setLoading(true)
+    setLoadingMsg(0)
+    // 星をランダム生成
+    const stars = Array.from({length: 30}, () => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 16 + 8,
+      delay: Math.random() * 3
+    }))
+    setLoadingStars(stars)
+    // メッセージをローテーション
+    let msgIdx = 0
+    const msgTimer = setInterval(() => {
+      msgIdx = (msgIdx + 1) % LOADING_MSGS.length
+      setLoadingMsg(msgIdx)
+    }, 1800)
     try {
       const res = await fetch('/api/analyze-foot', {
         method: 'POST',
@@ -33,8 +56,11 @@ export default function FootCameraPage() {
       setSelectedBrand(data.recommend?.[0] || null)
     } catch {
       setResult({ error: '解析に失敗しました。' })
+    } finally {
+      clearInterval(msgTimer)
+      setLoading(false)
+      setLoadingStars([])
     }
-    setLoading(false)
   }
 
   const saveImage = async () => {
@@ -230,12 +256,50 @@ export default function FootCameraPage() {
             </>
           )}
 
-          {/* ローディング */}
+          {/* ローディング - 星アニメーション */}
           {loading && (
-            <div style={{background:'#111',borderRadius:12,padding:'28px',textAlign:'center',marginTop:12}}>
-              <div style={{fontSize:40,marginBottom:12}}>🦶</div>
-              <p style={{fontSize:13,color:'rgba(255,255,255,0.7)',marginBottom:4}}>AIが足型を分析中...</p>
-              <p style={{fontSize:11,color:'rgba(255,255,255,0.3)'}}>幅・甲・アーチ・つま先を計測しています</p>
+            <div style={{background:'#0a0a14',borderRadius:14,overflow:'hidden',marginTop:12,position:'relative',height:280}}>
+              {/* 星フィールド */}
+              <div style={{position:'absolute',inset:0}}>
+                {loadingStars.map((star,i)=>(
+                  <div key={i} style={{
+                    position:'absolute',
+                    left:`${star.x}%`,
+                    top:`${star.y}%`,
+                    fontSize:star.size,
+                    animation:`starPop 1.5s ease-in-out ${star.delay}s infinite`,
+                    opacity:0,
+                  }}>⭐</div>
+                ))}
+              </div>
+              {/* 中央コンテンツ */}
+              <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',zIndex:10}}>
+                <div style={{fontSize:52,marginBottom:16,animation:'pulse 1.5s ease-in-out infinite'}}>🦶</div>
+                <p style={{fontSize:14,color:'white',fontWeight:500,marginBottom:6}}>AIが足型を分析中</p>
+                <p style={{fontSize:11,color:'rgba(255,255,255,0.5)',marginBottom:20}}>{LOADING_MSGS[loadingMsg]}</p>
+                {/* プログレスドット */}
+                <div style={{display:'flex',gap:6}}>
+                  {[0,1,2,3,4].map(i=>(
+                    <div key={i} style={{
+                      width:6,height:6,borderRadius:'50%',
+                      background:i<=loadingMsg%5?'#FFD700':'rgba(255,255,255,0.15)',
+                      transition:'background 0.3s'
+                    }}/>
+                  ))}
+                </div>
+              </div>
+              <style>{`
+                @keyframes starPop {
+                  0%{opacity:0;transform:scale(0.3) rotate(0deg)}
+                  30%{opacity:1;transform:scale(1.2) rotate(20deg)}
+                  60%{opacity:0.8;transform:scale(1) rotate(-10deg)}
+                  100%{opacity:0;transform:scale(0.5) rotate(30deg)}
+                }
+                @keyframes pulse {
+                  0%,100%{transform:scale(1)}
+                  50%{transform:scale(1.15)}
+                }
+              `}</style>
             </div>
           )}
 
@@ -372,6 +436,28 @@ export default function FootCameraPage() {
                       ))}
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* 選手マッチング */}
+              {result.playerMatch && (
+                <div style={{background:'linear-gradient(135deg,#0a0a2e,#1a1a4e)',borderRadius:14,padding:'16px',border:'1px solid rgba(255,215,0,0.2)'}}>
+                  <p style={{fontSize:10,color:'rgba(255,215,0,0.7)',letterSpacing:'0.15em',marginBottom:12}}>⚽ あなたと同じ足型の選手</p>
+                  <p style={{fontSize:11,color:'rgba(255,255,255,0.5)',marginBottom:12,lineHeight:1.6}}>{result.playerMatch.description}</p>
+                  <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                    {result.playerMatch.players.map((player:any,i:number)=>(
+                      <div key={i} style={{display:'flex',alignItems:'center',gap:12,background:'rgba(255,255,255,0.05)',borderRadius:10,padding:'10px 12px'}}>
+                        <div style={{width:36,height:36,borderRadius:'50%',background:'rgba(255,215,0,0.15)',border:'1px solid rgba(255,215,0,0.3)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,flexShrink:0}}>
+                          {player.emoji}
+                        </div>
+                        <div style={{flex:1}}>
+                          <p style={{fontSize:13,fontWeight:700,color:'white',marginBottom:2}}>{player.name}</p>
+                          <p style={{fontSize:10,color:'rgba(255,255,255,0.4)'}}>{player.position} · {player.team}</p>
+                        </div>
+                        {i===0 && <span style={{fontSize:9,padding:'2px 8px',borderRadius:8,background:'rgba(255,215,0,0.2)',color:'#FFD700',fontWeight:600,flexShrink:0}}>最も近い</span>}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
