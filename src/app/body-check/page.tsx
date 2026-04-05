@@ -86,6 +86,8 @@ export default function BodyCheckPage() {
   const [weight, setWeight] = useState('')
   const [result, setResult] = useState<any>(null)
   const [tab, setTab] = useState<'result'|'growth'|'nutrition'|'position'>('result')
+  const [aiComment, setAiComment] = useState('')
+  const [aiLoading, setAiLoading] = useState(false)
 
   const diagnose = () => {
     const h = parseFloat(height), w = parseFloat(weight)
@@ -97,8 +99,19 @@ export default function BodyCheckPage() {
     const hDiff = h - avg.height
     const wDiff = w - avg.weight
     const players = PLAYER_HEIGHTS[grade] || []
-    setResult({ h, w, bmi: Math.round(bmi*10)/10, status, avg, hDiff: Math.round(hDiff*10)/10, wDiff: Math.round(wDiff*10)/10, nutrition, players, grade })
+    const r = { h, w, bmi: Math.round(bmi*10)/10, status, avg, hDiff: Math.round(hDiff*10)/10, wDiff: Math.round(wDiff*10)/10, nutrition, players, grade }
+    setResult(r)
     setTab('result')
+    // AIコメント取得
+    setAiLoading(true)
+    setAiComment('')
+    fetch('/api/body-advice', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(r)
+    }).then(res=>res.json()).then(data=>{
+      setAiComment(data.comment || '')
+    }).catch(()=>{}).finally(()=>setAiLoading(false))
   }
 
   const gradeIdx = result ? GRADES.indexOf(result.grade) : 0
@@ -190,6 +203,22 @@ export default function BodyCheckPage() {
                       <span style={{fontSize:12,color:'#888'}}>BMI: {result.bmi}</span>
                     </div>
                     <p style={{fontSize:11,color:'#555',lineHeight:1.7}}>{statusConfig[result.status as keyof typeof statusConfig].advice}</p>
+                  </div>
+
+                  {/* AIコメント */}
+                  <div style={{background:'#0a0a0a',borderRadius:12,padding:'14px',marginBottom:2}}>
+                    <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:8}}>
+                      <span style={{fontSize:16}}>🤖</span>
+                      <p style={{fontSize:10,color:'rgba(255,255,255,0.4)',letterSpacing:'0.1em'}}>AIコーチからのコメント</p>
+                    </div>
+                    {aiLoading ? (
+                      <div style={{display:'flex',gap:6,alignItems:'center'}}>
+                        <div style={{width:6,height:6,borderRadius:'50%',background:'#FFD700',animation:'pulse 1s infinite'}}/>
+                        <p style={{fontSize:11,color:'rgba(255,255,255,0.4)'}}>分析中...</p>
+                      </div>
+                    ) : aiComment ? (
+                      <p style={{fontSize:12,color:'rgba(255,255,255,0.8)',lineHeight:1.8,whiteSpace:'pre-wrap'}}>{aiComment}</p>
+                    ) : null}
                   </div>
 
                   {/* チャート：平均との比較 */}
