@@ -101,6 +101,11 @@ export default function BodyCheckPage() {
     const players = PLAYER_HEIGHTS[grade] || []
     const r = { h, w, bmi: Math.round(bmi*10)/10, status, avg, hDiff: Math.round(hDiff*10)/10, wDiff: Math.round(wDiff*10)/10, nutrition, players, grade }
     setResult(r)
+    // マイページ用に自動保存
+    localStorage.setItem('bodyDiagnosis', JSON.stringify({
+      ...r,
+      diagnosedAt: new Date().toISOString()
+    }))
     setTab('result')
     // AIコメント取得
     setAiLoading(true)
