@@ -71,6 +71,7 @@ const TIMING_ADVICE = [
     items:['バナナ1本またはエネルギーゼリー','水分200〜300ml','重いものは食べない']},
   {phase:'ハーフタイム',color:'#534AB7',bg:'#EEEDFE',icon:'⏰',
     title:'15分間の補給',
+    image:'https://images.unsplash.com/photo-1546483875-ad9014c88eba?w=600&q=80',
     items:['スポーツドリンク200ml','カットフルーツ・バナナ','アミノ酸サプリがあれば']},
   {phase:'試合直後',color:'#A32D2D',bg:'#FCEBEB',icon:'🔄',
     title:'ゴールデンタイム（30分以内）',
@@ -85,10 +86,17 @@ export default function NutritionPage() {
   return (
     <main style={{minHeight:'100vh',background:'#f8f8f6',fontFamily:'-apple-system,sans-serif'}}>
       <div style={{maxWidth:480,margin:'0 auto'}}>
-        <div style={{background:'#0a0a0a',padding:'20px 16px 16px'}}>
-          <Link href="/" style={{color:'rgba(255,255,255,0.4)',fontSize:12,textDecoration:'none',display:'block',marginBottom:8}}>← 戻る</Link>
-          <h1 style={{color:'white',fontSize:22,fontWeight:300,marginBottom:4}}>栄養・補助食品</h1>
-          <p style={{color:'rgba(255,255,255,0.4)',fontSize:11}}>ジュニアサッカー選手のための栄養完全ガイド</p>
+        {/* ヒーロー画像 */}
+        <div style={{position:'relative',height:180,overflow:'hidden'}}>
+          <img src="https://images.unsplash.com/photo-1596463059283-da257325bab8?w=800&q=80"
+            alt="ハーフタイムの栄養補給" style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:'center 40%'}}/>
+          <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,rgba(0,0,0,0.1),rgba(10,10,10,0.92))'}}>
+            <div style={{position:'absolute',bottom:16,left:16,right:16}}>
+              <Link href="/" style={{color:'rgba(255,255,255,0.5)',fontSize:12,textDecoration:'none',display:'block',marginBottom:6}}>← 戻る</Link>
+              <h1 style={{color:'white',fontSize:22,fontWeight:300,marginBottom:2}}>栄養・補助食品</h1>
+              <p style={{color:'rgba(255,255,255,0.5)',fontSize:11}}>ジュニアサッカー選手のための栄養完全ガイド</p>
+            </div>
+          </div>
         </div>
 
         {/* 体格診断へのCTA */}
@@ -120,21 +128,32 @@ export default function NutritionPage() {
               <p style={{fontSize:11,color:'#888',lineHeight:1.7,marginBottom:4}}>
                 「いつ何を食べるか」がパフォーマンスを大きく左右します。試合前後の栄養タイミングを覚えましょう。
               </p>
-              {TIMING_ADVICE.map(t=>(
-                <div key={t.phase} style={{background:t.bg,borderRadius:12,padding:'14px',border:`1px solid ${t.color}20`}}>
-                  <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:8}}>
-                    <span style={{fontSize:20}}>{t.icon}</span>
-                    <div>
-                      <p style={{fontSize:10,color:t.color,fontWeight:600,letterSpacing:'0.05em'}}>{t.phase}</p>
-                      <p style={{fontSize:13,fontWeight:700,color:'#1a1a1a'}}>{t.title}</p>
+              {TIMING_ADVICE.map((t:any)=>(
+                <div key={t.phase} style={{background:t.bg,borderRadius:12,overflow:'hidden',border:`1px solid ${t.color}20`}}>
+                  {t.image && (
+                    <div style={{position:'relative',height:120,overflow:'hidden'}}>
+                      <img src={t.image} alt={t.title} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+                      <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,transparent,rgba(0,0,0,0.4))'}}/>
+                      <div style={{position:'absolute',bottom:8,left:12}}>
+                        <span style={{fontSize:9,padding:'2px 8px',borderRadius:6,background:t.color,color:'white',fontWeight:600}}>{t.phase}</span>
+                      </div>
                     </div>
+                  )}
+                  <div style={{padding:'14px'}}>
+                    <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:8}}>
+                      <span style={{fontSize:20}}>{t.icon}</span>
+                      <div>
+                        {!t.image && <p style={{fontSize:10,color:t.color,fontWeight:600,letterSpacing:'0.05em'}}>{t.phase}</p>}
+                        <p style={{fontSize:13,fontWeight:700,color:'#1a1a1a'}}>{t.title}</p>
+                      </div>
+                    </div>
+                    {t.items.map((item:string,i:number)=>(
+                      <div key={i} style={{display:'flex',gap:6,marginBottom:4}}>
+                        <span style={{color:t.color,fontWeight:700,fontSize:12,flexShrink:0}}>✓</span>
+                        <p style={{fontSize:11,color:'#444',lineHeight:1.6}}>{item}</p>
+                      </div>
+                    ))}
                   </div>
-                  {t.items.map((item,i)=>(
-                    <div key={i} style={{display:'flex',gap:6,marginBottom:4}}>
-                      <span style={{color:t.color,fontWeight:700,fontSize:12,flexShrink:0}}>✓</span>
-                      <p style={{fontSize:11,color:'#444',lineHeight:1.6}}>{item}</p>
-                    </div>
-                  ))}
                 </div>
               ))}
               <a href={`https://www.amazon.co.jp/s?k=スポーツ栄養+ジュニア&tag=${AMAZON_TAG}`} target="_blank" rel="noopener noreferrer sponsored"
