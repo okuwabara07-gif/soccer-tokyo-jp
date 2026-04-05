@@ -3,6 +3,77 @@ import { NextRequest, NextResponse } from 'next/server'
 const AMAZON_TAG = 'haircolorab22-22'
 const RAKUTEN_ID = '5253b9ed.08f9d938.5253b9ee.e71aefe8'
 
+
+const PLAYER_DATABASE: Record<string, {
+  players: { name: string; nameEn: string; position: string; team: string; emoji: string }[];
+  description: string;
+}> = {
+  'wide_high': {
+    players: [
+      { name: '久保建英', nameEn: 'Takefusa Kubo', position: 'MF', team: 'レアル・ソシエダ', emoji: '🇯🇵' },
+      { name: '遠藤航', nameEn: 'Wataru Endo', position: 'MF', team: 'リバプール', emoji: '🇯🇵' },
+      { name: 'ロベルト・レバンドフスキ', nameEn: 'R.Lewandowski', position: 'FW', team: 'バルセロナ', emoji: '🇵🇱' },
+    ],
+    description: '幅広・甲高タイプはパワーとスタミナに優れ、ボランチやCFに多い足型です。'
+  },
+  'wide_low': {
+    players: [
+      { name: '南野拓実', nameEn: 'Takumi Minamino', position: 'FW', team: 'モナコ', emoji: '🇯🇵' },
+      { name: '鎌田大地', nameEn: 'Daichi Kamada', position: 'MF', team: 'クリスタルパレス', emoji: '🇯🇵' },
+      { name: 'サディオ・マネ', nameEn: 'Sadio Mane', position: 'FW', team: 'アル・ナスル', emoji: '🇸🇳' },
+    ],
+    description: '幅広・甲低タイプはバランスが良く、どんなポジションにも適応できます。'
+  },
+  'narrow_high': {
+    players: [
+      { name: '三笘薫', nameEn: 'Kaoru Mitoma', position: 'FW', team: 'ブライトン', emoji: '🇯🇵' },
+      { name: 'キリアン・エムバペ', nameEn: 'K.Mbappé', position: 'FW', team: 'レアル・マドリード', emoji: '🇫🇷' },
+      { name: 'ネイマール', nameEn: 'Neymar', position: 'FW', team: 'アル・ヒラル', emoji: '🇧🇷' },
+    ],
+    description: '細め・甲高タイプはスピードとドリブル技術に優れ、ウインガーに多い足型です。'
+  },
+  'narrow_low': {
+    players: [
+      { name: 'リオネル・メッシ', nameEn: 'Lionel Messi', position: 'FW', team: 'インテル・マイアミ', emoji: '🇦🇷' },
+      { name: '堂安律', nameEn: 'Ritsu Doan', position: 'MF', team: 'フライブルク', emoji: '🇯🇵' },
+      { name: 'フィル・フォーデン', nameEn: 'Phil Foden', position: 'MF', team: 'マンチェスターC', emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+    ],
+    description: '細め・甲低タイプは俊敏性とテクニックに優れ、テクニカルなMFに多い足型です。'
+  },
+  'normal_high': {
+    players: [
+      { name: '上田綺世', nameEn: 'Ayase Ueda', position: 'FW', team: 'フェイエノールト', emoji: '🇯🇵' },
+      { name: 'アーリング・ハーランド', nameEn: 'E.Haaland', position: 'FW', team: 'マンチェスターC', emoji: '🇳🇴' },
+      { name: 'ヴィニシウス・ジュニオール', nameEn: 'Vinicius Jr.', position: 'FW', team: 'レアル・マドリード', emoji: '🇧🇷' },
+    ],
+    description: '普通幅・甲高タイプはパワーとスピードのバランスが良く、CFやSBに多い足型です。'
+  },
+  'normal_low': {
+    players: [
+      { name: '伊東純也', nameEn: 'Junya Ito', position: 'MF', team: 'スタッド・ランス', emoji: '🇯🇵' },
+      { name: 'ルカ・モドリッチ', nameEn: 'Luka Modric', position: 'MF', team: 'レアル・マドリード', emoji: '🇭🇷' },
+      { name: 'ケビン・デ・ブライネ', nameEn: 'K.De Bruyne', position: 'MF', team: 'マンチェスターC', emoji: '🇧🇪' },
+    ],
+    description: '普通幅・甲低タイプは最もバランスの良い足型。どのポジションにも適しています。'
+  },
+}
+
+function matchPlayers(footType: string[]): any {
+  const isWide = footType.some(t => t.includes('幅広'))
+  const isNarrow = footType.some(t => t.includes('細め') || t.includes('ナロー'))
+  const isHigh = footType.some(t => t.includes('甲高'))
+  const isLow = footType.some(t => t.includes('甲低') || t.includes('普通'))
+
+  let key = 'normal_low'
+  if (isWide && isHigh) key = 'wide_high'
+  else if (isWide && isLow) key = 'wide_low'
+  else if (isNarrow && isHigh) key = 'narrow_high'
+  else if (isNarrow && isLow) key = 'narrow_low'
+  else if (isHigh) key = 'normal_high'
+
+  return PLAYER_DATABASE[key] || PLAYER_DATABASE['normal_low']
+}
+
 const BRAND_CATALOG: Record<string, {
   position: { x: number; y: number };
   color: string;
@@ -122,6 +193,8 @@ export async function POST(req: NextRequest) {
     const result = JSON.parse(text.replace(/```json|```/g, '').trim())
 
     // ブランドカタログを追加
+    // 選手マッチング
+    result.playerMatch = matchPlayers(result.footType || [])
     result.brandCatalog = Object.entries(BRAND_CATALOG).map(([name, info]) => ({
       name,
       position: info.position,
