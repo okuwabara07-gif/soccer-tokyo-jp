@@ -115,10 +115,17 @@ export default function BodyCheckPage() {
   return (
     <main style={{minHeight:'100vh',background:'#f8f8f6',fontFamily:'-apple-system,sans-serif'}}>
       <div style={{maxWidth:480,margin:'0 auto'}}>
-        <div style={{background:'#0a0a0a',padding:'20px 16px 16px'}}>
-          <Link href="/" style={{color:'rgba(255,255,255,0.4)',fontSize:12,textDecoration:'none',display:'block',marginBottom:8}}>← 戻る</Link>
-          <h1 style={{color:'white',fontSize:22,fontWeight:300,marginBottom:4}}>体格診断</h1>
-          <p style={{color:'rgba(255,255,255,0.4)',fontSize:11}}>全国平均比較・成長予測・栄養アドバイス</p>
+        {/* ヒーロー画像 */}
+        <div style={{position:'relative',height:180,overflow:'hidden'}}>
+          <img src="https://images.unsplash.com/photo-1551280857-2b9bbe52acf9?w=800&q=80"
+            alt="サッカー少年の体格測定" style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:'center 30%'}}/>
+          <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,rgba(0,0,0,0.2),rgba(10,10,10,0.9))'}}>
+            <div style={{position:'absolute',bottom:16,left:16,right:16}}>
+              <Link href="/" style={{color:'rgba(255,255,255,0.5)',fontSize:12,textDecoration:'none',display:'block',marginBottom:6}}>← 戻る</Link>
+              <h1 style={{color:'white',fontSize:22,fontWeight:300,marginBottom:2}}>体格診断</h1>
+              <p style={{color:'rgba(255,255,255,0.5)',fontSize:11}}>全国平均比較・成長予測・栄養アドバイス</p>
+            </div>
+          </div>
         </div>
 
         <div style={{padding:16}}>
