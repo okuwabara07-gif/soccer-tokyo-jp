@@ -254,6 +254,51 @@ export default function TeamsPage() {
         )}
       </div>
 
+
+      {/* アフィリエイトバナー */}
+      <div style={{ background:"#0a0f1e", padding:"24px 20px" }}>
+        <div style={{ maxWidth:"560px", margin:"0 auto" }}>
+          <div style={{ fontSize:"10px", color:"#7ab3ff", letterSpacing:"2px", marginBottom:"12px", textAlign:"center" }}>RECOMMENDED</div>
+          <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
+            <a href="https://px.a8.net/svt/ejp?a8mat=4AZR8U+GGEBOY+4NL2+601S1" target="_blank" rel="noopener noreferrer sponsored"
+              style={{ display:"flex", alignItems:"center", gap:"12px", padding:"14px 16px", background:"rgba(255,255,255,0.05)", borderRadius:"12px", border:"1px solid rgba(255,255,255,0.1)", textDecoration:"none" }}>
+              <div style={{ width:"40px", height:"40px", background:"#e53e3e", borderRadius:"8px", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"20px", flexShrink:0 }}>💪</div>
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:"13px", fontWeight:600, color:"white", marginBottom:"2px" }}>ULTORA プロテイン</div>
+                <div style={{ fontSize:"11px", color:"rgba(255,255,255,0.5)" }}>国産高品質 サッカー選手の栄養補給に</div>
+              </div>
+              <div style={{ fontSize:"11px", color:"#7ab3ff", flexShrink:0 }}>詳しく →</div>
+            </a>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px" }}>
+              <a href={`https://www.amazon.co.jp/s?k=サッカースパイク+ジュニア&tag=haircolorab22-22`} target="_blank" rel="noopener noreferrer sponsored"
+                style={{ display:"flex", alignItems:"center", gap:"8px", padding:"12px", background:"rgba(255,165,0,0.1)", borderRadius:"10px", border:"1px solid rgba(255,165,0,0.2)", textDecoration:"none" }}>
+                <span style={{ fontSize:"18px" }}>📦</span>
+                <div>
+                  <div style={{ fontSize:"11px", fontWeight:600, color:"white" }}>Amazon</div>
+                  <div style={{ fontSize:"10px", color:"rgba(255,255,255,0.4)" }}>スパイク検索</div>
+                </div>
+              </a>
+              <a href={`https://hb.afl.rakuten.co.jp/hgc/5253b9ed.08f9d938.5253b9ee.e71aefe8/?pc=https%3A%2F%2Fsearch.rakuten.co.jp%2Fsearch%2Fmall%2F%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%E3%82%B9%E3%83%91%E3%82%A4%E3%82%AF%2F`} target="_blank" rel="noopener noreferrer sponsored"
+                style={{ display:"flex", alignItems:"center", gap:"8px", padding:"12px", background:"rgba(255,0,0,0.1)", borderRadius:"10px", border:"1px solid rgba(255,0,0,0.2)", textDecoration:"none" }}>
+                <span style={{ fontSize:"18px" }}>🛒</span>
+                <div>
+                  <div style={{ fontSize:"11px", fontWeight:600, color:"white" }}>楽天市場</div>
+                  <div style={{ fontSize:"10px", color:"rgba(255,255,255,0.4)" }}>スパイク検索</div>
+                </div>
+              </a>
+            </div>
+            <a href="/shoes"
+              style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 16px", background:"rgba(122,179,255,0.1)", borderRadius:"12px", border:"1px solid rgba(122,179,255,0.2)", textDecoration:"none" }}>
+              <div>
+                <div style={{ fontSize:"13px", fontWeight:600, color:"white", marginBottom:"2px" }}>⚽ スパイク選びに迷ったら</div>
+                <div style={{ fontSize:"11px", color:"rgba(255,255,255,0.5)" }}>足型診断で最適なスパイクを見つける</div>
+              </div>
+              <div style={{ fontSize:"11px", color:"#7ab3ff" }}>診断する →</div>
+            </a>
+          </div>
+        </div>
+      </div>
+
       <div style={{ background:"#1a1a2e", color:"#fff", padding:"36px 20px", textAlign:"center" }}>
         <div style={{ maxWidth:"560px", margin:"0 auto" }}>
           <div style={{ fontSize:"13px", color:"#7ab3ff", marginBottom:"14px" }}>このページをシェア</div>
