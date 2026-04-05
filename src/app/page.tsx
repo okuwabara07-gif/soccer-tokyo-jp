@@ -144,6 +144,28 @@ export default function HomePage() {
         ))}
       </div>
 
+      {/* ジュニア・ジュニアユース向けバナー */}
+      <div style={{margin:'12px 16px 0',borderRadius:14,overflow:'hidden',position:'relative'}}>
+        <img src="https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=800&q=80"
+          alt="ジュニアサッカー" style={{width:'100%',height:120,objectFit:'cover',objectPosition:'center 30%',display:'block'}}/>
+        <div style={{position:'absolute',inset:0,background:'linear-gradient(135deg,rgba(76,175,80,0.85),rgba(45,106,79,0.85))',
+          display:'flex',alignItems:'center',padding:'0 16px',gap:12}}>
+          <div style={{flex:1}}>
+            <p style={{color:'rgba(255,255,255,0.8)',fontSize:10,letterSpacing:'0.1em',marginBottom:4}}>FOR JUNIOR & JUNIOR YOUTH</p>
+            <p style={{color:'white',fontSize:15,fontWeight:700,lineHeight:1.4,marginBottom:4}}>
+              ジュニア・ジュニアユースの<br/>未来をサポート
+            </p>
+            <p style={{color:'rgba(255,255,255,0.75)',fontSize:10,lineHeight:1.6}}>
+              東京・関東のU-12〜U-15チーム情報・セレクション・AI診断まで
+            </p>
+          </div>
+          <div style={{flexShrink:0,textAlign:'center'}}>
+            <div style={{fontSize:32,marginBottom:4}}>⚽</div>
+            <p style={{color:'rgba(255,255,255,0.7)',fontSize:9}}>730+チーム</p>
+          </div>
+        </div>
+      </div>
+
       {/* ナビゲーション */}
       <div style={{padding:'16px'}}>
         <p style={{fontSize:10,color:'rgba(255,255,255,0.3)',letterSpacing:'0.15em',marginBottom:12}}>MENU</p>
