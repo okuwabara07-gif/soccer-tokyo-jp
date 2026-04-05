@@ -102,6 +102,12 @@ export default function FootCameraPage() {
       <canvas ref={canvasRef} style={{display:'none'}}/>
       <div style={{maxWidth:480,margin:'0 auto'}}>
 
+        <div style={{background:'#0a0a0a',padding:'10px 16px 4px',display:'flex',alignItems:'center'}}>
+          <Link href="/" style={{background:'rgba(255,255,255,0.08)',color:'rgba(255,255,255,0.7)',fontSize:12,padding:'6px 12px',borderRadius:8,textDecoration:'none'}}>
+            ← ホームへ
+          </Link>
+        </div>
+
         {showGuide && (
           <div style={{position:'relative',height:200,overflow:'hidden'}}>
             <img src="/spike-hero.png" alt="スパイク" style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:'center 30%'}}/>
@@ -115,13 +121,13 @@ export default function FootCameraPage() {
           </div>
         )}
 
-        {!showGuide && (
-          <div style={{background:'#0a0a0a',padding:'14px 16px 6px',display:'flex',alignItems:'center',gap:12}}>
-            <button onClick={()=>{setShowGuide(true);setImage(null);setResult(null)}}
-              style={{background:'none',border:'none',color:'rgba(255,255,255,0.4)',fontSize:12,cursor:'pointer',padding:0}}>← 戻る</button>
-            <p style={{color:'rgba(255,255,255,0.6)',fontSize:12}}>AI足型診断</p>
-          </div>
-        )}
+        <div style={{background:'#0a0a0a',padding:'14px 16px 6px',display:'flex',alignItems:'center',gap:12}}>
+          <button onClick={()=>{setShowGuide(true);setImage(null);setResult(null);setSelectedBrand(null)}}
+            style={{background:'rgba(255,255,255,0.08)',border:'none',color:'rgba(255,255,255,0.7)',fontSize:12,cursor:'pointer',padding:'6px 12px',borderRadius:8,display:'flex',alignItems:'center',gap:4}}>
+            ← 戻る
+          </button>
+          <p style={{color:'rgba(255,255,255,0.5)',fontSize:12}}>AI足型診断</p>
+        </div>
 
         <div style={{padding:'12px 16px 32px'}}>
 
@@ -129,30 +135,43 @@ export default function FootCameraPage() {
           {showGuide && (
             <>
               <div style={{background:'#111',borderRadius:14,overflow:'hidden',marginBottom:12,height:220,position:'relative',display:'flex',alignItems:'center',justifyContent:'center'}}>
-                <svg viewBox="0 0 240 220" width="220" height="200">
-                  {/* 背景グリッド */}
-                  <line x1="120" y1="10" x2="120" y2="210" stroke="rgba(255,255,255,0.06)" strokeWidth="1"/>
-                  <line x1="10" y1="110" x2="230" y2="110" stroke="rgba(255,255,255,0.06)" strokeWidth="1"/>
-                  {/* 足の輪郭ガイド */}
-                  <ellipse cx="100" cy="110" rx="38" ry="85" fill="none" stroke="rgba(255,215,0,0.5)" strokeWidth="2" strokeDasharray="8,4"/>
+                <svg viewBox="0 0 280 260" width="260" height="240">
+                  {/* グリッド */}
+                  {[1,2,3,4].map(i=>(
+                    <line key={"v"+i} x1={i*56} y1="0" x2={i*56} y2="260" stroke="rgba(255,255,255,0.04)" strokeWidth="0.5"/>
+                  ))}
+                  {[1,2,3,4].map(i=>(
+                    <line key={"h"+i} x1="0" y1={i*52} x2="280" y2={i*52} stroke="rgba(255,255,255,0.04)" strokeWidth="0.5"/>
+                  ))}
+                  {/* 中心十字線 */}
+                  <line x1="140" y1="10" x2="140" y2="250" stroke="rgba(255,215,0,0.15)" strokeWidth="0.8" strokeDasharray="4,3"/>
+                  <line x1="10" y1="130" x2="270" y2="130" stroke="rgba(255,215,0,0.15)" strokeWidth="0.8" strokeDasharray="4,3"/>
+                  {/* 足の輪郭メイン */}
+                  <ellipse cx="120" cy="130" rx="44" ry="98" fill="rgba(255,215,0,0.04)" stroke="rgba(255,215,0,0.6)" strokeWidth="2" strokeDasharray="10,5"/>
                   {/* かかと */}
-                  <ellipse cx="100" cy="178" rx="28" ry="18" fill="none" stroke="rgba(255,215,0,0.3)" strokeWidth="1.5" strokeDasharray="4,3"/>
+                  <ellipse cx="120" cy="210" rx="32" ry="20" fill="none" stroke="rgba(255,215,0,0.35)" strokeWidth="1.5" strokeDasharray="5,3"/>
                   {/* つま先 */}
-                  <ellipse cx="100" cy="42" rx="22" ry="14" fill="none" stroke="rgba(255,215,0,0.3)" strokeWidth="1.5" strokeDasharray="4,3"/>
+                  <ellipse cx="120" cy="50" rx="26" ry="16" fill="none" stroke="rgba(255,215,0,0.35)" strokeWidth="1.5" strokeDasharray="5,3"/>
                   {/* 幅の計測線 */}
-                  <line x1="62" y1="100" x2="138" y2="100" stroke="rgba(255,255,255,0.5)" strokeWidth="1" strokeDasharray="3,3"/>
-                  <line x1="62" y1="95" x2="62" y2="105" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5"/>
-                  <line x1="138" y1="95" x2="138" y2="105" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5"/>
-                  <text x="100" y="92" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.6)">← 幅を測定 →</text>
+                  <line x1="76" y1="118" x2="164" y2="118" stroke="rgba(255,255,255,0.6)" strokeWidth="1.2" strokeDasharray="4,3"/>
+                  <line x1="76" y1="112" x2="76" y2="124" stroke="rgba(255,255,255,0.8)" strokeWidth="1.5"/>
+                  <line x1="164" y1="112" x2="164" y2="124" stroke="rgba(255,255,255,0.8)" strokeWidth="1.5"/>
+                  <text x="120" y="110" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.65)">← 幅を測定 →</text>
                   {/* 長さの計測線 */}
-                  <line x1="148" y1="42" x2="148" y2="178" stroke="rgba(255,255,255,0.5)" strokeWidth="1" strokeDasharray="3,3"/>
-                  <line x1="143" y1="42" x2="153" y2="42" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5"/>
-                  <line x1="143" y1="178" x2="153" y2="178" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5"/>
-                  <text x="162" y="115" fontSize="8" fill="rgba(255,255,255,0.6)">長さ</text>
+                  <line x1="174" y1="50" x2="174" y2="210" stroke="rgba(255,255,255,0.6)" strokeWidth="1.2" strokeDasharray="4,3"/>
+                  <line x1="168" y1="50" x2="180" y2="50" stroke="rgba(255,255,255,0.8)" strokeWidth="1.5"/>
+                  <line x1="168" y1="210" x2="180" y2="210" stroke="rgba(255,255,255,0.8)" strokeWidth="1.5"/>
+                  <text x="185" y="133" fontSize="8" fill="rgba(255,255,255,0.65)">長さ</text>
+                  {/* コーナーマーカー */}
+                  <path d="M 60 30 L 60 50 L 80 50" fill="none" stroke="rgba(255,215,0,0.5)" strokeWidth="2"/>
+                  <path d="M 200 30 L 200 50 L 180 50" fill="none" stroke="rgba(255,215,0,0.5)" strokeWidth="2"/>
+                  <path d="M 60 230 L 60 210 L 80 210" fill="none" stroke="rgba(255,215,0,0.5)" strokeWidth="2"/>
+                  <path d="M 200 230 L 200 210 L 180 210" fill="none" stroke="rgba(255,215,0,0.5)" strokeWidth="2"/>
                   {/* 中心点 */}
-                  <circle cx="100" cy="110" r="4" fill="rgba(255,215,0,0.6)"/>
+                  <circle cx="120" cy="130" r="5" fill="rgba(255,215,0,0.7)"/>
+                  <circle cx="120" cy="130" r="10" fill="none" stroke="rgba(255,215,0,0.3)" strokeWidth="1"/>
                   {/* 指示テキスト */}
-                  <text x="120" y="205" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.35)">足をこのガイドに合わせて真上から撮影</text>
+                  <text x="140" y="250" textAnchor="middle" fontSize="8.5" fill="rgba(255,255,255,0.4)">足をこのガイドに合わせて真上から撮影</text>
                 </svg>
                 <div style={{position:'absolute',top:10,left:10,right:10,display:'flex',gap:5,flexWrap:'wrap'}}>
                   {['📐 真上から','🧦 素足で','💡 明るい場所','⬜ 白い床'].map(t=>(
@@ -181,9 +200,21 @@ export default function FootCameraPage() {
               <div style={{position:'relative',marginBottom:12,borderRadius:12,overflow:'hidden'}}>
                 <img src={image} alt="足の写真" style={{width:'100%',objectFit:'cover',maxHeight:280,display:'block'}}/>
                 <svg style={{position:'absolute',inset:0,width:'100%',height:'100%'}} viewBox="0 0 100 100" preserveAspectRatio="none">
-                  <ellipse cx="50" cy="50" rx="28" ry="44" fill="none" stroke="rgba(255,215,0,0.45)" strokeWidth="0.5" strokeDasharray="3,2"/>
-                  <line x1="22" y1="50" x2="78" y2="50" stroke="rgba(255,255,255,0.2)" strokeWidth="0.3" strokeDasharray="2,2"/>
-                  <line x1="50" y1="6" x2="50" y2="94" stroke="rgba(255,255,255,0.2)" strokeWidth="0.3" strokeDasharray="2,2"/>
+                  {/* グリッド */}
+                  <line x1="33" y1="0" x2="33" y2="100" stroke="rgba(255,255,255,0.08)" strokeWidth="0.3"/>
+                  <line x1="66" y1="0" x2="66" y2="100" stroke="rgba(255,255,255,0.08)" strokeWidth="0.3"/>
+                  <line x1="0" y1="33" x2="100" y2="33" stroke="rgba(255,255,255,0.08)" strokeWidth="0.3"/>
+                  <line x1="0" y1="66" x2="100" y2="66" stroke="rgba(255,255,255,0.08)" strokeWidth="0.3"/>
+                  {/* 中心線 */}
+                  <line x1="50" y1="0" x2="50" y2="100" stroke="rgba(255,215,0,0.2)" strokeWidth="0.3" strokeDasharray="2,2"/>
+                  <line x1="0" y1="50" x2="100" y2="50" stroke="rgba(255,215,0,0.2)" strokeWidth="0.3" strokeDasharray="2,2"/>
+                  {/* 足の輪郭 */}
+                  <ellipse cx="50" cy="50" rx="27" ry="43" fill="none" stroke="rgba(255,215,0,0.5)" strokeWidth="0.5" strokeDasharray="3,2"/>
+                  {/* コーナーマーカー */}
+                  <path d="M 8 8 L 8 16 L 16 16" fill="none" stroke="rgba(255,215,0,0.6)" strokeWidth="0.6"/>
+                  <path d="M 92 8 L 92 16 L 84 16" fill="none" stroke="rgba(255,215,0,0.6)" strokeWidth="0.6"/>
+                  <path d="M 8 92 L 8 84 L 16 84" fill="none" stroke="rgba(255,215,0,0.6)" strokeWidth="0.6"/>
+                  <path d="M 92 92 L 92 84 L 84 84" fill="none" stroke="rgba(255,215,0,0.6)" strokeWidth="0.6"/>
                 </svg>
               </div>
               <div style={{display:'flex',gap:8}}>
