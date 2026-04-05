@@ -212,6 +212,7 @@ export default function HomePage() {
             {href:'/rules',emoji:'📋',title:'新ルール＆用語検索',desc:'2025年最新ルール・AI質問対応',color:'#854F0B'},
             {href:'/position',emoji:'🎯',title:'ポジション別資料',desc:'練習方法・有名選手・季節アイテム',color:'#534AB7'},
             {href:'/calendar',emoji:'📅',title:'セレクションカレンダー',desc:'締切情報・申込URL',color:'#185FA5'},
+            {href:'/matching',emoji:'🤝',title:'チームマッチング',desc:'7つの質問で最適チームを提案（会員限定）',color:'#4CAF50'},
           ].map(item=>(
             <Link key={item.href} href={item.href}
               style={{display:'flex',alignItems:'center',gap:12,padding:'12px 14px',
