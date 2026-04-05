@@ -53,6 +53,13 @@ export default function FootCameraPage() {
       })
       const data = await res.json()
       setResult(data)
+      // マイページ用に自動保存
+      if (data && !data.error) {
+        localStorage.setItem('footDiagnosis', JSON.stringify({
+          ...data,
+          diagnosedAt: new Date().toISOString()
+        }))
+      }
       setSelectedBrand(data.recommend?.[0] || null)
     } catch {
       setResult({ error: '解析に失敗しました。' })
