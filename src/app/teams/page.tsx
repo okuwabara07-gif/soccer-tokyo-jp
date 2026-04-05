@@ -26,10 +26,17 @@ const fuzzyMatch = (text: string, q: string) => {
 
 const CATEGORIES = [
   { key:"all", label:"すべて", color:"#1a1a2e" },
-  { key:"ジュニアユース", label:"ジュニアユース", color:"#e63946" },
   { key:"ジュニア", label:"ジュニア", color:"#457b9d" },
-  { key:"アカデミー", label:"アカデミー", color:"#2d6a4f" },
-  { key:"社会人", label:"社会人", color:"#6d4c41" },
+  { key:"ジュニアユース", label:"ジュニアユース", color:"#e63946" },
+  { key:"アカデミー", label:"アカデミー＆スクール", color:"#2d6a4f" },
+];
+
+const PREFECTURES = [
+  { key:"all", label:"すべて" },
+  { key:"東京都", label:"東京" },
+  { key:"神奈川県", label:"神奈川" },
+  { key:"埼玉県", label:"埼玉" },
+  { key:"千葉県", label:"千葉" },
 ];
 
 declare global { interface Window { initMap: () => void; google: any; } }
@@ -75,8 +82,8 @@ const MapView = ({ teams, selectedTeam, onSelectTeam }: {
       const marker = new window.google.maps.Marker({
         position: { lat: team.lat, lng: team.lng },
         map: mapInstanceRef.current, title: team.name,
-        icon: { path: window.google.maps.SymbolPath.CIRCLE, scale: isSel?12:8,
-          fillColor: color, fillOpacity: 1, strokeColor: "#fff", strokeWeight: isSel?3:2 },
+        icon: { path: "M 0,-1 0.588,0.809 -0.951,-0.309 0.951,-0.309 -0.588,0.809 Z", scale: isSel?16:11,
+          fillColor: color, fillOpacity: 1, strokeColor: "#fff", strokeWeight: isSel?2:1 },
         zIndex: isSel?100:1,
       });
       marker.addListener("click", () => {
