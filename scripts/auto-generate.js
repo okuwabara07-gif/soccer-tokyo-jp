@@ -21,6 +21,12 @@ function request(options, body) {
   });
 }
 
+
+async function getUnsplashUrl(keyword) {
+  const q = encodeURIComponent(keyword.replace(/おすすめ|ランキング|比較|TOP5|【.*?】/g, '').trim() || 'beauty');
+  return `https://source.unsplash.com/800x450/?${q}`;
+}
+
 async function generateArticle(keyword) {
   const year = new Date().getFullYear();
   const amazonUrl = `https://www.amazon.co.jp/s?k=${encodeURIComponent(keyword)}&tag=${AMAZON_TRACKING_ID}`;
@@ -42,9 +48,12 @@ async function generateArticle(keyword) {
 ---
 title: "【${year}年最新】${keyword}おすすめランキングTOP5｜徹底比較"
 date: "${new Date().toISOString().split('T')[0]}"
+thumbnail: "https://source.unsplash.com/800x450/?${encodeURIComponent(keyword.replace(/[\u3040-\u9fff\u30a0-\u30ff]/g, '').trim() || 'beauty,cosmetics')}"
 excerpt: "${keyword}のおすすめ商品をランキング形式で比較。選び方のポイントも解説。"
 genre: "${TOPIC}"
 ---
+
+![${keyword}](https://source.unsplash.com/800x450/?${encodeURIComponent(keyword.replace(/[\u3040-\u9fff\u30a0-\u30ff]/g, '').trim() || 'beauty')})
 
 ## 結論：おすすめ1位はこれ
 
