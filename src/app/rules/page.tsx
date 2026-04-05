@@ -28,6 +28,62 @@ const POSITION_IMAGES: Record<string, string> = {
   'FW': 'https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?w=400&q=80',
 }
 
+
+const RANKINGS = {
+  unknown_rules: {
+    title: '知らなかった！ルールランキング',
+    emoji: '😲',
+    color: '#e63946',
+    bg: '#FCEBEB',
+    items: [
+      { rank:1, title:'GKはPK時に動いてはいけない', desc:'GKはPKが蹴られるまで、少なくとも片足をゴールライン上に置いていなければならない。知らずに動くと蹴り直しに！', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=500&q=80', votes:892 },
+      { rank:2, title:'スローインで両足が地面に着いていないといけない', desc:'スローインの際、投げる選手はタッチライン上か外側に立ち、両足が地面についていないと反則。片足が浮いていたらやり直し。', image:'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=500&q=80', votes:743 },
+      { rank:3, title:'ゴールキックはペナルティエリア内ならどこでも置ける', desc:'2019年のルール改正から、ゴールキックはペナルティエリア内ならどこにでも置いていい。昔はゴールエリア内のみだった。', image:'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=500&q=80', votes:621 },
+      { rank:4, title:'オフサイドは「触れた瞬間」が基準', desc:'オフサイドの判定は、ボールが出た瞬間（パスを蹴った瞬間）の位置で判定する。受け取った瞬間ではない！', image:'https://images.unsplash.com/photo-1551280857-2b9bbe52acf9?w=500&q=80', votes:534 },
+      { rank:5, title:'試合中に靴が脱げても反則にならない', desc:'靴が脱げても試合は続行。ただしその状態でプレーを続けることは危険なので、審判の許可を得て直すのがマナー。', image:'https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?w=500&q=80', votes:412 },
+    ]
+  },
+  confusing_terms: {
+    title: '間違えやすい用語ランキング',
+    emoji: '🤔',
+    color: '#854F0B',
+    bg: '#FAEEDA',
+    items: [
+      { rank:1, title:'ボランチ vs アンカー', desc:'どちらも守備的MFだが、ボランチは2人で組む場合に使う（ポルトガル語）。アンカーは1人で最後尾に置く役割。日本ではどちらもボランチと呼ぶことが多い。', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&q=80', votes:678 },
+      { rank:2, title:'直接FK vs 間接FK', desc:'直接FKはそのままシュートしてゴールになる。間接FKは他の選手に触れてからでないとゴールにならない。笛の合図が違う（間接=腕を上げる）。', image:'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&q=80', votes:589 },
+      { rank:3, title:'トラップ vs コントロール', desc:'どちらもボールを受け止める技術。トラップはボールを止めることに重点。コントロールは次のプレーにつなげるために最適な位置にボールを置くこと。', image:'https://images.unsplash.com/photo-1551958219-acbc595d5f5b?w=500&q=80', votes:445 },
+      { rank:4, title:'センターバック vs ストッパー', desc:'センターバックは守備の中央全般を指す。ストッパーは相手FWに対して厳しくマークにつく役割の選手を特に指す。日本では混用されることも多い。', image:'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&q=80', votes:367 },
+      { rank:5, title:'シュート vs ヘディング', desc:'一般的にシュートは足で蹴ること。ヘディングは頭で打つこと。ただし「ヘディングシュート」という言い方もある。厳密には打ち方の違いで使い分ける。', image:'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=500&q=80', votes:298 },
+    ]
+  },
+  junior_fouls: {
+    title: 'ジュニアがよく犯すファウルランキング',
+    emoji: '⚠️',
+    color: '#2d6a4f',
+    bg: '#E1F5EE',
+    items: [
+      { rank:1, title:'スライディングタックル', desc:'後ろや横からのスライディングは危険なプレーとして取られやすい。特にジュニアでは厳しく取られることが多い。足を伸ばしてボールより先に相手に当たるとファウル。', image:'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=500&q=80', votes:934 },
+      { rank:2, title:'プッシング（手で押す）', desc:'相手を手で押すのは反則。でもジュニアは思わず手が出てしまうことが多い。体でのチャージは許されるが、手を使うとファウル。', image:'https://images.unsplash.com/photo-1551958219-acbc595d5f5b?w=500&q=80', votes:812 },
+      { rank:3, title:'シャツを引っ張る', desc:'相手のユニフォームを掴んで引っ張るのは明確なファウル。走っている相手を引っ張る行為は危険でもあり、イエローカードになることも。', image:'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&q=80', votes:698 },
+      { rank:4, title:'オーバーザトップ（足を上げすぎ)', desc:'相手の足の上を越えるような高いタックルは危険プレーとして退場になることも。特に足を高く上げながらのチャレンジは要注意。', image:'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=500&q=80', votes:567 },
+      { rank:5, title:'意図的なハンド', desc:'ボールが来るとつい手が出てしまうジュニアが多い。ゴール前でのハンドはPKになるので、手を体につけておく習慣が大切。', image:'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=500&q=80', votes:423 },
+    ]
+  },
+  parent_questions: {
+    title: '保護者が疑問に思うルールランキング',
+    emoji: '👨‍👩‍👦',
+    color: '#185FA5',
+    bg: '#E6F1FB',
+    items: [
+      { rank:1, title:'なぜオフサイドになったのかわからない', desc:'オフサイドは「パスが蹴られた瞬間」の位置が基準。受け取った時ではない。守備側から2番目の選手より前にいるとオフサイドポジションとなる。', image:'https://images.unsplash.com/photo-1551280857-2b9bbe52acf9?w=500&q=80', votes:1243 },
+      { rank:2, title:'なぜあのシュートがゴールじゃないのか', desc:'ゴールラインをボール全体が完全に越えていないとゴールにならない。またゴール前のファウルや反則があれば得点は認められない。', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=500&q=80', votes:987 },
+      { rank:3, title:'ハンドとそうでない場合の違いは何か', desc:'意図的に手を使った場合や腕を不自然に広げた場合はハンド。ただし体の自然な位置にある腕への接触は反則にならない場合がある。', image:'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=500&q=80', votes:876 },
+      { rank:4, title:'なぜアディショナルタイムがあんなに増えるのか', desc:'VAR確認・交代・負傷・ゴール後の混乱などで試合が止まった時間を追加する。近年は厳密に計測されるため以前より長くなりがち。', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&q=80', votes:734 },
+      { rank:5, title:'同じようなプレーなのにファウルになったりならなかったりする', desc:'審判の判断は「意図性・危険性・有利不利」を総合的に判断する。状況や試合展開によっても異なり、完全に統一することは難しい。', image:'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=500&q=80', votes:623 },
+    ]
+  }
+}
+
 const NEW_RULES = [
   { year:'2025', category:'競技規則', title:'ハンドの反則明確化',
     detail:'意図的なハンドに加え、腕を不自然に広げた状態でボールが当たった場合も反則。ただし体の自然な位置にある腕への接触は反則とならない。',
@@ -144,7 +200,9 @@ const TERMS: {category:string, emoji:string, items:{word:string, reading:string,
 ]
 
 export default function RulesPage() {
-  const [tab, setTab] = useState<'rules'|'terms'|'ai'>('rules')
+  const [tab, setTab] = useState<'rules'|'terms'|'ai'|'ranking'>('rules')
+  const [selectedRanking, setSelectedRanking] = useState('unknown_rules')
+  const [expandedItem, setExpandedItem] = useState<number|null>(null)
   const [search, setSearch] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedRule, setSelectedRule] = useState<any>(null)
@@ -207,7 +265,7 @@ export default function RulesPage() {
 
         {/* タブ */}
         <div style={{display:'flex',background:'white',borderBottom:'1px solid #eeeeea'}}>
-          {([['rules','📋 新ルール'],['terms','📖 用語辞典'],['ai','🤖 AIに質問']] as const).map(([key,label])=>(
+          {([['rules','📋 新ルール'],['terms','📖 用語辞典'],['ranking','🏆 ランキング'],['ai','🤖 AIに質問']] as const).map(([key,label])=>(
             <button key={key} onClick={()=>{setTab(key);setSearch('');setSelectedCategory('all')}}
               style={{flex:1,padding:'11px 4px',fontSize:10,border:'none',background:'transparent',cursor:'pointer',
                 borderBottom:`2px solid ${tab===key?'#1a1a1a':'transparent'}`,
@@ -334,6 +392,75 @@ export default function RulesPage() {
                   )}
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* ランキングタブ */}
+          {tab==='ranking' && (
+            <div style={{display:'flex',flexDirection:'column',gap:12}}>
+              {/* ランキング選択 */}
+              <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                {Object.entries(RANKINGS).map(([key, r]:any)=>(
+                  <button key={key} onClick={()=>{setSelectedRanking(key);setExpandedItem(null)}}
+                    style={{padding:'12px 14px',borderRadius:12,border:`2px solid ${selectedRanking===key?r.color:'#eeeeea'}`,
+                      background:selectedRanking===key?r.bg:'white',textAlign:'left',cursor:'pointer',
+                      display:'flex',alignItems:'center',gap:10}}>
+                    <span style={{fontSize:22}}>{r.emoji}</span>
+                    <div>
+                      <p style={{fontSize:12,fontWeight:selectedRanking===key?700:400,
+                        color:selectedRanking===key?r.color:'#1a1a1a'}}>{r.title}</p>
+                      <p style={{fontSize:9,color:'#999',marginTop:2}}>TOP5</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* 選択されたランキング */}
+              {selectedRanking && (RANKINGS as any)[selectedRanking] && (
+                <div>
+                  <p style={{fontSize:11,color:'#999',marginBottom:10}}>
+                    {(RANKINGS as any)[selectedRanking].emoji} {(RANKINGS as any)[selectedRanking].title}
+                  </p>
+                  {(RANKINGS as any)[selectedRanking].items.map((item:any,i:number)=>(
+                    <div key={i} style={{borderRadius:12,overflow:'hidden',border:'1px solid #eeeeea',background:'white',marginBottom:10}}>
+                      {/* 画像 */}
+                      <div style={{position:'relative',height:130,overflow:'hidden'}}>
+                        <img src={item.image} alt={item.title}
+                          style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+                        <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,transparent 20%,rgba(0,0,0,0.8) 100%)'}}/>
+                        {/* ランク */}
+                        <div style={{position:'absolute',top:10,left:10,
+                          width:36,height:36,borderRadius:'50%',
+                          background:i===0?'#c9a84c':i===1?'#8e8e8e':i===2?'#8b6343':'rgba(0,0,0,0.6)',
+                          display:'flex',alignItems:'center',justifyContent:'center',
+                          fontSize:14,fontWeight:700,color:'white'}}>
+                          {item.rank}
+                        </div>
+                        {/* 投票数 */}
+                        <div style={{position:'absolute',top:10,right:10,
+                          background:'rgba(0,0,0,0.6)',borderRadius:8,padding:'3px 8px'}}>
+                          <p style={{fontSize:9,color:'rgba(255,255,255,0.8)'}}>👍 {item.votes.toLocaleString()}</p>
+                        </div>
+                        <div style={{position:'absolute',bottom:10,left:12,right:12}}>
+                          <p style={{fontSize:13,fontWeight:700,color:'white',textShadow:'0 1px 4px rgba(0,0,0,0.8)'}}>{item.title}</p>
+                        </div>
+                      </div>
+                      {/* 詳細 */}
+                      <button onClick={()=>setExpandedItem(expandedItem===i?null:i)}
+                        style={{width:'100%',background:'transparent',border:'none',padding:'10px 14px',
+                          textAlign:'left',cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                        <p style={{fontSize:11,color:'#666',lineHeight:1.5,flex:1}}>{item.desc.slice(0,50)}...</p>
+                        <span style={{fontSize:11,color:'#999',flexShrink:0,marginLeft:8}}>{expandedItem===i?'▲':'▼'}</span>
+                      </button>
+                      {expandedItem===i && (
+                        <div style={{padding:'0 14px 14px',borderTop:'1px solid #f0f0ec'}}>
+                          <p style={{fontSize:12,color:'#444',lineHeight:1.8,paddingTop:10}}>{item.desc}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
