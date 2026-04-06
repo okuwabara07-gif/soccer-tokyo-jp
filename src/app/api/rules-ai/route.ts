@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
         max_tokens: 400,
         messages: [{
           role: 'user',
-          content: `あなたはサッカーのルールと用語に詳しいコーチです。ジュニア選手や保護者にわかりやすく200文字程度で答えてください。絵文字を使って読みやすくしてください。\n\n質問：${question}`
+          content: `ジュニアサッカーのルールや用語について簡潔に答えてください（100文字以内）。質問：${question}`
         }]
       })
     })
