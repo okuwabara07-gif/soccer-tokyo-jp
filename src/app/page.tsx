@@ -285,6 +285,45 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* SNS・共有セクション */}
+      <div style={{margin:'0 16px 16px',padding:'16px',background:'#111',borderRadius:14,border:'1px solid rgba(255,255,255,0.08)'}}>
+        <p style={{fontSize:10,color:'rgba(255,255,255,0.4)',letterSpacing:'0.15em',marginBottom:12}}>SNS・シェア</p>
+
+        {/* Instagramフォローバナー */}
+        <a href="https://www.instagram.com/soccer_kanto_jp/"
+          target="_blank" rel="noopener noreferrer"
+          style={{display:'flex',alignItems:'center',gap:12,padding:'12px 14px',
+            background:'linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)',
+            borderRadius:12,textDecoration:'none',marginBottom:10}}>
+          <div style={{width:36,height:36,borderRadius:'50%',background:'rgba(255,255,255,0.2)',
+            display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,flexShrink:0}}>📸</div>
+          <div style={{flex:1}}>
+            <p style={{fontSize:13,fontWeight:700,color:'white',marginBottom:2}}>@soccer_kanto_jp</p>
+            <p style={{fontSize:10,color:'rgba(255,255,255,0.8)'}}>関東ジュニアサッカー情報局 公式Instagram</p>
+          </div>
+          <span style={{color:'rgba(255,255,255,0.7)',fontSize:16}}>›</span>
+        </a>
+
+        {/* LINE・Twitter シェアボタン */}
+        <p style={{fontSize:10,color:'rgba(255,255,255,0.3)',marginBottom:8}}>このサイトをシェア</p>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+          <a href="https://line.me/R/msg/text/?関東ジュニアサッカー情報局%0a東京・関東のサッカーチームをAIで検索%0ahttps://soccer-tokyo-jp.vercel.app"
+            target="_blank" rel="noopener noreferrer"
+            style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,
+              padding:'10px',borderRadius:10,background:'#06C755',
+              textDecoration:'none',color:'white',fontSize:12,fontWeight:700}}>
+            <span style={{fontSize:16}}>💬</span> LINEで送る
+          </a>
+          <a href="https://twitter.com/intent/tweet?text=関東のジュニアサッカーチームを検索できます⚽&url=https://soccer-tokyo-jp.vercel.app&hashtags=ジュニアサッカー,少年サッカー,関東サッカー"
+            target="_blank" rel="noopener noreferrer"
+            style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,
+              padding:'10px',borderRadius:10,background:'#1DA1F2',
+              textDecoration:'none',color:'white',fontSize:12,fontWeight:700}}>
+            <span style={{fontSize:16}}>🐦</span> Xで共有
+          </a>
+        </div>
+      </div>
+
       {/* フッター */}
       <div style={{padding:'16px',borderTop:'1px solid rgba(255,255,255,0.05)',textAlign:'center'}}>
         <p style={{fontSize:10,color:'rgba(255,255,255,0.2)'}}>© 2026 関東ジュニアサッカー情報局</p>
