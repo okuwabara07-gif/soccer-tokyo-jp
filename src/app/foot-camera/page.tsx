@@ -533,6 +533,37 @@ export default function FootCameraPage() {
           )}
         </div>
       </div>
+      {/* スパイク購入リンク */}
+      <div style={{padding:'0 16px 16px'}}>
+        <div style={{padding:'16px',background:'rgba(255,165,0,0.1)',borderRadius:12,border:'1px solid rgba(255,165,0,0.3)'}}>
+          <p style={{color:'#FFD700',fontSize:13,fontWeight:700,marginBottom:12}}>⚽ あなたの足型に合うスパイクを探す</p>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+            <a href="https://www.amazon.co.jp/s?k=%E3%82%B8%E3%83%A5%E3%83%8B%E3%82%A2%20%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%20%E3%82%B9%E3%83%91%E3%82%A4%E3%82%AF&tag=haircolorab22-22" target="_blank" rel="noopener noreferrer sponsored"
+              style={{padding:'10px',borderRadius:10,background:'#FF9900',textDecoration:'none',
+                color:'#1a1a1a',fontSize:12,fontWeight:700,textAlign:'center',display:'block'}}>
+              Amazonで探す
+            </a>
+            <a href="https://search.rakuten.co.jp/search/mall/%E3%82%B8%E3%83%A5%E3%83%8B%E3%82%A2%20%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%20%E3%82%B9%E3%83%91%E3%82%A4%E3%82%AF/?af=5253b9ed.08f9d938.5253b9ee.e71aefe8" target="_blank" rel="noopener noreferrer sponsored"
+              style={{padding:'10px',borderRadius:10,background:'#BF0000',textDecoration:'none',
+                color:'white',fontSize:12,fontWeight:700,textAlign:'center',display:'block'}}>
+              楽天で探す
+            </a>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginTop:8}}>
+            <a href="https://www.amazon.co.jp/s?k=%E3%82%B8%E3%83%A5%E3%83%8B%E3%82%A2%20%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%E3%83%9C%E3%83%BC%E3%83%AB%205%E5%8F%B7&tag=haircolorab22-22" target="_blank" rel="noopener noreferrer sponsored"
+              style={{padding:'10px',borderRadius:10,background:'#1a3a5c',textDecoration:'none',
+                color:'white',fontSize:12,fontWeight:700,textAlign:'center',display:'block'}}>
+              ボールを探す
+            </a>
+            <a href="https://www.amazon.co.jp/s?k=%E3%82%B8%E3%83%A5%E3%83%8B%E3%82%A2%20%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%20%E3%83%A6%E3%83%8B%E3%83%95%E3%82%A9%E3%83%BC%E3%83%A0&tag=haircolorab22-22" target="_blank" rel="noopener noreferrer sponsored"
+              style={{padding:'10px',borderRadius:10,background:'#1a3a5c',textDecoration:'none',
+                color:'white',fontSize:12,fontWeight:700,textAlign:'center',display:'block'}}>
+              ユニフォームを探す
+            </a>
+          </div>
+          <p style={{fontSize:'9px',color:'rgba(255,255,255,0.3)',marginTop:8,textAlign:'center'}}>PR</p>
+        </div>
+      </div>
     </main>
   )
 }
