@@ -3,11 +3,31 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
 const HERO_IMAGES = [
-  { url:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&q=80', pos:'center 30%' },
-  { url:'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=900&q=80', pos:'center 40%' },
-  { url:'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=900&q=80', pos:'center 50%' },
-  { url:'https://images.unsplash.com/photo-1551958219-acbc595d5f5b?w=900&q=80', pos:'center 35%' },
-  { url:'https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?w=900&q=80', pos:'center 40%' },
+  {
+    url: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=900&q=80',
+    pos: 'center 30%',
+    label: '仲間と共に、勝利をつかめ'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?w=900&q=80',
+    pos: 'center 25%',
+    label: '毎日の積み重ねが、未来を変える'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=900&q=80',
+    pos: 'center 40%',
+    label: '関東のグラウンドで、夢を描け'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1600679472829-3044539ce405?w=900&q=80',
+    pos: 'center 35%',
+    label: 'コーチと二人三脚、限界を超えろ'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&q=80',
+    pos: 'center 20%',
+    label: 'チームが、もう一人の家族になる'
+  },
 ]
 
 export default function HomePage() {
@@ -23,12 +43,20 @@ export default function HomePage() {
     const handler = (e: any) => { e.preventDefault(); setDeferredPrompt(e); setShowInstall(true) }
     window.addEventListener('beforeinstallprompt', handler)
 
+    // ヒーロー自動スライド（5秒ごと）
+    const slideTimer = setInterval(() => {
+      setHeroIdx(prev => (prev + 1) % HERO_IMAGES.length)
+    }, 5000)
+
     // iOSの場合は常に表示
     const isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())
     const isStandalone = (window.navigator as any).standalone
     if (isIOS && !isStandalone) setShowInstall(true)
 
-    return () => window.removeEventListener('beforeinstallprompt', handler)
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler)
+      clearInterval(slideTimer)
+    }
   }, [])
 
   const handleInstall = async () => {
@@ -101,15 +129,22 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* 画像インジケーター */}
+          {/* 画像インジケーター＋ラベル */}
           <div style={{position:'absolute',bottom:16,left:'50%',transform:'translateX(-50%)',
-            display:'flex',gap:5}}>
-            {HERO_IMAGES.map((_,i)=>(
-              <div key={i} style={{width:i===heroIdx?16:5,height:5,borderRadius:3,
-                background:i===heroIdx?'#FFD700':'rgba(255,255,255,0.3)',
-                transition:'all 0.3s',cursor:'pointer'}}
-                onClick={()=>setHeroIdx(i)}/>
-            ))}
+            display:'flex',flexDirection:'column',alignItems:'center',gap:8}}>
+            <p style={{color:'rgba(255,255,255,0.7)',fontSize:11,letterSpacing:'0.08em',
+              textShadow:'0 1px 4px rgba(0,0,0,0.9)',fontWeight:500,textAlign:'center'}}>
+              {HERO_IMAGES[heroIdx].label}
+            </p>
+            <div style={{display:'flex',gap:6}}>
+              {HERO_IMAGES.map((_,i)=>(
+                <div key={i}
+                  onClick={()=>setHeroIdx(i)}
+                  style={{width:i===heroIdx?22:6,height:6,borderRadius:3,
+                    background:i===heroIdx?'#FFD700':'rgba(255,255,255,0.35)',
+                    transition:'all 0.4s ease',cursor:'pointer'}}/>
+              ))}
+            </div>
           </div>
         </div>
       </div>
