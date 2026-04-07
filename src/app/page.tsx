@@ -286,14 +286,31 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ValueCommerce 広告バナー */}
-      <div style={{padding:'12px 16px',textAlign:'center'}}>
-        <a href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3767207&pid=892590417"
-          target="_blank" rel="noopener noreferrer sponsored"
-          style={{display:'inline-block'}}>
-          <img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3767207&pid=892590417"
-            width="234" height="60" alt="" style={{display:'block'}}/>
-        </a>
+      {/* サッカー用品・スパイクおすすめ */}
+      <div style={{margin:'0 16px 16px',padding:'16px',background:'#111',borderRadius:14,border:'1px solid rgba(255,255,255,0.08)'}}>
+        <p style={{fontSize:'10px',color:'rgba(255,255,255,0.4)',letterSpacing:'0.15em',marginBottom:12,textAlign:'center'}}>PR・おすすめサービス</p>
+        <div style={{display:'flex',flexDirection:'column',gap:'10px',alignItems:'center'}}>
+          {/* Renta! 漫画レンタル */}
+          <div style={{textAlign:'center'}}>
+            <p style={{fontSize:'11px',color:'rgba(255,255,255,0.5)',marginBottom:'6px'}}>サッカー漫画をレンタルで読む</p>
+            <a href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3767207&pid=892590463"
+              target="_blank" rel="nofollow noopener noreferrer sponsored"
+              style={{display:'inline-block'}}>
+              <img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3767207&pid=892590463"
+                border="0" alt="Renta!漫画レンタル" style={{display:'block'}}/>
+            </a>
+          </div>
+          {/* BookLive */}
+          <div style={{textAlign:'center'}}>
+            <p style={{fontSize:'11px',color:'rgba(255,255,255,0.5)',marginBottom:'6px'}}>電子書籍をお得に購入</p>
+            <a href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3767207&pid=892590475"
+              target="_blank" rel="nofollow noopener noreferrer sponsored"
+              style={{display:'inline-block'}}>
+              <img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3767207&pid=892590475"
+                border="0" alt="BookLive電子書籍" style={{display:'block'}}/>
+            </a>
+          </div>
+        </div>
       </div>
 
       {/* SNS・共有セクション */}
