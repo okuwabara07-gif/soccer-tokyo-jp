@@ -313,6 +313,28 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* Amazon用品ショッピング */}
+      <div style={{margin:'0 16px 16px',padding:'16px',background:'#111',borderRadius:14,border:'1px solid rgba(255,180,0,0.2)'}}>
+        <p style={{fontSize:10,color:'rgba(255,255,255,0.4)',letterSpacing:'0.15em',marginBottom:12}}>SOCCER GOODS</p>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6}}>
+          {[
+            {e:'👟',l:'スパイク',k:'ジュニア サッカー スパイク'},
+            {e:'⚽',l:'ボール',k:'サッカーボール 5号'},
+            {e:'👕',l:'ユニフォーム',k:'ジュニア サッカー ユニフォーム'},
+            {e:'🚩',l:'審判グッズ',k:'サッカー 審判 グッズ'},
+          ].map(item=>(
+            <a key={item.k}
+              href={`https://www.amazon.co.jp/s?k=${encodeURIComponent(item.k)}&tag=haircolorab22-22`}
+              target="_blank" rel="noopener noreferrer sponsored"
+              style={{padding:'10px 4px',borderRadius:10,background:'rgba(255,255,255,0.03)',
+                border:'1px solid rgba(255,255,255,0.06)',textDecoration:'none',textAlign:'center',display:'block'}}>
+              <span style={{fontSize:22,display:'block',marginBottom:3}}>{item.e}</span>
+              <p style={{fontSize:9,color:'white',fontWeight:600,marginBottom:1}}>{item.l}</p>
+              <p style={{fontSize:8,color:'#FF9900'}}>Amazon</p>
+            </a>
+          ))}
+        </div>
+      </div>
       {/* SNS・共有セクション */}
       <div style={{margin:'0 16px 16px',padding:'16px',background:'#111',borderRadius:14,border:'1px solid rgba(255,255,255,0.08)'}}>
         <p style={{fontSize:10,color:'rgba(255,255,255,0.4)',letterSpacing:'0.15em',marginBottom:12}}>SNS・シェア</p>
