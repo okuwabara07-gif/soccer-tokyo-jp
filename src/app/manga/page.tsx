@@ -86,6 +86,16 @@ export default function MangaPage() {
         </p>
       </div>
 
+      {/* ValueCommerce 広告 */}
+      <div style={{padding:'0 16px',margin:'8px 0',textAlign:'center'}}>
+        <a href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3767207&pid=892590417"
+          target="_blank" rel="noopener noreferrer sponsored"
+          style={{display:'inline-block'}}>
+          <img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3767207&pid=892590417"
+            width="234" height="60" alt="" style={{display:'block'}}/>
+        </a>
+      </div>
+
       {/* ランキング */}
       <div style={{padding:'0 16px'}}>
         {SOCCER_MANGA.map((manga) => (
