@@ -248,6 +248,7 @@ export default function HomePage() {
             {href:'/position',emoji:'🎯',title:'ポジション別資料',desc:'練習方法・有名選手・季節アイテム',color:'#534AB7'},
             {href:'/calendar',emoji:'📅',title:'セレクションカレンダー',desc:'締切情報・申込URL',color:'#185FA5'},
             {href:'/matching',emoji:'🤝',title:'チームマッチング',desc:'7つの質問で最適チームを提案（会員限定）',color:'#4CAF50'},
+            {href:'/manga',emoji:'📚',title:'サッカー漫画ランキング',desc:'少年に読ませたいおすすめ漫画TOP5',color:'#e63946'},
           ].map(item=>(
             <Link key={item.href} href={item.href}
               style={{display:'flex',alignItems:'center',gap:12,padding:'12px 14px',
