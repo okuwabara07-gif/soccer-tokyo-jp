@@ -332,6 +332,63 @@ export default function ShoesPage() {
           )}
         </div>
       </div>
+      {/* サッカー用品 Amazon購入リンク */}
+      <div style={{padding:'0 16px 24px'}}>
+        <p style={{fontSize:10,color:'rgba(255,255,255,0.4)',letterSpacing:'0.15em',marginBottom:12}}>SOCCER GOODS</p>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:8}}>
+          <a href="https://www.amazon.co.jp/s?k=%E3%82%B8%E3%83%A5%E3%83%8B%E3%82%A2%20%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%20%E3%82%B9%E3%83%91%E3%82%A4%E3%82%AF&tag=haircolorab22-22"
+            target="_blank" rel="noopener noreferrer sponsored"
+            style={{padding:'14px 8px',borderRadius:12,background:'#111',
+              border:'1px solid rgba(255,180,0,0.3)',textDecoration:'none',textAlign:'center',display:'block'}}>
+            <span style={{fontSize:28,display:'block',marginBottom:4}}>👟</span>
+            <p style={{fontSize:11,color:'white',fontWeight:700,marginBottom:2}}>スパイク</p>
+            <p style={{fontSize:9,color:'#FF9900'}}>Amazonで探す</p>
+          </a>
+          <a href="https://www.amazon.co.jp/s?k=%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%E3%83%9C%E3%83%BC%E3%83%AB%205%E5%8F%B7%20%E3%82%B8%E3%83%A5%E3%83%8B%E3%82%A2&tag=haircolorab22-22"
+            target="_blank" rel="noopener noreferrer sponsored"
+            style={{padding:'14px 8px',borderRadius:12,background:'#111',
+              border:'1px solid rgba(255,180,0,0.3)',textDecoration:'none',textAlign:'center',display:'block'}}>
+            <span style={{fontSize:28,display:'block',marginBottom:4}}>⚽</span>
+            <p style={{fontSize:11,color:'white',fontWeight:700,marginBottom:2}}>サッカーボール</p>
+            <p style={{fontSize:9,color:'#FF9900'}}>Amazonで探す</p>
+          </a>
+          <a href="https://www.amazon.co.jp/s?k=%E3%82%B8%E3%83%A5%E3%83%8B%E3%82%A2%20%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%20%E3%83%A6%E3%83%8B%E3%83%95%E3%82%A9%E3%83%BC%E3%83%A0%20%E4%B8%8A%E4%B8%8B%E3%82%BB%E3%83%83%E3%83%88&tag=haircolorab22-22"
+            target="_blank" rel="noopener noreferrer sponsored"
+            style={{padding:'14px 8px',borderRadius:12,background:'#111',
+              border:'1px solid rgba(255,180,0,0.3)',textDecoration:'none',textAlign:'center',display:'block'}}>
+            <span style={{fontSize:28,display:'block',marginBottom:4}}>👕</span>
+            <p style={{fontSize:11,color:'white',fontWeight:700,marginBottom:2}}>ユニフォーム</p>
+            <p style={{fontSize:9,color:'#FF9900'}}>Amazonで探す</p>
+          </a>
+          <a href="https://www.amazon.co.jp/s?k=%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%20%E5%AF%A9%E5%88%A4%20%E3%82%B0%E3%83%83%E3%82%BA%20%E3%83%9B%E3%82%A4%E3%83%83%E3%82%B9%E3%83%AB%20%E3%83%95%E3%83%A9%E3%83%83%E3%82%B0&tag=haircolorab22-22"
+            target="_blank" rel="noopener noreferrer sponsored"
+            style={{padding:'14px 8px',borderRadius:12,background:'#111',
+              border:'1px solid rgba(255,180,0,0.3)',textDecoration:'none',textAlign:'center',display:'block'}}>
+            <span style={{fontSize:28,display:'block',marginBottom:4}}>🚩</span>
+            <p style={{fontSize:11,color:'white',fontWeight:700,marginBottom:2}}>審判グッズ</p>
+            <p style={{fontSize:9,color:'#FF9900'}}>Amazonで探す</p>
+          </a>
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+          <a href="https://www.amazon.co.jp/s?k=%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%20%E3%81%99%E3%81%AD%E5%BD%93%E3%81%A6%20%E3%82%B8%E3%83%A5%E3%83%8B%E3%82%A2&tag=haircolorab22-22"
+            target="_blank" rel="noopener noreferrer sponsored"
+            style={{padding:'14px 8px',borderRadius:12,background:'#111',
+              border:'1px solid rgba(255,180,0,0.3)',textDecoration:'none',textAlign:'center',display:'block'}}>
+            <span style={{fontSize:28,display:'block',marginBottom:4}}>🦵</span>
+            <p style={{fontSize:11,color:'white',fontWeight:700,marginBottom:2}}>すね当て</p>
+            <p style={{fontSize:9,color:'#FF9900'}}>Amazonで探す</p>
+          </a>
+          <a href="https://www.amazon.co.jp/s?k=%E3%82%B5%E3%83%83%E3%82%AB%E3%83%BC%20%E3%82%BD%E3%83%83%E3%82%AF%E3%82%B9%20%E3%82%B8%E3%83%A5%E3%83%8B%E3%82%A2&tag=haircolorab22-22"
+            target="_blank" rel="noopener noreferrer sponsored"
+            style={{padding:'14px 8px',borderRadius:12,background:'#111',
+              border:'1px solid rgba(255,180,0,0.3)',textDecoration:'none',textAlign:'center',display:'block'}}>
+            <span style={{fontSize:28,display:'block',marginBottom:4}}>🧦</span>
+            <p style={{fontSize:11,color:'white',fontWeight:700,marginBottom:2}}>ソックス</p>
+            <p style={{fontSize:9,color:'#FF9900'}}>Amazonで探す</p>
+          </a>
+        </div>
+        <p style={{fontSize:'9px',color:'rgba(255,255,255,0.2)',textAlign:'center',marginTop:10}}>PR・Amazonアソシエイト</p>
+      </div>
     </main>
   )
 }
