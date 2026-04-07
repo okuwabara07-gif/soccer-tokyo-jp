@@ -88,10 +88,10 @@ export default function MangaPage() {
 
       {/* ValueCommerce 広告 */}
       <div style={{padding:'0 16px',margin:'8px 0',textAlign:'center'}}>
-        <a href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3767207&pid=892590417"
+        <a href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3767207&pid=892590463"
           target="_blank" rel="noopener noreferrer sponsored"
           style={{display:'inline-block'}}>
-          <img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3767207&pid=892590417"
+          <img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3767207&pid=892590463"
             width="234" height="60" alt="" style={{display:'block'}}/>
         </a>
       </div>
