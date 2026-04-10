@@ -297,7 +297,7 @@ export default function HomePage() {
               target="_blank" rel="nofollow noopener noreferrer sponsored"
               style={{display:'inline-block'}}>
               <img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3767207&pid=892590463"
-                border="0" alt="Renta!漫画レンタル" style={{display:'block'}}/>
+                alt="Renta!漫画レンタル" style={{display:'block'}}/>
             </a>
           </div>
           {/* BookLive */}
@@ -307,7 +307,7 @@ export default function HomePage() {
               target="_blank" rel="nofollow noopener noreferrer sponsored"
               style={{display:'inline-block'}}>
               <img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3767207&pid=892590475"
-                border="0" alt="BookLive電子書籍" style={{display:'block'}}/>
+                alt="BookLive電子書籍" style={{display:'block'}}/>
             </a>
           </div>
         </div>
