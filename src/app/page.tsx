@@ -338,6 +338,23 @@ export default function HomePage() {
           ))}
         </div>
       </div>
+      {/* ホーム画面に追加 */}
+      <div style={{margin:"0 16px 16px",padding:"16px",background:"#111",borderRadius:14,border:"1px solid rgba(255,255,255,0.08)"}}>
+        <p style={{fontSize:10,color:"rgba(255,255,255,0.4)",letterSpacing:"0.15em",marginBottom:12}}>ホーム画面に追加</p>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <span style={{fontSize:32}}>📱</span>
+          <div style={{flex:1}}>
+            <p style={{fontSize:13,fontWeight:600,color:"white",marginBottom:4}}>アプリのように使う</p>
+            <p style={{fontSize:11,color:"rgba(255,255,255,0.5)",lineHeight:1.5}}>ホーム画面に追加すると
+すぐに開けます</p>
+          </div>
+        </div>
+        <button onClick={handleInstall} style={{width:"100%",marginTop:12,padding:"12px",borderRadius:10,background:"#FFD700",border:"none",color:"#1a1a1a",fontSize:13,fontWeight:700,cursor:"pointer"}}>
+          📲 ホーム画面に追加する
+        </button>
+        <p style={{fontSize:10,color:"rgba(255,255,255,0.3)",marginTop:8,textAlign:"center"}}>iOSの場合：Safari下の共有ボタン →「ホーム画面に追加」</p>
+      </div>
+
       {/* SNS・共有セクション */}
       <div style={{margin:'0 16px 16px',padding:'16px',background:'#111',borderRadius:14,border:'1px solid rgba(255,255,255,0.08)'}}>
         <p style={{fontSize:10,color:'rgba(255,255,255,0.4)',letterSpacing:'0.15em',marginBottom:12}}>SNS・シェア</p>
