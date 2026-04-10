@@ -34,10 +34,12 @@ export default function HomePage() {
   const [heroIdx, setHeroIdx] = useState(0)
   const [showInstall, setShowInstall] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const [childName, setChildName] = useState("")
 
   useEffect(() => {
     // ページ読み込み時にランダムなヒーロー画像を選択
     setHeroIdx(Math.floor(Math.random() * HERO_IMAGES.length))
+    const name = localStorage.getItem("childName"); if(name) setChildName(name)
 
     // PWAインストールプロンプト
     const handler = (e: any) => { e.preventDefault(); setDeferredPrompt(e); setShowInstall(true) }
@@ -101,7 +103,8 @@ export default function HomePage() {
 
           {/* メインコピー */}
           <div style={{position:'absolute',bottom:120,left:20,right:20}}>
-            <p style={{color:'rgba(255,255,255,0.5)',fontSize:10,letterSpacing:'0.2em',marginBottom:8}}>TOKYO & KANTO</p>
+            {childName && <p style={{color:"#FFD700",fontSize:13,fontWeight:700,marginBottom:4}}>こんにちは、{childName}選手！</p>}
+            <p style={{color:"rgba(255,255,255,0.5)",fontSize:10,letterSpacing:"0.2em",marginBottom:8}}>TOKYO & KANTO</p>
             <h1 style={{color:'white',fontSize:36,fontWeight:700,lineHeight:1.2,marginBottom:8,
               textShadow:'0 2px 8px rgba(0,0,0,0.6)'}}>
               チームを探す。<br/>仲間と出会う。<br/>成長する。
