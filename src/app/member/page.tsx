@@ -8,6 +8,10 @@ const PLANS = [
 ]
 export default function MemberPage() {
   const [loading, setLoading] = useState<string|null>(null)
+  const [inviteCode, setInviteCode] = useState('')
+  const [inviteStatus, setInviteStatus] = useState<'idle'|'loading'|'success'|'error'>('idle')
+  const [inviteMsg, setInviteMsg] = useState('')
+
   const handleCheckout = async (planId: string) => {
     setLoading(planId)
     const res = await fetch('/api/create-checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan:planId})})
@@ -15,6 +19,30 @@ export default function MemberPage() {
     if (data.url) window.location.href = data.url
     setLoading(null)
   }
+
+  const handleInviteCode = async () => {
+    if (!inviteCode.trim()) return
+    setInviteStatus('loading')
+    try {
+      const res = await fetch('/api/use-invite-code', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({code: inviteCode.trim()})
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setInviteStatus('success')
+        setInviteMsg('✅ 招待コードが適用されました！プレミアム会員として登録されました。')
+      } else {
+        setInviteStatus('error')
+        setInviteMsg(data.error || '❌ 無効なコードです')
+      }
+    } catch {
+      setInviteStatus('error')
+      setInviteMsg('❌ エラーが発生しました')
+    }
+  }
+
   return (
     <main style={{minHeight:'100vh',background:'#f8f8f6',fontFamily:'-apple-system,sans-serif'}}>
       <div style={{maxWidth:480,margin:'0 auto'}}>
@@ -24,7 +52,32 @@ export default function MemberPage() {
           <p style={{color:'rgba(255,255,255,0.4)',fontSize:11}}>セレクション申込URL・詳細情報を閲覧できます</p>
         </div>
         <div style={{padding:16}}>
-          {PLANS.map(plan=>(
+
+          {/* 招待コード */}
+          <div style={{background:'white',borderRadius:14,border:'2px solid #4CAF50',padding:'14px 16px',marginBottom:16}}>
+            <p style={{fontSize:13,fontWeight:500,marginBottom:8,color:'#2e7d32'}}>🎟️ 招待コードをお持ちの方</p>
+            <div style={{display:'flex',gap:8}}>
+              <input
+                type="text"
+                value={inviteCode}
+                onChange={e=>setInviteCode(e.target.value.toUpperCase())}
+                placeholder="招待コードを入力"
+                style={{flex:1,padding:'10px 12px',borderRadius:8,border:'1px solid #ddd',fontSize:13,outline:'none'}}
+              />
+              <button
+                onClick={handleInviteCode}
+                disabled={inviteStatus==='loading'||inviteStatus==='success'}
+                style={{padding:'10px 16px',borderRadius:8,border:'none',cursor:'pointer',fontSize:13,fontWeight:500,background:'#4CAF50',color:'white',whiteSpace:'nowrap'}}
+              >
+                {inviteStatus==='loading'?'確認中...':'適用する'}
+              </button>
+            </div>
+            {inviteMsg && (
+              <p style={{fontSize:12,marginTop:8,color:inviteStatus==='success'?'#2e7d32':'#c62828'}}>{inviteMsg}</p>
+            )}
+          </div>
+
+          {inviteStatus !== 'success' && PLANS.map(plan=>(
             <div key={plan.id} style={{background:'white',borderRadius:14,border:plan.highlight?'2px solid #c9a84c':'1px solid #eeeeea',padding:'14px 16px',marginBottom:10,position:'relative'}}>
               {plan.highlight && <div style={{position:'absolute',top:-10,left:'50%',transform:'translateX(-50%)',background:'#c9a84c',color:'white',fontSize:9,padding:'3px 12px',borderRadius:10,fontWeight:500,whiteSpace:'nowrap'}}>一番お得</div>}
               <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
