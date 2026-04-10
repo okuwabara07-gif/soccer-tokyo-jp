@@ -171,7 +171,7 @@ export default function HomePage() {
 
       {/* 統計 */}
       <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:1,background:'rgba(255,255,255,0.05)',margin:'0'}}>
-        {[['730+','登録チーム'],['4都県','対応エリア'],['無料','チーム検索']].map(([num,label])=>(
+        {[['6,000+','登録チーム'],['4都県','対応エリア'],['無料','チーム検索']].map(([num,label])=>(
           <div key={label} style={{background:'#111',padding:'16px 8px',textAlign:'center'}}>
             <p style={{fontSize:20,fontWeight:700,color:'#FFD700',marginBottom:2}}>{num}</p>
             <p style={{fontSize:10,color:'rgba(255,255,255,0.4)'}}>{label}</p>
@@ -196,7 +196,7 @@ export default function HomePage() {
           </div>
           <div style={{flexShrink:0,textAlign:'center'}}>
             <div style={{fontSize:32,marginBottom:4}}>⚽</div>
-            <p style={{color:'rgba(255,255,255,0.7)',fontSize:9}}>730+チーム</p>
+            <p style={{color:'rgba(255,255,255,0.7)',fontSize:9}}>6,000+チーム</p>
           </div>
         </div>
       </div>
@@ -208,7 +208,7 @@ export default function HomePage() {
         {/* メイン機能 */}
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:8}}>
           {[
-            {href:'/teams',emoji:'🗺️',title:'チームを探す',desc:'730+チームをマップで検索',color:'#4CAF50',image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&q=80'},
+            {href:'/teams',emoji:'🗺️',title:'チームを探す',desc:'6,000+チームをマップで検索',color:'#4CAF50',image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&q=80'},
             {href:'/foot-camera',emoji:'👟',title:'AI足型診断',desc:'写真1枚でスパイク提案',color:'#FFD700',image:'https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?w=400&q=80'},
           ].map(item=>(
             <Link key={item.href} href={item.href}
