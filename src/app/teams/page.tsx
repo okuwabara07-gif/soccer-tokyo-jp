@@ -64,7 +64,8 @@ export default function TeamsPage() {
 
   useEffect(() => {
     const plan = localStorage.getItem('memberPlan')
-    setIsPremium(!!plan)
+    const isAdmin = localStorage.getItem('isAdmin')
+    setIsPremium(!!plan || !!isAdmin)
   }, [])
 
   useEffect(() => {
