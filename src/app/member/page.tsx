@@ -31,7 +31,7 @@ export default function MemberPage() {
       })
       const data = await res.json()
       if (res.ok) {
-        setInviteStatus('success')
+        localStorage.setItem("memberPlan","premium");localStorage.setItem("memberSince",new Date().toISOString());setInviteStatus("success")
         setInviteMsg('✅ 招待コードが適用されました！プレミアム会員として登録されました。')
       } else {
         setInviteStatus('error')
