@@ -44,7 +44,11 @@ export default function AdminPage() {
   const [stats, setStats] = useState<{prefecture:string,count:number}[]>([])
 
   const login = () => {
-    if (pw === ADMIN_PASSWORD) { setAuthed(true); setPwError(false) }
+    if (pw === ADMIN_PASSWORD) {
+      setAuthed(true)
+      setPwError(false)
+      localStorage.setItem('isAdmin', 'true')
+    }
     else setPwError(true)
   }
 
@@ -129,7 +133,7 @@ export default function AdminPage() {
     <main style={{minHeight:'100vh',background:'#f8f8f6',fontFamily:'-apple-system,sans-serif'}}>
       <div style={{background:'#0a0a0a',padding:'14px 20px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
         <p style={{color:'white',fontWeight:700,fontSize:16}}>⚽ 管理画面</p>
-        <button onClick={()=>setAuthed(false)}
+        <button onClick={()=>{setAuthed(false);localStorage.removeItem('isAdmin')}}
           style={{color:'rgba(255,255,255,0.4)',fontSize:12,background:'none',border:'none',cursor:'pointer'}}>
           ログアウト
         </button>
