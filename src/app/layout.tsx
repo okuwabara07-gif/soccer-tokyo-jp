@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ja" className={geistSans.variable}>
       <head>
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3460729726810386" crossorigin="anonymous"></script>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3460729726810386" crossOrigin="anonymous"></script>
         <link rel="apple-touch-icon" href="/icon-192.png"/>
         <meta name="apple-mobile-web-app-capable" content="yes"/>
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
