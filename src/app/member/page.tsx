@@ -1,16 +1,27 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 const PLANS = [
   { id:'papa_mama', name:'パパママ応援プラン', price:'¥4,500', sub:'6ヶ月一括', badge:'初回限定・一番お得', badgeColor:'#854F0B', badgeBg:'#FAEEDA', features:['申込URL・締切日','チーム詳細情報','ブロック別順位表','セレクション速報'], highlight:true },
   { id:'standard', name:'スタンダード', price:'¥500', sub:'月額', badge:'保護者向け', badgeColor:'#0C447C', badgeBg:'#E6F1FB', features:['申込URL・締切日','チーム詳細情報','ブロック別順位表'], highlight:false },
   { id:'premium', name:'プレミアム', price:'¥1,500', sub:'月額', badge:'本気の保護者向け', badgeColor:'#3C3489', badgeBg:'#EEEDFE', features:['スタンダード全機能','合格率データ','セレクション対策','LINE個別通知'], highlight:false },
 ]
 export default function MemberPage() {
+  const router = useRouter()
   const [loading, setLoading] = useState<string|null>(null)
   const [inviteCode, setInviteCode] = useState('')
   const [inviteStatus, setInviteStatus] = useState<'idle'|'loading'|'success'|'error'>('idle')
   const [inviteMsg, setInviteMsg] = useState('')
+
+  useEffect(() => {
+    if (inviteStatus === 'success') {
+      const timer = setTimeout(() => {
+        router.push('/mypage')
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [inviteStatus, router])
 
   const handleCheckout = async (planId: string) => {
     setLoading(planId)
@@ -47,7 +58,7 @@ export default function MemberPage() {
     <main style={{minHeight:'100vh',background:'#f8f8f6',fontFamily:'-apple-system,sans-serif'}}>
       <div style={{maxWidth:480,margin:'0 auto'}}>
         <div style={{background:'#0a0a0a',padding:'20px 16px 16px'}}>
-          <Link href="/" style={{color:'rgba(255,255,255,0.4)',fontSize:12,textDecoration:'none',display:'block',marginBottom:8}}>← 戻る</Link>
+          <button onClick={() => window.history.back()} style={{background:'none',border:'none',color:'rgba(255,255,255,0.4)',fontSize:12,textDecoration:'none',display:'block',marginBottom:8,cursor:'pointer',padding:0}}>← 戻る</button>
           <h1 style={{color:'white',fontSize:22,fontWeight:300,marginBottom:4}}>会員プランを選ぶ</h1>
           <p style={{color:'rgba(255,255,255,0.4)',fontSize:11}}>セレクション申込URL・詳細情報を閲覧できます</p>
         </div>
