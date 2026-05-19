@@ -5,11 +5,12 @@ import "./globals.css";
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "サッカー東京・神奈川・埼玉・千葉 | 関東ジュニアサッカー情報局",
-  description: "東京・神奈川・埼玉・千葉のジュニアサッカーチーム検索・セレクション情報・AI足型診断・栄養アドバイス",
+  metadataBase: new URL("https://soccer-selection.jp"),
+  title: "サッカーセレクション | 関東のジュニアチーム検索・セレクション情報",
+  description: "関東のジュニアサッカーチーム・セレクション情報を検索。チーム選びに役立つ情報を提供する総合サッカー情報サイト。",
   manifest: "/manifest.json",
   themeColor: "#0a0a0a",
-  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "サッカー関東" },
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "サッカーセレクション" },
 };
 
 export const viewport = {

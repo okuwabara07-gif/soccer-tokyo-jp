@@ -1,4 +1,9 @@
+# *
 User-agent: *
 Allow: /
 
-Sitemap: https://okuwabara07-gif.github.io/soccer-tokyo-jp/sitemap.xml
+# Host
+Host: https://soccer-selection.jp
+
+# Sitemaps
+Sitemap: https://soccer-selection.jp/sitemap.xml
