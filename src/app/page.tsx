@@ -134,6 +134,18 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* LINEミニアプリ 近日公開告知 */}
+      <section className="kf-container" style={{ padding: "40px 16px 0" }}>
+        <div className="kf-card" style={{ padding: 24, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap", background: "#06C755", border: "none" }}>
+          <div style={{ color: "#fff" }}>
+            <div style={{ fontSize: 12, fontWeight: 700, opacity: .9 }}>COMING SOON</div>
+            <div style={{ fontSize: 20, fontWeight: 800, marginTop: 2 }}>LINEミニアプリ 近日公開</div>
+            <p style={{ margin: "6px 0 0", fontSize: 13, opacity: .95 }}>セレクション締切のリマインド通知や、お子さまのマイカルテをLINEで。準備が整い次第お知らせします。</p>
+          </div>
+          <span style={{ background: "rgba(255,255,255,.2)", color: "#fff", padding: "10px 18px", borderRadius: 999, fontWeight: 700, fontSize: 13 }}>準備中</span>
+        </div>
+      </section>
+
       <section style={{ background:"var(--kf-surface)", borderTop:"1px solid var(--kf-border)", marginTop:48, padding:"56px 0" }}>
         <div className="kf-container">
           <div style={{ textAlign:"center", marginBottom:28 }}>

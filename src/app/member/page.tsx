@@ -3,9 +3,9 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 const PLANS = [
-  { id:'papa_mama', name:'パパママ応援プラン', price:'¥4,500', sub:'6ヶ月一括', badge:'初回限定・一番お得', badgeColor:'#854F0B', badgeBg:'#FAEEDA', features:['申込URL・締切日','チーム詳細情報','ブロック別順位表','セレクション速報'], highlight:true },
-  { id:'standard', name:'スタンダード', price:'¥500', sub:'月額', badge:'保護者向け', badgeColor:'#0C447C', badgeBg:'#E6F1FB', features:['申込URL・締切日','チーム詳細情報','ブロック別順位表'], highlight:false },
-  { id:'premium', name:'プレミアム', price:'¥1,500', sub:'月額', badge:'本気の保護者向け', badgeColor:'#3C3489', badgeBg:'#EEEDFE', features:['スタンダード全機能','合格率データ','セレクション対策','LINE個別通知'], highlight:false },
+  { id:'papa_mama', name:'パパママ応援プラン', price:'¥4,500', sub:'6ヶ月一括', badge:'一番お得', badgeColor:'#854F0B', badgeBg:'#FAEEDA', features:['Jリーグ/JFL下部組織セレクション情報フル閲覧','セレクション締切リマインド通知','AI診断フル開放（足型・体格・栄養）','お気に入りチーム無制限','診断結果・締切一覧のPDF保存'], highlight:true },
+  { id:'standard', name:'スタンダード', price:'¥500', sub:'月額', badge:'まずはここから', badgeColor:'#0C447C', badgeBg:'#E6F1FB', features:['Jリーグ/JFL下部組織セレクション情報フル閲覧','セレクション締切リマインド通知','AI診断フル開放（足型・体格・栄養）','お気に入りチーム無制限'], highlight:false },
+  { id:'premium', name:'プレミアム', price:'¥1,500', sub:'月額', badge:'しっかりサポート', badgeColor:'#3C3489', badgeBg:'#EEEDFE', features:['スタンダード全機能','診断結果・締切一覧のPDF保存','過去のセレクション開催履歴','新着セレクションの優先通知'], highlight:false },
 ]
 export default function MemberPage() {
   const router = useRouter()
