@@ -39,3 +39,74 @@ body {
 html {
   font-size: 18px;
 }
+
+/* =========================================================
+   KANTO FOOTBALL DATABASE — Redesign Tokens (auto-appended)
+   ========================================================= */
+:root {
+  --kf-bg:            #F7F8F5;
+  --kf-surface:       #FFFFFF;
+  --kf-primary:       #168342;
+  --kf-primary-soft:  #E7F4EC;
+  --kf-primary-dark:  #0F6A34;
+  --kf-accent:        #F5C542;
+  --kf-accent-dark:   #E0AF20;
+  --kf-text:          #111827;
+  --kf-muted:         #6B7280;
+  --kf-border:        #E5E7EB;
+  --kf-danger:        #E5484D;
+  --kf-radius:        14px;
+  --kf-radius-sm:     10px;
+  --kf-radius-lg:     20px;
+  --kf-shadow:        0 1px 2px rgba(17,24,39,.04), 0 4px 16px rgba(17,24,39,.06);
+  --kf-shadow-hover:  0 4px 8px rgba(17,24,39,.06), 0 12px 28px rgba(17,24,39,.10);
+  --kf-gap:           16px;
+  --kf-maxw:          1120px;
+}
+.kf-container { max-width: var(--kf-maxw); margin-inline: auto; padding-inline: 16px; }
+.kf-card {
+  background: var(--kf-surface);
+  border: 1px solid var(--kf-border);
+  border-radius: var(--kf-radius);
+  box-shadow: var(--kf-shadow);
+  transition: box-shadow .18s ease, transform .18s ease;
+}
+.kf-card:hover { box-shadow: var(--kf-shadow-hover); transform: translateY(-2px); }
+.kf-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-weight: 700; line-height: 1; cursor: pointer;
+  padding: 12px 18px; border-radius: 999px; border: 1px solid transparent;
+  text-decoration: none;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.kf-btn--primary { background: var(--kf-primary); color: #fff; }
+.kf-btn--primary:hover { background: var(--kf-primary-dark); }
+.kf-btn--ghost { background: #fff; color: var(--kf-primary); border-color: var(--kf-border); }
+.kf-btn--ghost:hover { border-color: var(--kf-primary); background: var(--kf-primary-soft); }
+.kf-btn--pay { background: var(--kf-accent); color: #1A1A1A; }
+.kf-btn--pay:hover { background: var(--kf-accent-dark); }
+.kf-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600; color: var(--kf-muted);
+  padding: 6px 12px; border-radius: 999px;
+  background: #fff; border: 1px solid var(--kf-border);
+}
+.kf-chip[data-active="true"] { color: var(--kf-primary); background: var(--kf-primary-soft); border-color: transparent; }
+.kf-badge {
+  display: inline-flex; align-items: center;
+  font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 6px;
+  background: var(--kf-primary-soft); color: var(--kf-primary);
+}
+.kf-badge--deadline { background: #FDECEC; color: var(--kf-danger); }
+.kf-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 40px 20px; text-align: center; color: var(--kf-muted);
+  border: 1px dashed var(--kf-border); border-radius: var(--kf-radius);
+  background: #fff;
+}
+.kf-empty__title { font-weight: 700; color: var(--kf-text); }
+.kf-empty__hint  { font-size: 13px; }
+.kf-pr-label {
+  display: inline-block; font-size: 11px; color: var(--kf-muted);
+  border: 1px solid var(--kf-border); border-radius: 4px; padding: 1px 6px;
+}

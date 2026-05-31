@@ -1,408 +1,166 @@
-'use client'
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
+// 配置先: src/app/page.tsx
+import Link from "next/link";
+import Header from "@/components/Header";
+import BottomNav from "@/components/BottomNav";
+import StatBar from "@/components/StatBar";
+import SectionHeader from "@/components/SectionHeader";
+import SiteFooter from "@/components/SiteFooter";
 
-const HERO_IMAGES = [
-  {
-    url: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=900&q=80',
-    pos: 'center 30%',
-    label: '仲間と共に、勝利をつかめ'
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?w=900&q=80',
-    pos: 'center 25%',
-    label: '毎日の積み重ねが、未来を変える'
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=900&q=80',
-    pos: 'center 40%',
-    label: '関東のグラウンドで、夢を描け'
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1600679472829-3044539ce405?w=900&q=80',
-    pos: 'center 35%',
-    label: 'コーチと二人三脚、限界を超えろ'
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&q=80',
-    pos: 'center 20%',
-    label: 'チームが、もう一人の家族になる'
-  },
-]
+const HERO_IMG = "https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?w=1000&q=80";
+
+const CONTENTS = [
+  { label: "チームを探す", href: "/teams", icon: "M11 19a8 8 0 100-16 8 8 0 000 16zM21 21l-4.3-4.3" },
+  { label: "セレクション情報", href: "/selection", icon: "M8 2v4M16 2v4M3 9h18M5 5h14v15H5z" },
+  { label: "口コミランキング", href: "/reviews", icon: "M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.7L12 17l-6.2 3.8 1.6-6.7L2.2 9.5l6.9-.6z" },
+  { label: "準備物・グッズ", href: "/goods", icon: "M6 2l1.5 4h9L18 2M3 6h18l-1.6 13.4A2 2 0 0117.4 21H6.6a2 2 0 01-2-1.6z" },
+  { label: "スパイク診断", href: "/shoes", icon: "M2 17h13l5-3 .5-2-9-3-2-3H4z" },
+  { label: "ゴールパフォーマンス図鑑", href: "/performance", icon: "M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.7L12 17l-6.2 3.8 1.6-6.7L2.2 9.5l6.9-.6z" },
+  { label: "栄養・補食ガイド", href: "/nutrition", icon: "M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20" },
+  { label: "体格診断", href: "/body-check", icon: "M12 12a4 4 0 100-8 4 4 0 000 8zM4 20a8 8 0 0116 0" },
+  { label: "AI足型診断", href: "/foot-check", icon: "M2 17h13l5-3 .5-2-9-3-2-3H4z" },
+  { label: "ポジション別資料", href: "/position", icon: "M4 4h16v16H4zM4 9h16M9 9v11" },
+  { label: "新ルール・用語", href: "/rules", icon: "M4 19.5A2.5 2.5 0 016.5 17H20M4 4.5A2.5 2.5 0 016.5 2H20v15H6.5A2.5 2.5 0 004 19.5z" },
+  { label: "サッカー漫画", href: "/manga", icon: "M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" },
+  { label: "チームマッチング", href: "/matching", icon: "M16 11a4 4 0 10-8 0M2 21a7 7 0 0120 0" },
+];
+
+const AREAS = [
+  { label: "東京エリア", href: "/teams?area=tokyo" },
+  { label: "神奈川エリア", href: "/teams?area=kanagawa" },
+  { label: "埼玉エリア", href: "/teams?area=saitama" },
+  { label: "千葉エリア", href: "/teams?area=chiba" },
+];
+
+const GOODS = [
+  { label: "入団準備ガイド", href: "/goods" },
+  { label: "遠征準備ガイド", href: "/goods" },
+  { label: "夏の暑さ対策ガイド", href: "/goods" },
+  { label: "冬の寒さ対策ガイド", href: "/goods" },
+  { label: "GK専用ガイド", href: "/goods" },
+  { label: "ジュニアユース準備", href: "/goods" },
+];
+
+const SELECTIONS: { id: string; team: string; category: string; date: string; target: string; deadline: string }[] = [];
 
 export default function HomePage() {
-  const [heroIdx, setHeroIdx] = useState(0)
-  const [showInstall, setShowInstall] = useState(false)
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
-  const [childName, setChildName] = useState("")
-
-  useEffect(() => {
-    // ページ読み込み時にランダムなヒーロー画像を選択
-    setHeroIdx(Math.floor(Math.random() * HERO_IMAGES.length))
-    const name = localStorage.getItem("childName"); if(name) setChildName(name)
-
-    // PWAインストールプロンプト
-    const handler = (e: any) => { e.preventDefault(); setDeferredPrompt(e); setShowInstall(true) }
-    window.addEventListener('beforeinstallprompt', handler)
-
-    // ヒーロー自動スライド（5秒ごと）
-    const slideTimer = setInterval(() => {
-      setHeroIdx(prev => (prev + 1) % HERO_IMAGES.length)
-    }, 5000)
-
-    // iOSの場合は常に表示
-    const isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())
-    const isStandalone = (window.navigator as any).standalone
-    if (isIOS && !isStandalone) setShowInstall(true)
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handler)
-      clearInterval(slideTimer)
-    }
-  }, [])
-
-  const handleInstall = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt()
-      const result = await deferredPrompt.userChoice
-      if (result.outcome === 'accepted') setShowInstall(false)
-    } else {
-      // iOS向けの説明
-      alert('ホーム画面に追加する方法\n\nSafariの場合：\n1. 画面下の「共有」ボタンをタップ\n2.「ホーム画面に追加」を選択\n3.「追加」をタップ')
-    }
-  }
-
-  const hero = HERO_IMAGES[heroIdx]
-
   return (
-    <main style={{minHeight:'100vh',background:'#0a0a0a',fontFamily:'-apple-system,sans-serif'}}>
+    <div style={{ background: "var(--kf-bg)", minHeight: "100vh", color: "var(--kf-text)" }}>
+      <Header />
 
-      {/* ヒーローセクション */}
-      <div style={{position:'relative',height:'100svh',maxHeight:700,overflow:'hidden'}}>
-        <img key={heroIdx} src={hero.url} alt="サッカー"
-          style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:hero.pos,
-            animation:'fadeIn 1s ease-in-out'}}/>
-        <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,rgba(0,0,0,0.3) 0%,rgba(10,10,10,0.95) 100%)'}}>
-
-          {/* ヘッダー */}
-          <div style={{position:'absolute',top:0,left:0,right:0,padding:'16px',
-            display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <div>
-              <p style={{color:'rgba(255,255,255,0.5)',fontSize:9,letterSpacing:'0.15em',marginBottom:2}}>KANTO FOOTBALL DATABASE</p>
-              <p style={{color:'white',fontSize:13,fontWeight:700,lineHeight:1.2}}>
-                サッカー東京・神奈川<br/>埼玉・千葉
-              </p>
-            </div>
-            <Link href="/member"
-              style={{padding:'8px 14px',borderRadius:20,background:'#FFD700',
-                color:'#1a1a1a',fontSize:11,fontWeight:700,textDecoration:'none',
-                whiteSpace:'nowrap',flexShrink:0}}>
-              会員登録
-            </Link>
-          </div>
-
-          {/* メインコピー */}
-          <div style={{position:'absolute',bottom:120,left:20,right:20}}>
-            {childName && <p style={{color:"#FFD700",fontSize:13,fontWeight:700,marginBottom:4}}>こんにちは、{childName}選手！</p>}
-            <p style={{color:"rgba(255,255,255,0.5)",fontSize:10,letterSpacing:"0.2em",marginBottom:8}}>TOKYO & KANTO</p>
-            <h1 style={{color:'white',fontSize:36,fontWeight:700,lineHeight:1.2,marginBottom:8,
-              textShadow:'0 2px 8px rgba(0,0,0,0.6)'}}>
-              チームを探す。<br/>仲間と出会う。<br/>成長する。
+      <section style={{ background: "var(--kf-surface)", borderBottom: "1px solid var(--kf-border)" }}>
+        <div className="kf-container kf-hero" style={{ display: "grid", gridTemplateColumns: "1.1fr .9fr", gap: 32, alignItems: "center", padding: "48px 16px" }}>
+          <div>
+            <h1 style={{ margin: 0, fontSize: 40, lineHeight: 1.2, fontWeight: 800 }}>
+              子どもに合う<br />サッカーチームを探そう
             </h1>
-            <p style={{color:'rgba(255,255,255,0.75)',fontSize:14,fontWeight:600,lineHeight:1.6,
-              textShadow:'0 1px 4px rgba(0,0,0,0.8)'}}>
-              東京・関東のサッカー情報を<br/>ひとつにまとめたプラットフォーム
+            <p style={{ margin: "16px 0 8px", fontSize: 18, fontWeight: 700, color: "var(--kf-primary)" }}>
+              関東 6,000チーム掲載
             </p>
-          </div>
-
-          {/* CTAボタン */}
-          <div style={{position:'absolute',bottom:40,left:20,right:20,display:'flex',gap:10}}>
-            <Link href="/teams"
-              style={{flex:2,padding:'14px',borderRadius:12,background:'#4CAF50',
-                color:'white',fontSize:14,fontWeight:700,textDecoration:'none',
-                textAlign:'center',boxShadow:'0 4px 12px rgba(76,175,80,0.4)'}}>
-              チームを探す
-            </Link>
-            <Link href="/mypage"
-              style={{flex:1,padding:'14px',borderRadius:12,
-                background:'rgba(255,255,255,0.12)',border:'1px solid rgba(255,255,255,0.2)',
-                color:'white',fontSize:13,fontWeight:500,textDecoration:'none',
-                textAlign:'center',backdropFilter:'blur(4px)'}}>
-              マイページ
-            </Link>
-          </div>
-
-          {/* 画像インジケーター＋ラベル */}
-          <div style={{position:'absolute',bottom:16,left:'50%',transform:'translateX(-50%)',
-            display:'flex',flexDirection:'column',alignItems:'center',gap:8}}>
-            <p style={{color:'rgba(255,255,255,0.7)',fontSize:11,letterSpacing:'0.08em',
-              textShadow:'0 1px 4px rgba(0,0,0,0.9)',fontWeight:500,textAlign:'center'}}>
-              {HERO_IMAGES[heroIdx].label}
+            <p style={{ margin: 0, color: "var(--kf-muted)", fontSize: 14, lineHeight: 1.7 }}>
+              東京・神奈川・埼玉・千葉のジュニアサッカー・ジュニアユース・スクールまで完全網羅
             </p>
-            <div style={{display:'flex',gap:6}}>
-              {HERO_IMAGES.map((_,i)=>(
-                <div key={i}
-                  onClick={()=>setHeroIdx(i)}
-                  style={{width:i===heroIdx?22:6,height:6,borderRadius:3,
-                    background:i===heroIdx?'#FFD700':'rgba(255,255,255,0.35)',
-                    transition:'all 0.4s ease',cursor:'pointer'}}/>
-              ))}
+            <div style={{ display: "flex", gap: 12, marginTop: 24, flexWrap: "wrap" }}>
+              <Link href="/teams" className="kf-btn kf-btn--primary" style={{ padding: "14px 24px" }}>チームを探す</Link>
+              <Link href="/teams#area" className="kf-btn kf-btn--ghost" style={{ padding: "14px 24px" }}>エリアから探す</Link>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* ホーム画面追加バナー */}
-      {showInstall && (
-        <div style={{background:'#1a1a2e',padding:'12px 16px',
-          display:'flex',alignItems:'center',gap:12,borderBottom:'1px solid rgba(255,255,255,0.08)'}}>
-          <span style={{fontSize:24,flexShrink:0}}>📱</span>
-          <div style={{flex:1}}>
-            <p style={{fontSize:12,fontWeight:600,color:'white',marginBottom:1}}>ホーム画面に追加</p>
-            <p style={{fontSize:10,color:'rgba(255,255,255,0.5)'}}>アプリのように使えます</p>
-          </div>
-          <button onClick={handleInstall}
-            style={{padding:'7px 14px',borderRadius:8,background:'#FFD700',
-              border:'none',color:'#1a1a1a',fontSize:11,fontWeight:700,cursor:'pointer',flexShrink:0}}>
-            追加する
-          </button>
-          <button onClick={()=>setShowInstall(false)}
-            style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',
-              fontSize:18,cursor:'pointer',flexShrink:0,padding:0}}>✕</button>
-        </div>
-      )}
-
-      {/* 統計 */}
-      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:1,background:'rgba(255,255,255,0.05)',margin:'0'}}>
-        {[['6,000+','登録チーム'],['4都県','対応エリア'],['無料','チーム検索']].map(([num,label])=>(
-          <div key={label} style={{background:'#111',padding:'16px 8px',textAlign:'center'}}>
-            <p style={{fontSize:20,fontWeight:700,color:'#FFD700',marginBottom:2}}>{num}</p>
-            <p style={{fontSize:10,color:'rgba(255,255,255,0.4)'}}>{label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* ジュニア・ジュニアユース向けバナー */}
-      <div style={{margin:'12px 16px 0',borderRadius:14,overflow:'hidden',position:'relative'}}>
-        <img src="https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=800&q=80"
-          alt="ジュニアサッカー" style={{width:'100%',height:120,objectFit:'cover',objectPosition:'center 30%',display:'block'}}/>
-        <div style={{position:'absolute',inset:0,background:'linear-gradient(135deg,rgba(76,175,80,0.85),rgba(45,106,79,0.85))',
-          display:'flex',alignItems:'center',padding:'0 16px',gap:12}}>
-          <div style={{flex:1}}>
-            <p style={{color:'rgba(255,255,255,0.8)',fontSize:10,letterSpacing:'0.1em',marginBottom:4}}>FOR JUNIOR & JUNIOR YOUTH</p>
-            <p style={{color:'white',fontSize:15,fontWeight:700,lineHeight:1.4,marginBottom:4}}>
-              ジュニア・ジュニアユースの<br/>未来をサポート
-            </p>
-            <p style={{color:'rgba(255,255,255,0.75)',fontSize:10,lineHeight:1.6}}>
-              東京・関東のU-12〜U-15チーム情報・セレクション・AI診断まで
-            </p>
-          </div>
-          <div style={{flexShrink:0,textAlign:'center'}}>
-            <div style={{fontSize:32,marginBottom:4}}>⚽</div>
-            <p style={{color:'rgba(255,255,255,0.7)',fontSize:9}}>6,000+チーム</p>
+          <div style={{ borderRadius: "var(--kf-radius-lg)", overflow: "hidden", aspectRatio: "4/3", background: "var(--kf-primary-soft)" }}>
+            <img src={HERO_IMG} alt="サッカーボールを持つ子ども" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* ナビゲーション */}
-      <div style={{padding:'16px'}}>
-        <p style={{fontSize:10,color:'rgba(255,255,255,0.3)',letterSpacing:'0.15em',marginBottom:12}}>MENU</p>
+      <section className="kf-container" style={{ padding: "24px 16px 0" }}>
+        <StatBar />
+      </section>
 
-        {/* メイン機能 */}
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:8}}>
-          {[
-            {href:'/teams',emoji:'🗺️',title:'チームを探す',desc:'6,000+チームをマップで検索',color:'#4CAF50',image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&q=80'},
-            {href:'/foot-camera',emoji:'👟',title:'AI足型診断',desc:'写真1枚でスパイク提案',color:'#FFD700',image:'https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?w=400&q=80'},
-          ].map(item=>(
-            <Link key={item.href} href={item.href}
-              style={{position:'relative',height:130,borderRadius:14,overflow:'hidden',textDecoration:'none',display:'block'}}>
-              <img src={item.image} alt={item.title} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
-              <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,transparent 20%,rgba(0,0,0,0.85) 100%)'}}>
-                <div style={{position:'absolute',bottom:10,left:10,right:10}}>
-                  <span style={{fontSize:16}}>{item.emoji}</span>
-                  <p style={{fontSize:12,fontWeight:700,color:'white',marginBottom:1}}>{item.title}</p>
-                  <p style={{fontSize:9,color:'rgba(255,255,255,0.6)'}}>{item.desc}</p>
-                </div>
+      <section className="kf-container" style={{ padding: "40px 16px 0" }}>
+        <SectionHeader title="今月のセレクション情報" moreHref="/selection" />
+        {SELECTIONS.length === 0 ? (
+          <div className="kf-empty">
+            <div className="kf-empty__title">セレクション情報は準備中です</div>
+            <div className="kf-empty__hint">各チームの募集・締切・会場が確定次第ここに掲載します。</div>
+            <Link href="/selection" className="kf-btn kf-btn--ghost" style={{ marginTop: 8, padding: "10px 18px", fontSize: 13 }}>セレクション情報を見る</Link>
+          </div>
+        ) : (
+          <div style={{ display: "flex", gap: 14, overflowX: "auto", paddingBottom: 8 }}>
+            {SELECTIONS.map((s) => (
+              <div key={s.id} className="kf-card" style={{ minWidth: 200, padding: 16 }}>
+                <div style={{ fontWeight: 700 }}>{s.team}</div>
+                <span className="kf-badge" style={{ marginTop: 6 }}>{s.category}</span>
+                <div style={{ fontSize: 13, color: "var(--kf-muted)", marginTop: 8 }}>{s.date}／{s.target}</div>
+                <span className="kf-badge kf-badge--deadline" style={{ marginTop: 8 }}>{s.deadline}</span>
               </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="kf-container" style={{ padding: "40px 16px 0" }}>
+        <SectionHeader title="人気コンテンツ" />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 14 }}>
+          {CONTENTS.map((c) => (
+            <Link key={c.label} href={c.href} className="kf-card" style={{ textDecoration: "none", color: "var(--kf-text)", padding: 18, display: "grid", gap: 10, justifyItems: "center", textAlign: "center" }}>
+              <span style={{ width: 44, height: 44, borderRadius: 12, background: "var(--kf-primary-soft)", display: "grid", placeItems: "center" }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--kf-primary)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={c.icon} /></svg>
+              </span>
+              <span style={{ fontSize: 13, fontWeight: 700 }}>{c.label}</span>
             </Link>
           ))}
         </div>
+      </section>
 
-        {/* サブ機能 */}
-        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:6,marginBottom:8}}>
-          {[
-            {href:'/body-check',emoji:'📊',title:'体格診断',color:'#e63946'},
-            {href:'/nutrition',emoji:'🥗',title:'栄養ガイド',color:'#2d6a4f'},
-            {href:'/shoes',emoji:'⚽',title:'スパイク選び',color:'#457b9d'},
-          ].map(item=>(
-            <Link key={item.href} href={item.href}
-              style={{padding:'14px 8px',borderRadius:12,background:'#111',
-                border:`1px solid ${item.color}30`,textDecoration:'none',textAlign:'center',display:'block'}}>
-              <span style={{fontSize:22,display:'block',marginBottom:4}}>{item.emoji}</span>
-              <p style={{fontSize:10,fontWeight:600,color:'white'}}>{item.title}</p>
+      <section id="area" className="kf-container" style={{ padding: "40px 16px 0" }}>
+        <SectionHeader title="エリアから人気チームを探す" />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 14 }}>
+          {AREAS.map((a) => (
+            <Link key={a.label} href={a.href} className="kf-card" style={{ textDecoration: "none", color: "var(--kf-text)", padding: "22px 18px", fontWeight: 800, fontSize: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              {a.label}<span style={{ color: "var(--kf-primary)" }}>›</span>
             </Link>
           ))}
         </div>
+      </section>
 
-        {/* 情報系 */}
-        <div style={{display:'flex',flexDirection:'column',gap:6}}>
-          {[
-            {href:'/rules',emoji:'📋',title:'新ルール＆用語検索',desc:'2025年最新ルール・AI質問対応',color:'#854F0B'},
-            {href:'/position',emoji:'🎯',title:'ポジション別資料',desc:'練習方法・有名選手・季節アイテム',color:'#534AB7'},
-            {href:'/calendar',emoji:'📅',title:'セレクションカレンダー',desc:'締切情報・申込URL',color:'#185FA5'},
-            {href:'/matching',emoji:'🤝',title:'チームマッチング',desc:'7つの質問で最適チームを提案（会員限定）',color:'#4CAF50'},
-            {href:'/manga',emoji:'📚',title:'サッカー漫画ランキング',desc:'少年に読ませたいおすすめ漫画TOP5',color:'#e63946'},
-          ].map(item=>(
-            <Link key={item.href} href={item.href}
-              style={{display:'flex',alignItems:'center',gap:12,padding:'12px 14px',
-                borderRadius:12,background:'#111',border:`1px solid ${item.color}20`,textDecoration:'none'}}>
-              <span style={{fontSize:22,flexShrink:0}}>{item.emoji}</span>
-              <div style={{flex:1}}>
-                <p style={{fontSize:12,fontWeight:600,color:'white',marginBottom:1}}>{item.title}</p>
-                <p style={{fontSize:10,color:'rgba(255,255,255,0.4)'}}>{item.desc}</p>
-              </div>
-              <span style={{color:'rgba(255,255,255,0.2)',fontSize:16}}>›</span>
+      <section className="kf-container" style={{ padding: "40px 16px 0" }}>
+        <SectionHeader title="保護者口コミランキング" subtitle="送迎負担・雰囲気・育成・費用感などで比較" moreHref="/reviews" />
+        <div className="kf-empty">
+          <div className="kf-empty__title">口コミ募集中</div>
+          <div className="kf-empty__hint">保護者の口コミが集まり次第ランキングを公開します（個人の感想です）。</div>
+          <Link href="/reviews" className="kf-btn kf-btn--ghost" style={{ marginTop: 8, padding: "10px 18px", fontSize: 13 }}>口コミを見る・投稿する</Link>
+        </div>
+      </section>
+
+      <section className="kf-container" style={{ padding: "40px 16px 0" }}>
+        <SectionHeader title="準備物・グッズガイド" subtitle="入団・遠征・季節対策の必需品を解説" moreHref="/goods" />
+        <div style={{ marginBottom: 10 }}><span className="kf-pr-label">PR</span></div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: 14 }}>
+          {GOODS.map((g) => (
+            <Link key={g.label} href={g.href} className="kf-card" style={{ textDecoration: "none", color: "var(--kf-text)", padding: 18, fontWeight: 700, fontSize: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              {g.label}<span style={{ color: "var(--kf-primary)" }}>›</span>
             </Link>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* 会員プランCTA */}
-      <div style={{margin:'0 16px 16px',borderRadius:14,overflow:'hidden'}}>
-        <div style={{position:'relative',height:120}}>
-          <img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&q=80"
-            alt="会員" style={{width:'100%',height:'100%',objectFit:'cover'}}/>
-          <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,0.65)',
-            display:'flex',alignItems:'center',padding:'0 16px',justifyContent:'space-between'}}>
-            <div>
-              <p style={{color:'#FFD700',fontSize:10,fontWeight:600,marginBottom:3}}>PREMIUM MEMBER</p>
-              <p style={{color:'white',fontSize:14,fontWeight:700,marginBottom:2}}>セレクション情報を解放</p>
-              <p style={{color:'rgba(255,255,255,0.6)',fontSize:10}}>申込URL・締切日・チーム詳細</p>
-            </div>
-            <Link href="/member"
-              style={{padding:'10px 16px',borderRadius:10,background:'#FFD700',
-                color:'#1a1a1a',fontSize:12,fontWeight:700,textDecoration:'none',
-                whiteSpace:'nowrap',flexShrink:0}}>
-              ¥500/月〜
-            </Link>
+      <section className="kf-container" style={{ padding: "40px 16px 56px" }}>
+        <div className="kf-card" style={{ padding: 28, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", background: "var(--kf-primary-soft)", border: "none" }}>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800 }}>プレミアム会員</h2>
+            <p style={{ margin: "6px 0 0", fontSize: 14, color: "var(--kf-muted)" }}>地図検索・お気に入り無制限・締切通知・PDF保存・AI診断</p>
           </div>
+          <Link href="/member" className="kf-btn kf-btn--pay" style={{ padding: "14px 28px", fontSize: 15 }}>月額 ¥500 ではじめる</Link>
         </div>
-      </div>
+      </section>
 
-      {/* サッカー用品・スパイクおすすめ */}
-      <div style={{margin:'0 16px 16px',padding:'16px',background:'#111',borderRadius:14,border:'1px solid rgba(255,255,255,0.08)'}}>
-        <p style={{fontSize:'10px',color:'rgba(255,255,255,0.4)',letterSpacing:'0.15em',marginBottom:12,textAlign:'center'}}>PR・おすすめサービス</p>
-        <div style={{display:'flex',flexDirection:'column',gap:'10px',alignItems:'center'}}>
-          {/* Renta! 漫画レンタル */}
-          <div style={{textAlign:'center'}}>
-            <p style={{fontSize:'11px',color:'rgba(255,255,255,0.5)',marginBottom:'6px'}}>サッカー漫画をレンタルで読む</p>
-            <a href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3767207&pid=892590463"
-              target="_blank" rel="nofollow noopener noreferrer sponsored"
-              style={{display:'inline-block'}}>
-              <img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3767207&pid=892590463"
-                alt="Renta!漫画レンタル" style={{display:'block'}}/>
-            </a>
-          </div>
-          {/* BookLive */}
-          <div style={{textAlign:'center'}}>
-            <p style={{fontSize:'11px',color:'rgba(255,255,255,0.5)',marginBottom:'6px'}}>電子書籍をお得に購入</p>
-            <a href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3767207&pid=892590475"
-              target="_blank" rel="nofollow noopener noreferrer sponsored"
-              style={{display:'inline-block'}}>
-              <img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3767207&pid=892590475"
-                alt="BookLive電子書籍" style={{display:'block'}}/>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* Amazon用品ショッピング */}
-      <div style={{margin:'0 16px 16px',padding:'16px',background:'#111',borderRadius:14,border:'1px solid rgba(255,180,0,0.2)'}}>
-        <p style={{fontSize:10,color:'rgba(255,255,255,0.4)',letterSpacing:'0.15em',marginBottom:12}}>SOCCER GOODS</p>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6}}>
-          {[
-            {e:'👟',l:'スパイク',k:'ジュニア サッカー スパイク'},
-            {e:'⚽',l:'ボール',k:'サッカーボール 5号'},
-            {e:'👕',l:'ユニフォーム',k:'ジュニア サッカー ユニフォーム'},
-            {e:'🚩',l:'審判グッズ',k:'サッカー 審判 グッズ'},
-          ].map(item=>(
-            <a key={item.k}
-              href={`https://www.amazon.co.jp/s?k=${encodeURIComponent(item.k)}&tag=haircolorab22-22`}
-              target="_blank" rel="noopener noreferrer sponsored"
-              style={{padding:'10px 4px',borderRadius:10,background:'rgba(255,255,255,0.03)',
-                border:'1px solid rgba(255,255,255,0.06)',textDecoration:'none',textAlign:'center',display:'block'}}>
-              <span style={{fontSize:22,display:'block',marginBottom:3}}>{item.e}</span>
-              <p style={{fontSize:9,color:'white',fontWeight:600,marginBottom:1}}>{item.l}</p>
-              <p style={{fontSize:8,color:'#FF9900'}}>Amazon</p>
-            </a>
-          ))}
-        </div>
-      </div>
-      {/* ホーム画面に追加 */}
-      <div style={{margin:"0 16px 16px",padding:"16px",background:"#111",borderRadius:14,border:"1px solid rgba(255,255,255,0.08)"}}>
-        <p style={{fontSize:10,color:"rgba(255,255,255,0.4)",letterSpacing:"0.15em",marginBottom:12}}>ホーム画面に追加</p>
-        <div style={{display:"flex",alignItems:"center",gap:12}}>
-          <span style={{fontSize:32}}>📱</span>
-          <div style={{flex:1}}>
-            <p style={{fontSize:13,fontWeight:600,color:"white",marginBottom:4}}>アプリのように使う</p>
-            <p style={{fontSize:11,color:"rgba(255,255,255,0.5)",lineHeight:1.5}}>ホーム画面に追加すると
-すぐに開けます</p>
-          </div>
-        </div>
-        <button onClick={handleInstall} style={{width:"100%",marginTop:12,padding:"12px",borderRadius:10,background:"#FFD700",border:"none",color:"#1a1a1a",fontSize:13,fontWeight:700,cursor:"pointer"}}>
-          📲 ホーム画面に追加する
-        </button>
-        <p style={{fontSize:10,color:"rgba(255,255,255,0.3)",marginTop:8,textAlign:"center"}}>iOSの場合：Safari下の共有ボタン →「ホーム画面に追加」</p>
-      </div>
-
-      {/* SNS・共有セクション */}
-      <div style={{margin:'0 16px 16px',padding:'16px',background:'#111',borderRadius:14,border:'1px solid rgba(255,255,255,0.08)'}}>
-        <p style={{fontSize:10,color:'rgba(255,255,255,0.4)',letterSpacing:'0.15em',marginBottom:12}}>SNS・シェア</p>
-
-        {/* Instagramフォローバナー */}
-        <a href="https://www.instagram.com/soccer_kanto_jp/"
-          target="_blank" rel="noopener noreferrer"
-          style={{display:'flex',alignItems:'center',gap:12,padding:'12px 14px',
-            background:'linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)',
-            borderRadius:12,textDecoration:'none',marginBottom:10}}>
-          <div style={{width:36,height:36,borderRadius:'50%',background:'rgba(255,255,255,0.2)',
-            display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,flexShrink:0}}>📸</div>
-          <div style={{flex:1}}>
-            <p style={{fontSize:13,fontWeight:700,color:'white',marginBottom:2}}>@soccer_kanto_jp</p>
-            <p style={{fontSize:10,color:'rgba(255,255,255,0.8)'}}>関東ジュニアサッカー情報局 公式Instagram</p>
-          </div>
-          <span style={{color:'rgba(255,255,255,0.7)',fontSize:16}}>›</span>
-        </a>
-
-        {/* LINE・Twitter シェアボタン */}
-        <p style={{fontSize:10,color:'rgba(255,255,255,0.3)',marginBottom:8}}>このサイトをシェア</p>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-          <a href="https://line.me/R/msg/text/?関東ジュニアサッカー情報局%0a東京・関東のサッカーチームをAIで検索%0ahttps://soccer-tokyo-jp.vercel.app"
-            target="_blank" rel="noopener noreferrer"
-            style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,
-              padding:'10px',borderRadius:10,background:'#06C755',
-              textDecoration:'none',color:'white',fontSize:12,fontWeight:700}}>
-            <span style={{fontSize:16}}>💬</span> LINEで送る
-          </a>
-          <a href="https://twitter.com/intent/tweet?text=関東のジュニアサッカーチームを検索できます⚽&url=https://soccer-tokyo-jp.vercel.app&hashtags=ジュニアサッカー,少年サッカー,関東サッカー"
-            target="_blank" rel="noopener noreferrer"
-            style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,
-              padding:'10px',borderRadius:10,background:'#1DA1F2',
-              textDecoration:'none',color:'white',fontSize:12,fontWeight:700}}>
-            <span style={{fontSize:16}}>🐦</span> Xで共有
-          </a>
-        </div>
-      </div>
-
-      {/* フッター */}
-      <div style={{padding:'16px',borderTop:'1px solid rgba(255,255,255,0.05)',textAlign:'center'}}>
-        <p style={{fontSize:10,color:'rgba(255,255,255,0.2)'}}>© 2026 関東ジュニアサッカー情報局</p>
-        <p style={{fontSize:9,color:'rgba(255,255,255,0.15)',marginTop:4}}>本サイトはアフィリエイト広告を含みます</p>
-      </div>
+      <SiteFooter />
+      <BottomNav />
 
       <style>{`
-        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @media (max-width: 760px){
+          .kf-hero{ grid-template-columns: 1fr !important; }
+          .kf-hero h1{ font-size: 30px !important; }
+        }
       `}</style>
-    </main>
-  )
+    </div>
+  );
 }
