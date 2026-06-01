@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
 import RakutenItems from "@/components/RakutenItems";
+import ReactMarkdown from "react-markdown";
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
@@ -51,7 +52,16 @@ export default async function GoodsArticlePage({ params }: { params: Promise<{ s
         </div>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 16px", lineHeight: 1.4 }}>{article.title}</h1>
         {article.hero_image && <img src={article.hero_image} alt="" style={{ width: "100%", borderRadius: "var(--kf-radius)", marginBottom: 20 }} />}
-        <div style={{ fontSize: 15, lineHeight: 2, whiteSpace: "pre-wrap" }}>{article.body}</div>
+        <div className="kf-article-body" style={{ fontSize: 15, lineHeight: 2 }}>
+          <ReactMarkdown components={{
+            a: ({href, children}) => <a href={href || "#"} style={{ color: "var(--kf-primary)", textDecoration: "underline" }}>{children}</a>,
+            h2: ({children}) => <h2 style={{ fontSize: 18, fontWeight: 800, margin: "24px 0 8px" }}>{children}</h2>,
+            ul: ({children}) => <ul style={{ paddingLeft: 20, margin: "8px 0" }}>{children}</ul>,
+            li: ({children}) => <li style={{ margin: "4px 0" }}>{children}</li>,
+            p: ({children}) => <p style={{ margin: "8px 0" }}>{children}</p>,
+            strong: ({children}) => <strong style={{ fontWeight: 700 }}>{children}</strong>,
+          }}>{article.body}</ReactMarkdown>
+        </div>
         {related && related.length > 0 && (
           <div style={{ marginTop: 32 }}>
             <h2 style={{ fontSize: 16, fontWeight: 800, marginBottom: 12 }}>関連記事</h2>
