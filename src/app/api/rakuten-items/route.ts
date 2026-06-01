@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const AFFILIATE_ID = "5253b9ed.08f9d938.5253b9ee.e71aefe8";
 
 export async function GET(req: Request) {
@@ -9,14 +12,14 @@ export async function GET(req: Request) {
   const debug = searchParams.get("debug");
   const appId = process.env.RAKUTEN_APP_ID;
 
-  if (debug) {
+  if (debug === "1") {
     return NextResponse.json({ hasAppId: !!appId, appIdLen: appId?.length || 0, keyword });
   }
-  if (!appId || !keyword) return NextResponse.json({ items: [] });
+  if (!appId || !keyword) return NextResponse.json({ items: [], reason: !appId ? "no_app_id" : "no_keyword" });
 
   const url = `https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601?applicationId=${appId}&affiliateId=${AFFILIATE_ID}&keyword=${encodeURIComponent(keyword)}&hits=${hits}&sort=-reviewCount&imageFlag=1&availability=1`;
   try {
-    const res = await fetch(url, { next: { revalidate: 86400 } });
+    const res = await fetch(url, { cache: "no-store" });
     const data = await res.json();
     if (debug === "raw") return NextResponse.json(data);
     const items = (data.Items || []).map((w: any) => {
