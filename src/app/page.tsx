@@ -25,10 +25,10 @@ const FUN = [
   { label: "チームマッチング", href: "/matching", img: "/images/kf/panels/p_matching.jpg", desc: "あなたに合うチームを紹介" },
 ];
 const AREAS = [
-  { label: "東京エリア", href: "/teams?area=tokyo", img: "/images/kf/area_tokyo.jpg" },
-  { label: "神奈川エリア", href: "/teams?area=kanagawa", img: "/images/kf/area_kanagawa.jpg" },
-  { label: "埼玉エリア", href: "/teams?area=saitama", img: "/images/kf/area_saitama.jpg" },
-  { label: "千葉エリア", href: "/teams?area=chiba", img: "/images/kf/area_chiba.jpg" },
+  { label: "東京 2,239チーム", href: "/teams?area=tokyo", img: "/images/kf/area_tokyo.jpg" },
+  { label: "神奈川 1,576チーム", href: "/teams?area=kanagawa", img: "/images/kf/area_kanagawa.jpg" },
+  { label: "埼玉 1,332チーム", href: "/teams?area=saitama", img: "/images/kf/area_saitama.jpg" },
+  { label: "千葉 1,176チーム", href: "/teams?area=chiba", img: "/images/kf/area_chiba.jpg" },
 ];
 const GOODS = ["入団準備ガイド","遠征準備ガイド","夏の暑さ対策ガイド","冬の寒さ対策ガイド","GK専用ガイド","ジュニアユース準備"];
 
