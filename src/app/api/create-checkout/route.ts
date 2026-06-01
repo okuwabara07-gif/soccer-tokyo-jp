@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
         quantity: 1,
       }],
       mode: plan === 'papa_mama' ? 'payment' : 'subscription',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/member/success?plan=${plan}`,
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/member/success?plan=${plan}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/member`,
     })
 
