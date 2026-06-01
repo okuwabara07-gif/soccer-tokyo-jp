@@ -3,8 +3,27 @@ import { createClient } from "@supabase/supabase-js";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
+import RakutenItems from "@/components/RakutenItems";
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
+const RAKUTEN_KW: Record<string, string> = {
+  "入団準備": "ジュニア サッカー スターターセット",
+  "遠征準備": "サッカー 遠征 ボストンバッグ",
+  "夏対策": "スポーツ 水筒 1リットル 保冷",
+  "冬対策": "サッカー 防寒 ネックウォーマー",
+  "雨の日対策": "サッカー ピステ 上下",
+  "GK専用": "キーパーグローブ ジュニア",
+  "ジュニアユース準備": "サッカー リュック 大容量",
+  "補食・栄養": "スポーツ ゼリー 補給",
+  "スパイク": "ジュニア サッカースパイク",
+  "バッグ": "サッカー リュック ボール収納",
+  "水筒": "スポーツ ウォータージャグ",
+  "インナー": "サッカー コンプレッション インナー",
+  "レガース": "サッカー すね当て ジュニア",
+  "靴下": "サッカーソックス グリップ",
+  "ケア用品": "スポーツ アイシング 冷却",
+};
 
 export default async function GoodsArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -45,6 +64,10 @@ export default async function GoodsArticlePage({ params }: { params: Promise<{ s
             </div>
           </div>
         )}
+        <div style={{ marginTop: 32 }}>
+          <h2 style={{ fontSize: 16, fontWeight: 800, marginBottom: 4 }}>おすすめ商品をチェック</h2>
+          <RakutenItems keyword={RAKUTEN_KW[article.category] || article.category} />
+        </div>
         <p style={{ fontSize: 11, color: "var(--kf-muted)", marginTop: 24 }}>※本ページはアフィリエイトプログラムを利用した商品紹介を含みます。価格・在庫は各販売サイトでご確認ください。</p>
       </main>
       <SiteFooter />
