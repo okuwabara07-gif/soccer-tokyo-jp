@@ -6,6 +6,7 @@ const NAV = [
   { label: "セレクション", href: "/selection" },
   { label: "口コミ", href: "/reviews" },
   { label: "学ぶ・楽しむ", href: "/performance" },
+  { label: "育成コラム", href: "/column" },
   { label: "準備・グッズ", href: "/goods" },
   { label: "プレミアム", href: "/member" },
 ];
