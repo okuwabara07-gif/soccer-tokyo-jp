@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
 import { GOODS_CATEGORIES } from "@/lib/goodsCategories";
+import GoodsCatImage from "@/components/GoodsCatImage";
 
 export const metadata = { title: "準備物・グッズガイド | サッカーセレクション" };
 
@@ -24,12 +25,7 @@ export default function GoodsPage() {
                 <span style={{ background: "var(--kf-primary)", color: "#fff", borderRadius: 6, fontWeight: 800, fontSize: 12, padding: "2px 7px" }}>{c.no}</span>
                 <span style={{ fontWeight: 800, fontSize: 15 }}>{c.title}</span>
               </div>
-              <div style={{ position: "relative", height: 130, background: "linear-gradient(180deg,#eef2ee,#e3e9e3)", display: "grid", placeItems: "center", overflow: "hidden" }}>
-                <img src={`/images/kf/goods/${c.no}.jpg`} alt={c.title}
-                  onError={(e:any) => { e.currentTarget.style.display = "none"; }}
-                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
-                <span style={{ fontSize: 44 }}>{c.emoji}</span>
-              </div>
+<GoodsCatImage no={c.no} title={c.title} emoji={c.emoji} />
               <div style={{ padding: 14 }}>
                 <p style={{ fontSize: 12, color: "var(--kf-muted)", margin: "0 0 10px", lineHeight: 1.6 }}>{c.desc}</p>
                 <div style={{ fontSize: 11, fontWeight: 800, color: "var(--kf-primary)", marginBottom: 4 }}>チェックポイント</div>
