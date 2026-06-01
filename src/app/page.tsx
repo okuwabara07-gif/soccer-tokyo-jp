@@ -1,3 +1,4 @@
+import ReviewRankClient from "@/components/ReviewRankClient";
 import JleagueRailClient from "@/components/JleagueRailClient";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -116,16 +117,7 @@ export default function HomePage() {
 
       <section className="kf-container" style={{ padding:"48px 16px 0" }}>
         <SectionHeader title="保護者口コミランキング" subtitle="送迎負担・雰囲気・育成・費用感などで比較" moreHref="/reviews" />
-        <div className="kf-empty">
-          <div className="kf-empty__title">口コミ募集中</div>
-          <div className="kf-empty__hint">保護者の口コミが集まり次第ランキングを公開します（個人の感想です）。</div>
-          <Link href="/reviews" className="kf-btn kf-btn--ghost" style={{ marginTop:8, padding:"10px 18px", fontSize:13 }}>口コミを見る・投稿する</Link>
-        </div>
-      </section>
-
-      <section className="kf-container" style={{ padding:"48px 16px 0" }}>
-        <SectionHeader title="準備物・グッズガイド" subtitle="入団・遠征・季節対策の必需品を解説" moreHref="/goods" />
-        <div style={{ marginBottom:10 }}><span className="kf-pr-label">PR</span></div>
+        <ReviewRankClient />
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(170px,1fr))", gap:14 }}>
           {GOODS.map(g=>(<Link key={g} href="/goods" className="kf-card" style={{ textDecoration:"none", color:"var(--kf-text)", padding:18, fontWeight:700, fontSize:14, display:"flex", justifyContent:"space-between", alignItems:"center" }}>{g}<span style={{ color:"var(--kf-primary)" }}>›</span></Link>))}
         </div>
