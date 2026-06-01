@@ -4,6 +4,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
+import RakutenItems from "@/components/RakutenItems";
 
 const STEPS = [
   { key: "width", title: "足の幅を教えてください", hint: "一番広い部分に合わせて選んでください。",
@@ -17,11 +18,20 @@ const STEPS = [
 const STEP_LABELS = ["幅の測定", "土踏まず", "かかとの形", "完了"];
 
 function judge(a: Record<string, string>) {
-  // 一般的な目安（事実ベース・断定しない表現）
+  // 一般的な傾向（事実ベース・ブランド名を出さない・断定/効能を言わない）
   const width = a.width;
-  if (width === "wide" || width === "xwide") return { type: "幅広・甲高タイプ", brands: ["ミズノ", "アシックス"], avoid: "ナイキ（細め設計）", note: "日本人に多い足型。横幅にゆとりのあるモデルが快適です。" };
-  if (width === "narrow") return { type: "細め・甲低タイプ", brands: ["ナイキ", "アディダス"], avoid: "幅広モデル（緩くなりがち）", note: "フィット感重視。細め設計のモデルが合いやすいです。" };
-  return { type: "標準タイプ", brands: ["アディダス", "アシックス", "ミズノ"], avoid: "特になし", note: "多くのブランドが合いやすい足型。好みで選べます。" };
+  const arch = a.arch;
+  const archNote = arch === "high" ? " アーチ高めの傾向なので、クッション性のあるインソールの併用も選択肢になります。"
+    : arch === "low" ? " アーチ低めの傾向。土踏まずを支える設計のインソール併用も選択肢になります。"
+    : "";
+  if (width === "wide" || width === "xwide")
+    return { type: "幅広・甲高タイプ", keyword: "サッカースパイク 3E 幅広 ジュニア",
+      note: "横幅にゆとりのある設計（3E・ワイド表記など）のモデルが履きやすい傾向です。" + archNote };
+  if (width === "narrow")
+    return { type: "細め・甲低タイプ", keyword: "サッカースパイク ジュニア 軽量",
+      note: "フィット感を重視した、細め・軽量設計のモデルが合いやすい傾向です。" + archNote };
+  return { type: "標準タイプ", keyword: "サッカースパイク ジュニア",
+    note: "多くのモデルが合いやすい足型です。サイズ感や好みで選べます。" + archNote };
 }
 
 export default function FootCheckPage() {
@@ -40,9 +50,8 @@ export default function FootCheckPage() {
       <Header />
       <main className="kf-container" style={{ padding: "24px 16px 56px", maxWidth: 680 }}>
         <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px", textAlign: "center" }}>足型診断</h1>
-        <p style={{ fontSize: 13, color: "var(--kf-muted)", margin: "0 0 20px", textAlign: "center" }}>あなたに最適なスパイクを見つけましょう</p>
+        <p style={{ fontSize: 13, color: "var(--kf-muted)", margin: "0 0 20px", textAlign: "center" }}>あなたの足型に合いやすいスパイクの傾向を診断します</p>
 
-        {/* ステッパー */}
         <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
           {STEP_LABELS.map((l, i) => (
             <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
@@ -76,16 +85,12 @@ export default function FootCheckPage() {
               <div style={{ fontSize: 24, fontWeight: 800, margin: "6px 0", color: "var(--kf-primary)" }}>{result!.type}</div>
               <p style={{ fontSize: 13, color: "var(--kf-text)", margin: 0, lineHeight: 1.7 }}>{result!.note}</p>
             </div>
-            <div className="kf-card" style={{ padding: 20, marginTop: 14 }}>
-              <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 8 }}>合いやすいブランド</div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>{result!.brands.map(b => <span key={b} className="kf-badge" style={{ background: "var(--kf-primary)", color: "#fff" }}>{b}</span>)}</div>
-              <div style={{ fontSize: 12, color: "var(--kf-muted)", marginTop: 10 }}>注意: {result!.avoid}</div>
-            </div>
-            <div style={{ display: "flex", gap: 10, marginTop: 16, flexWrap: "wrap" }}>
-              <Link href="/shoes" className="kf-btn kf-btn--primary" style={{ padding: "12px 20px" }}>おすすめスパイクを見る</Link>
+            <RakutenItems keyword={result!.keyword} title="このタイプに合いやすいスパイク" />
+            <div style={{ display: "flex", gap: 10, marginTop: 8, flexWrap: "wrap" }}>
+              <Link href="/shoes" className="kf-btn kf-btn--ghost" style={{ padding: "12px 20px" }}>スパイクの選び方を読む</Link>
               <button onClick={() => { setStep(0); setAns({}); }} className="kf-btn kf-btn--ghost" style={{ padding: "12px 20px" }}>もう一度診断する</button>
             </div>
-            <p style={{ fontSize: 11, color: "var(--kf-muted)", marginTop: 16 }}>※一般的な目安です。実際の購入時は試着をおすすめします。</p>
+            <p style={{ fontSize: 11, color: "var(--kf-muted)", marginTop: 16 }}>※一般的な傾向の目安です。フィットには個人差があるため、購入時は試着・サイズ確認をおすすめします。</p>
           </div>
         )}
       </main>
