@@ -49,7 +49,7 @@ export default function ReviewsPage() {
   const avg = reviews.length ? (reviews.reduce((a, r) => a + (r.rating || 0), 0) / reviews.filter(r => r.rating).length || 0) : 0;
 
   const submit = async () => {
-    if (!teamName.trim() || !body.trim()) { alert("チーム名と口コミ内容を入力してください"); return; }
+    if (!teamName.trim() || !body.trim()) { alert("題名と口コミ内容を入力してください"); return; }
     if (rating < 1) { alert("星評価を選んでください"); return; }
     const text = teamName + body + nickname;
     if (NG.some(w => text.includes(w))) { alert("不適切な表現が含まれている可能性があります。表現を見直してください。"); return; }
@@ -96,8 +96,8 @@ export default function ReviewsPage() {
         {open && (
           <div className="kf-card" style={{ padding: 20, marginBottom: 20 }}>
             <h2 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 14px" }}>口コミを投稿</h2>
-            <label style={{ fontSize: 12, color: "var(--kf-muted)" }}>チーム名 *</label>
-            <input value={teamName} onChange={e => setTeamName(e.target.value)} placeholder="例: ◯◯FC ジュニアユース"
+            <label style={{ fontSize: 12, color: "var(--kf-muted)" }}>題名 *</label>
+            <input value={teamName} onChange={e => setTeamName(e.target.value)} placeholder="例: ◯◯FCジュニアユース セレクション参加レポート"
               style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--kf-border)", margin: "4px 0 12px", fontSize: 14 }} />
 
             <label style={{ fontSize: 12, color: "var(--kf-muted)", display: "block", marginBottom: 6 }}>総合評価 *</label>

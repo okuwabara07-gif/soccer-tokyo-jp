@@ -43,6 +43,7 @@ export default function TeamsPage() {
   const [feeMax, setFeeMax] = useState(30000);
   const [practice, setPractice] = useState("指定なし");
   const [selectionOnly, setSelectionOnly] = useState(false);
+  const [jleagueOnly, setJleagueOnly] = useState(false);
   const [view, setView] = useState<"card" | "map">("card");
   const [favs, setFavs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,8 +73,9 @@ export default function TeamsPage() {
       if (practice === "週3回以上" && !/[3-7]/.test(p)) return false;
     }
     if (selectionOnly && !(t.is_jleague || t.selection_start)) return false;
+    if (jleagueOnly && !t.is_jleague) return false;
     return true;
-  }), [teams, cat, nq, feeMax, practice, selectionOnly]);
+  }), [teams, cat, nq, feeMax, practice, selectionOnly, jleagueOnly]);
 
   const mapTeams = filtered.filter(t => t.lat && t.lng).slice(0, 50);
   const mapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -128,8 +130,12 @@ export default function TeamsPage() {
               <input type="checkbox" checked={selectionOnly} onChange={e => setSelectionOnly(e.target.checked)} />
               セレクション情報あり
             </label>
+            <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", marginBottom: 8 }}>
+              <input type="checkbox" checked={jleagueOnly} onChange={e => setJleagueOnly(e.target.checked)} />
+              Jリーグ下部組織のみ
+            </label>
 
-            <button onClick={() => { setCat("すべて"); setQ(""); setFeeMax(30000); setPractice("指定なし"); setSelectionOnly(false); }}
+            <button onClick={() => { setCat("すべて"); setQ(""); setFeeMax(30000); setPractice("指定なし"); setSelectionOnly(false); setJleagueOnly(false); }}
               style={{ marginTop: 8, background: "none", border: "none", color: "var(--kf-primary)", fontSize: 12, cursor: "pointer", fontWeight: 700 }}>
               ↻ 条件をリセット
             </button>
