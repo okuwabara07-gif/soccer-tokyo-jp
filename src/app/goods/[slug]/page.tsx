@@ -1,0 +1,54 @@
+import Link from "next/link";
+import { createClient } from "@supabase/supabase-js";
+import Header from "@/components/Header";
+import BottomNav from "@/components/BottomNav";
+import SiteFooter from "@/components/SiteFooter";
+
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
+export default async function GoodsArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const { data: article } = await supabase.from("goods_articles").select("*").eq("slug", slug).eq("status", "published").single();
+  if (!article) {
+    return (
+      <div style={{ background: "var(--kf-bg)", minHeight: "100vh" }}><Header />
+        <main className="kf-container" style={{ padding: "40px 16px", maxWidth: 760, textAlign: "center" }}>
+          <div className="kf-empty"><div className="kf-empty__title">記事が見つかりません</div></div>
+          <Link href="/goods" style={{ color: "var(--kf-primary)" }}>← グッズガイドへ戻る</Link>
+        </main><SiteFooter /><BottomNav />
+      </div>
+    );
+  }
+  const { data: related } = await supabase.from("goods_articles").select("slug,title,category")
+    .eq("category", article.category).eq("status", "published").neq("slug", slug).limit(4);
+
+  return (
+    <div style={{ background: "var(--kf-bg)", minHeight: "100vh", color: "var(--kf-text)" }}>
+      <Header />
+      <main className="kf-container" style={{ padding: "24px 16px 56px", maxWidth: 760 }}>
+        <Link href={`/goods/c/${encodeURIComponent(article.category)}`} style={{ fontSize: 13, color: "var(--kf-muted)", textDecoration: "none" }}>← {article.category}の記事一覧へ</Link>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "12px 0 4px" }}>
+          <span className="kf-badge">{article.category}</span>{article.is_pr && <span className="kf-pr-label">PR</span>}
+        </div>
+        <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 16px", lineHeight: 1.4 }}>{article.title}</h1>
+        {article.hero_image && <img src={article.hero_image} alt="" style={{ width: "100%", borderRadius: "var(--kf-radius)", marginBottom: 20 }} />}
+        <div style={{ fontSize: 15, lineHeight: 2, whiteSpace: "pre-wrap" }}>{article.body}</div>
+        {related && related.length > 0 && (
+          <div style={{ marginTop: 32 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 800, marginBottom: 12 }}>関連記事</h2>
+            <div style={{ display: "grid", gap: 10 }}>
+              {related.map((r: any) => (
+                <Link key={r.slug} href={`/goods/${r.slug}`} className="kf-card" style={{ padding: 14, textDecoration: "none", color: "var(--kf-text)" }}>
+                  <div style={{ fontWeight: 700, fontSize: 14 }}>{r.title}</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+        <p style={{ fontSize: 11, color: "var(--kf-muted)", marginTop: 24 }}>※本ページはアフィリエイトプログラムを利用した商品紹介を含みます。価格・在庫は各販売サイトでご確認ください。</p>
+      </main>
+      <SiteFooter />
+      <BottomNav />
+    </div>
+  );
+}
