@@ -1,3 +1,4 @@
+import JleagueRailClient from "@/components/JleagueRailClient";
 import Link from "next/link";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
@@ -73,13 +74,9 @@ export default function HomePage() {
 
       <section className="kf-container" style={{ padding:"24px 16px 0" }}><StatBar /></section>
 
-      <section className="kf-container" style={{ padding:"40px 16px 0" }}>
-        <SectionHeader title="今月のセレクション情報" moreHref="/selection" />
-        <div className="kf-empty">
-          <div className="kf-empty__title">セレクション情報は準備中です</div>
-          <div className="kf-empty__hint">各チームの募集・締切・会場が確定次第ここに掲載します。</div>
-          <Link href="/selection" className="kf-btn kf-btn--ghost" style={{ marginTop:8, padding:"10px 18px", fontSize:13 }}>セレクション情報を見る</Link>
-        </div>
+      <section className="kf-container" style={{ padding: "40px 16px 0" }}>
+        <SectionHeader title="今月のJリーグセレクション情報" moreHref="/selection" />
+        <JleagueRailClient />
       </section>
 
       <section className="kf-container" style={{ padding:"48px 16px 0" }}>
