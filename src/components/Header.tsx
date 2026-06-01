@@ -7,7 +7,7 @@ const NAV = [
   { label: "口コミ", href: "/reviews" },
   { label: "学ぶ・楽しむ", href: "/performance" },
   { label: "準備・グッズ", href: "/goods" },
-  { label: "プレミアム", href: "/premium" },
+  { label: "プレミアム", href: "/member" },
 ];
 export default function Header() {
   const [open, setOpen] = useState(false);
