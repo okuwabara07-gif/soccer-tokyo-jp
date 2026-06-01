@@ -9,21 +9,16 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const keyword = searchParams.get("keyword") || "";
   const hits = searchParams.get("hits") || "6";
-  const debug = searchParams.get("debug");
   const appId = process.env.RAKUTEN_APP_ID;
+  const accessKey = process.env.RAKUTEN_ACCESS_KEY;
+  if (!appId || !accessKey || !keyword) return NextResponse.json({ items: [] });
 
-  if (debug === "1") {
-    return NextResponse.json({ hasAppId: !!appId, appIdLen: appId?.length || 0, keyword });
-  }
-  if (!appId || !keyword) return NextResponse.json({ items: [], reason: !appId ? "no_app_id" : "no_keyword" });
-
-  const url = `https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601?applicationId=${appId}&affiliateId=${AFFILIATE_ID}&keyword=${encodeURIComponent(keyword)}&hits=${hits}&sort=-reviewCount&imageFlag=1&availability=1`;
+  const url = `https://openapi.rakuten.co.jp/services/api/IchibaItem/Search/20220601?format=json&applicationId=${appId}&accessKey=${accessKey}&affiliateId=${AFFILIATE_ID}&keyword=${encodeURIComponent(keyword)}&hits=${hits}&sort=-reviewCount&imageFlag=1&availability=1`;
   try {
     const res = await fetch(url, { cache: "no-store" });
     const data = await res.json();
-    if (debug === "raw") return NextResponse.json(data);
     const items = (data.Items || []).map((w: any) => {
-      const i = w.Item;
+      const i = w.Item || w;
       return {
         name: i.itemName, price: i.itemPrice, url: i.affiliateUrl || i.itemUrl,
         image: i.mediumImageUrls?.[0]?.imageUrl?.replace("?_ex=128x128", "?_ex=300x300") || "",

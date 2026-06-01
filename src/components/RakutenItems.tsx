@@ -6,22 +6,18 @@ type Item = { name: string; price: number; url: string; image: string; shop: str
 export default function RakutenItems({ keyword }: { keyword: string }) {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     fetch(`/api/rakuten-items?keyword=${encodeURIComponent(keyword)}&hits=6`)
       .then(r => r.json()).then(d => { setItems(d.items || []); setLoading(false); })
       .catch(() => setLoading(false));
   }, [keyword]);
-
   if (loading) return <div style={{ padding: 20, color: "var(--kf-muted)", fontSize: 13 }}>商品を読み込み中…</div>;
   if (items.length === 0) return null;
-
   return (
     <div style={{ marginTop: 16 }}>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 12 }}>
         {items.map((it, i) => (
-          <a key={i} href={it.url} target="_blank" rel="nofollow noopener sponsored"
-            className="kf-card" style={{ padding: 10, textDecoration: "none", color: "var(--kf-text)", display: "block" }}>
+          <a key={i} href={it.url} target="_blank" rel="nofollow noopener sponsored" className="kf-card" style={{ padding: 10, textDecoration: "none", color: "var(--kf-text)", display: "block" }}>
             <div style={{ height: 130, background: "#fff", borderRadius: 8, overflow: "hidden", display: "grid", placeItems: "center" }}>
               {it.image && <img src={it.image} alt="" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />}
             </div>
