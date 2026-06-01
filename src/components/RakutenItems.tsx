@@ -1,34 +1,60 @@
-"use client";
-import { useEffect, useState } from "react";
+'use client';
+import { useEffect, useState } from 'react';
 
-type Item = { name: string; price: number; url: string; image: string; shop: string; reviewCount: number; reviewAverage: number };
+type Item = {
+  name: string; price: number; image?: string;
+  review?: number; reviewCount?: number; shop?: string; url: string;
+};
 
-export default function RakutenItems({ keyword }: { keyword: string }) {
-  const [items, setItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function RakutenItems({ keyword, title = 'おすすめ商品' }: { keyword: string; title?: string }) {
+  const [items, setItems] = useState<Item[] | null>(null);
+
   useEffect(() => {
-    fetch(`/api/rakuten-items?keyword=${encodeURIComponent(keyword)}&hits=6`)
-      .then(r => r.json()).then(d => { setItems(d.items || []); setLoading(false); })
-      .catch(() => setLoading(false));
+    let alive = true;
+    fetch(`/api/rakuten?keyword=${encodeURIComponent(keyword)}`)
+      .then((r) => r.json())
+      .then((d) => { if (alive) setItems(d.items ?? []); })
+      .catch(() => { if (alive) setItems([]); });
+    return () => { alive = false; };
   }, [keyword]);
-  if (loading) return <div style={{ padding: 20, color: "var(--kf-muted)", fontSize: 13 }}>商品を読み込み中…</div>;
-  if (items.length === 0) return null;
+
+  if (items === null) return <p style={{ color: '#888', fontSize: 14 }}>商品を読み込み中…</p>;
+
+  const searchUrl = `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(keyword)}/`;
+
   return (
-    <div style={{ marginTop: 16 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 12 }}>
-        {items.map((it, i) => (
-          <a key={i} href={it.url} target="_blank" rel="nofollow noopener sponsored" className="kf-card" style={{ padding: 10, textDecoration: "none", color: "var(--kf-text)", display: "block" }}>
-            <div style={{ height: 130, background: "#fff", borderRadius: 8, overflow: "hidden", display: "grid", placeItems: "center" }}>
-              {it.image && <img src={it.image} alt="" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />}
-            </div>
-            <div style={{ fontSize: 12, fontWeight: 600, marginTop: 8, lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{it.name}</div>
-            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--kf-primary)", marginTop: 4 }}>¥{it.price?.toLocaleString()}</div>
-            {it.reviewCount > 0 && <div style={{ fontSize: 11, color: "#F5B400", marginTop: 2 }}>★{it.reviewAverage}（{it.reviewCount}件）</div>}
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#bf0000", marginTop: 6, textAlign: "center", border: "1px solid #bf0000", borderRadius: 6, padding: "4px 0" }}>楽天で見る</div>
-          </a>
-        ))}
+    <section style={{ margin: '32px 0' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--kf-primary, #168342)', margin: 0 }}>{title}</h2>
+        <span style={{ fontSize: 11, color: '#999', border: '1px solid #ddd', borderRadius: 4, padding: '1px 6px' }}>PR</span>
       </div>
-      <p style={{ fontSize: 10, color: "var(--kf-muted)", marginTop: 8 }}>※楽天市場の商品情報です。価格・在庫は変動します。各商品ページでご確認ください。</p>
-    </div>
+      {items.length === 0 ? (
+        <a href={searchUrl} target="_blank" rel="nofollow sponsored noopener"
+          style={{ display: 'inline-block', background: 'var(--kf-primary, #168342)', color: '#fff', padding: '12px 24px', borderRadius: 8, textDecoration: 'none', fontWeight: 600 }}>
+          楽天で「{keyword}」を探す
+        </a>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 16 }}>
+          {items.map((it, i) => (
+            <a key={i} href={it.url} target="_blank" rel="nofollow sponsored noopener"
+              style={{ border: '1px solid #eee', borderRadius: 10, overflow: 'hidden', textDecoration: 'none', color: 'inherit', background: '#fff', display: 'flex', flexDirection: 'column' }}>
+              {it.image && (
+                <img src={it.image} alt={it.name} loading="lazy"
+                  style={{ width: '100%', aspectRatio: '1 / 1', objectFit: 'contain', background: '#fafafa' }} />
+              )}
+              <div style={{ padding: 10, display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
+                <span style={{ fontSize: 12, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{it.name}</span>
+                <span style={{ fontSize: 16, fontWeight: 700, color: '#c0392b' }}>¥{it.price.toLocaleString()}</span>
+                {typeof it.review === 'number' && it.review > 0 && (
+                  <span style={{ fontSize: 11, color: '#f39c12' }}>★{it.review.toFixed(2)} <span style={{ color: '#999' }}>({it.reviewCount})</span></span>
+                )}
+                <span style={{ fontSize: 10, color: '#aaa', marginTop: 'auto' }}>{it.shop}</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--kf-primary, #168342)', marginTop: 4 }}>楽天で見る →</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
