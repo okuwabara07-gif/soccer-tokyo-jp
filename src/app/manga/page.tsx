@@ -31,7 +31,7 @@ const SOCCER_MANGA = [
   {
     rank: 3,
     title: 'キャプテン翼',
-    cover: 'キャプテン翼 1巻 文庫',
+    cover: 'キャプテン翼 コミック',
     author: '高橋陽一',
     volumes: 37,
     position: '全ポジション',
