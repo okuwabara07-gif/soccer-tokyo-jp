@@ -1,5 +1,7 @@
+'use client'
 import Link from 'next/link'
 import MangaCover from "@/components/MangaCover";
+import { useState } from "react";
 
 const SOCCER_MANGA = [
   {
@@ -70,8 +72,11 @@ const SOCCER_MANGA = [
 ]
 
 export default function MangaPage() {
-  const top = SOCCER_MANGA[0];
-  const rest = SOCCER_MANGA.slice(1);
+  const [filter, setFilter] = useState("すべて");
+  const FILTERS = ["すべて", "FW", "MF", "DF"];
+  const filtered = filter === "すべて" ? SOCCER_MANGA : SOCCER_MANGA.filter((m) => m.position.includes(filter));
+  const top = filtered[0];
+  const rest = filtered.slice(1);
   return (
     <main style={{ minHeight: "100vh", background: "var(--kf-bg, #f7f8fa)", fontFamily: "-apple-system,sans-serif", paddingBottom: 48, color: "var(--kf-text, #1a1a1a)" }}>
       <div style={{ padding: "16px", borderBottom: "1px solid #eee", display: "flex", alignItems: "center", gap: 12, background: "#fff" }}>
@@ -85,6 +90,11 @@ export default function MangaPage() {
         <p style={{ color: "#666", fontSize: 13, lineHeight: 1.7 }}>編集部がサッカー育成の観点から、ポジション別・目的別に選びました。表紙画像・価格は楽天市場の情報を表示しています。</p>
       </div>
 
+      <div className="kf-container" style={{ padding: "8px 16px 0", display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {FILTERS.map((ff) => (
+          <button key={ff} onClick={() => setFilter(ff)} style={{ padding: "6px 16px", borderRadius: 999, border: "1px solid " + (filter === ff ? "#e63946" : "#ddd"), background: filter === ff ? "#e63946" : "#fff", color: filter === ff ? "#fff" : "#666", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{ff === "すべて" ? ff : ff + "向け"}</button>
+        ))}
+      </div>
       <div className="kf-container" style={{ padding: "0 16px", margin: "8px 0", textAlign: "center" }}>
         <a href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3767207&pid=892590463" target="_blank" rel="noopener noreferrer sponsored" style={{ display: "inline-block" }}>
           <img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3767207&pid=892590463" width="234" height="60" alt="" style={{ display: "block" }} />
@@ -92,7 +102,8 @@ export default function MangaPage() {
       </div>
 
       <div className="kf-container" style={{ padding: "8px 16px" }}>
-        <div className="kf-card" style={{ padding: 18, marginBottom: 18, display: "grid", gridTemplateColumns: "120px 1fr", gap: 16, alignItems: "start" }}>
+        {!top && <p style={{ color: "#999", fontSize: 13, padding: "20px 0" }}>該当する漫画がありません。</p>}
+        {top && <div className="kf-card" style={{ padding: 18, marginBottom: 18, display: "grid", gridTemplateColumns: "120px 1fr", gap: 16, alignItems: "start" }}>
           <div><MangaCover keyword={top.cover} alt={top.title} /></div>
           <div>
             <span style={{ display: "inline-block", background: top.color, color: "#fff", fontSize: 12, fontWeight: 800, padding: "2px 10px", borderRadius: 6, marginBottom: 6 }}>1位 {top.position}</span>
@@ -107,6 +118,7 @@ export default function MangaPage() {
           </div>
         </div>
 
+        }
         {rest.map((manga) => (
           <div key={manga.rank} className="kf-card" style={{ padding: 14, marginBottom: 14, display: "grid", gridTemplateColumns: "72px 1fr", gap: 14, alignItems: "start" }}>
             <div><MangaCover keyword={manga.cover} alt={manga.title} /></div>
