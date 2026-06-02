@@ -95,11 +95,6 @@ export default function MangaPage() {
           <button key={ff} onClick={() => setFilter(ff)} style={{ padding: "6px 16px", borderRadius: 999, border: "1px solid " + (filter === ff ? "#e63946" : "#ddd"), background: filter === ff ? "#e63946" : "#fff", color: filter === ff ? "#fff" : "#666", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{ff === "すべて" ? ff : ff + "向け"}</button>
         ))}
       </div>
-      <div className="kf-container" style={{ padding: "0 16px", margin: "8px 0", textAlign: "center" }}>
-        <a href="https://ck.jp.ap.valuecommerce.com/servlet/referral?sid=3767207&pid=892590463" target="_blank" rel="noopener noreferrer sponsored" style={{ display: "inline-block" }}>
-          <img src="https://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3767207&pid=892590463" width="234" height="60" alt="" style={{ display: "block" }} />
-        </a>
-      </div>
 
       <div className="kf-container" style={{ padding: "8px 16px" }}>
         {!top && <p style={{ color: "#999", fontSize: 13, padding: "20px 0" }}>該当する漫画がありません。</p>}
