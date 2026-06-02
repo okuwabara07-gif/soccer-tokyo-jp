@@ -4,6 +4,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
+import RakutenItems from "@/components/RakutenItems";
 
 // 文科省・学校保健統計をもとにした概算の同年代平均（参考値）
 const AVG: Record<string, { h: number; w: number }> = {
@@ -104,7 +105,11 @@ export default function BodyCheckPage() {
                 ))}
               </ul>
             </div>
-            <p style={{ fontSize: 11, color: "var(--kf-muted)", marginTop: 14 }}>※平均値は学校保健統計等を参考にした概算です。成長には個人差があります。発育の心配は専門家にご相談ください。</p>
+            <div className="kf-card" style={{ padding: 18, marginTop: 14 }}>
+              <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 10 }}>{res.type}に合いやすいスパイク</div>
+              <RakutenItems keyword={res.type === "スピード型" ? "サッカースパイク ジュニア 軽量" : res.type === "パワー型" ? "サッカースパイク ジュニア 安定" : "サッカースパイク ジュニア"} title="" />
+            </div>
+            <p style={{ fontSize: 11, color: "var(--kf-muted)", marginTop: 14 }}>※平均値は学校保健統計等を参考にした概算です。成長には個人差があります。発育の心配は専門家にご相談ください。本セクションは広告（アフィリエイト）を含みます。</p>
           </div>
         )}
       </main>

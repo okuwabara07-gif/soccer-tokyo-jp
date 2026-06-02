@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import RakutenItems from "@/components/RakutenItems";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
@@ -96,6 +97,10 @@ export default function NutritionPage() {
                 <p style={{ fontSize: 12, color: "var(--kf-muted)", margin: "4px 0 0", lineHeight: 1.6 }}>{a.c}</p>
               </div>
             ))}
+          </div>
+          <div className="kf-card" style={{ padding: 18, marginTop: 18 }}>
+            <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 10 }}>成長期の補食・ゼリー</div>
+            <RakutenItems keyword="ジュニア 補食 ゼリー スポーツ" title="" />
           </div>
           <p style={{ fontSize: 11, color: "var(--kf-muted)", marginTop: 18 }}>※一般的な栄養情報です。体質・アレルギー等は専門家にご相談ください。アフィリエイトを含みます。</p>
         </div>
