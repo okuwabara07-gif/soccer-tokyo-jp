@@ -20,6 +20,14 @@ export default function PerformancePage() {
             </div>
           ))}
         </div>
+        <div className="kf-card" style={{ padding: 20, marginTop: 24, textAlign: "center" }}>
+          <div style={{ fontWeight: 800 }}>パフォーマンスを投稿する</div>
+          <p style={{ fontSize: 13, color: "var(--kf-muted)", margin: "8px 0 12px" }}>
+            初期はパフォーマンス名・難易度・やり方の<strong>テキスト投稿</strong>のみ受け付けます。<br />
+            お子さまの安全のため、顔が写る写真・動画の投稿は受け付けていません。
+          </p>
+          <button className="kf-btn kf-btn--primary" style={{ padding: "12px 22px", fontSize: 14 }}>テキストで投稿する</button>
+        </div>
         <p style={{ fontSize: 11, color: "var(--kf-muted)", marginTop: 16, textAlign: "center" }}>※画像はAIで生成したイメージです。</p>
       </main>
       <SiteFooter />
