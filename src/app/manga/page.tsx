@@ -135,6 +135,23 @@ export default function MangaPage() {
         ))}
       </div>
 
+      <div className="kf-container" style={{ padding: "8px 16px 0" }}>
+        <h2 style={{ fontSize: 18, fontWeight: 800, margin: "8px 0 12px" }}>目的で選ぶ</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12 }}>
+          {[
+            { label: "得点力を上げたい", sub: "ゴールを奪う技術・メンタルを学ぶ", to: "FW", color: "#e63946" },
+            { label: "戦術・判断力を磨きたい", sub: "賢いプレー・ポジショニングを学ぶ", to: "MF", color: "#2b9348" },
+            { label: "守備・チームワーク", sub: "粘り強さ・仲間との連携を学ぶ", to: "DF", color: "#023e8a" },
+          ].map((c) => (
+            <button key={c.to} onClick={() => { setFilter(c.to); if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); }}
+              style={{ textAlign: "left", cursor: "pointer", border: "1px solid #eee", borderLeft: "4px solid " + c.color, borderRadius: 12, background: "#fff", padding: 14 }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: c.color, marginBottom: 4 }}>{c.label}</div>
+              <div style={{ fontSize: 11, color: "#666", lineHeight: 1.5 }}>{c.sub}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="kf-container" style={{ margin: "20px 16px 0", padding: "20px", borderRadius: 16, background: "linear-gradient(135deg,#0a3d62,#1a6ba0)" }}>
         <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 11, marginBottom: 6 }}>漫画で刺激を受けたら</p>
         <p style={{ color: "#fff", fontSize: 16, fontWeight: 700, marginBottom: 8 }}>最高のチームを見つけよう</p>
