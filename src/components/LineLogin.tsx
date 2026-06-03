@@ -27,18 +27,19 @@ export function useLineAuth() {
         const liff = (await import("@line/liff")).default;
         await liff.init({ liffId });
         if (liff.isLoggedIn()) {
+          const accessToken = liff.getAccessToken();
           const idToken = liff.getIDToken();
-          if (idToken) {
+          if (accessToken || idToken) {
             await fetch("/api/auth/line", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ idToken }),
+              body: JSON.stringify({ accessToken, idToken }),
             });
           }
         }
         await refresh();
-      } catch {
-        // LIFF未設定/初期化失敗時も画面は壊さない
+      } catch (e) {
+        console.error("liff init error", e);
       } finally {
         if (mounted) setReady(true);
       }
