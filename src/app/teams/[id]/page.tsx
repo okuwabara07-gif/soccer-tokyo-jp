@@ -1,16 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 type Team = {
   id: string; name: string; category: string; area: string; prefecture: string;
@@ -24,15 +18,17 @@ export default function TeamDetailPage() {
   const params = useParams();
   const id = params?.id as string;
   const [team, setTeam] = useState<Team | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [hasSelection, setHasSelection] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => { try { setIsPremium(!!localStorage.getItem("memberPlan")); } catch {} }, []);
   useEffect(() => {
     if (!id) return;
-    supabase.from("teams").select("*").eq("id", id).single().then(({ data }) => {
-      setTeam(data as Team); setLoading(false);
-    });
+    fetch(`/api/team?id=${encodeURIComponent(id)}`, { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => { setTeam((d.team as Team) ?? null); setHasSelection(!!d.has_selection); setIsPremium(!!d.active); })
+      .catch(() => setTeam(null))
+      .finally(() => setLoading(false));
   }, [id]);
 
   if (loading) return (<div style={{ background: "var(--kf-bg)", minHeight: "100vh" }}><Header /><main className="kf-container" style={{ padding: 40 }}>読み込み中…</main></div>);
@@ -70,8 +66,7 @@ export default function TeamDetailPage() {
           </div>
         )}
 
-        {/* セレクション情報（プレミアム） */}
-        {team.selection_start && (
+        {hasSelection && (
           <div className="kf-card" style={{ padding: 20, marginTop: 16 }}>
             <h2 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 8px" }}>セレクション情報</h2>
             {isPremium ? (
@@ -88,7 +83,6 @@ export default function TeamDetailPage() {
           </div>
         )}
 
-        {/* リンク（プレミアム制限） */}
         <div className="kf-card" style={{ padding: 20, marginTop: 16 }}>
           <h2 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 10px" }}>公式・SNS</h2>
           {isPremium ? (
