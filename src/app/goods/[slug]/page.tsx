@@ -26,6 +26,31 @@ const RAKUTEN_KW: Record<string, string> = {
   "ケア用品": "スポーツ アイシング 冷却",
 };
 
+const MD = {
+  a: ({ href, children }: any) => <a href={href || "#"} style={{ color: "var(--kf-primary)", textDecoration: "underline" }}>{children}</a>,
+  h2: ({ children }: any) => <h2 style={{ fontSize: 18, fontWeight: 800, margin: "24px 0 8px" }}>{children}</h2>,
+  ul: ({ children }: any) => <ul style={{ paddingLeft: 20, margin: "8px 0" }}>{children}</ul>,
+  li: ({ children }: any) => <li style={{ margin: "4px 0" }}>{children}</li>,
+  p: ({ children }: any) => <p style={{ margin: "8px 0" }}>{children}</p>,
+  strong: ({ children }: any) => <strong style={{ fontWeight: 700 }}>{children}</strong>,
+};
+
+// 本文を [[rakuten:キーワード|見出し]] で分割
+function parseBody(body: string) {
+  const re = /\[\[rakuten:([^\]]+)\]\]/g;
+  const parts: Array<{ t: "md" | "rk"; v: string; ttl?: string }> = [];
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(body)) !== null) {
+    if (m.index > last) parts.push({ t: "md", v: body.slice(last, m.index) });
+    const seg = m[1].split("|");
+    parts.push({ t: "rk", v: seg[0].trim(), ttl: seg[1]?.trim() });
+    last = m.index + m[0].length;
+  }
+  if (last < body.length) parts.push({ t: "md", v: body.slice(last) });
+  return parts;
+}
+
 export default async function GoodsArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const { data: article } = await supabase.from("goods_articles").select("*").eq("slug", slug).eq("status", "published").single();
@@ -42,6 +67,9 @@ export default async function GoodsArticlePage({ params }: { params: Promise<{ s
   const { data: related } = await supabase.from("goods_articles").select("slug,title,category")
     .eq("category", article.category).eq("status", "published").neq("slug", slug).limit(4);
 
+  const parts = parseBody(article.body || "");
+  const hasInline = parts.some((p) => p.t === "rk");
+
   return (
     <div style={{ background: "var(--kf-bg)", minHeight: "100vh", color: "var(--kf-text)" }}>
       <Header />
@@ -53,14 +81,11 @@ export default async function GoodsArticlePage({ params }: { params: Promise<{ s
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 16px", lineHeight: 1.4 }}>{article.title}</h1>
         {article.hero_image && <img src={article.hero_image} alt="" style={{ width: "100%", borderRadius: "var(--kf-radius)", marginBottom: 20 }} />}
         <div className="kf-article-body" style={{ fontSize: 15, lineHeight: 2 }}>
-          <ReactMarkdown components={{
-            a: ({href, children}) => <a href={href || "#"} style={{ color: "var(--kf-primary)", textDecoration: "underline" }}>{children}</a>,
-            h2: ({children}) => <h2 style={{ fontSize: 18, fontWeight: 800, margin: "24px 0 8px" }}>{children}</h2>,
-            ul: ({children}) => <ul style={{ paddingLeft: 20, margin: "8px 0" }}>{children}</ul>,
-            li: ({children}) => <li style={{ margin: "4px 0" }}>{children}</li>,
-            p: ({children}) => <p style={{ margin: "8px 0" }}>{children}</p>,
-            strong: ({children}) => <strong style={{ fontWeight: 700 }}>{children}</strong>,
-          }}>{article.body}</ReactMarkdown>
+          {parts.map((p, i) =>
+            p.t === "md"
+              ? <ReactMarkdown key={i} components={MD}>{p.v}</ReactMarkdown>
+              : <RakutenItems key={i} keyword={p.v} title={p.ttl || "おすすめ商品"} />
+          )}
         </div>
         {related && related.length > 0 && (
           <div style={{ marginTop: 32 }}>
@@ -74,10 +99,12 @@ export default async function GoodsArticlePage({ params }: { params: Promise<{ s
             </div>
           </div>
         )}
-        <div style={{ marginTop: 32 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 800, marginBottom: 4 }}>おすすめ商品をチェック</h2>
-          <RakutenItems keyword={RAKUTEN_KW[article.category] || article.category} />
-        </div>
+        {!hasInline && (
+          <div style={{ marginTop: 32 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 800, marginBottom: 4 }}>おすすめ商品をチェック</h2>
+            <RakutenItems keyword={RAKUTEN_KW[article.category] || article.category} />
+          </div>
+        )}
         <p style={{ fontSize: 11, color: "var(--kf-muted)", marginTop: 24 }}>※本ページはアフィリエイトプログラムを利用した商品紹介を含みます。価格・在庫は各販売サイトでご確認ください。</p>
       </main>
       <SiteFooter />
