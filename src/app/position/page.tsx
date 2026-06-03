@@ -23,6 +23,50 @@ const SKILLS = [
   { name: "キック（展開力）", val: 3.5, color: "#7b2d8b" },
 ];
 
+
+function Dot({ label, color, x, y }: { label: string; color: string; x: number; y: number }) {
+  return (
+    <div style={{ position: "absolute", left: `${x}%`, top: `${y}%`, transform: "translate(-50%,-50%)", width: 34, height: 34, borderRadius: "50%", background: color, border: "2px solid #fff", boxShadow: "0 2px 4px rgba(0,0,0,.25)", display: "grid", placeItems: "center", color: "#fff", fontSize: 11, fontWeight: 800 }}>{label}</div>
+  );
+}
+function Pitch({ fmt }: { fmt: "8" | "11" }) {
+  const eight = [
+    { l: "GK", c: "#7b2d8b", x: 50, y: 88 },
+    { l: "DF", c: "#1769e0", x: 20, y: 64 }, { l: "DF", c: "#1769e0", x: 40, y: 64 }, { l: "DF", c: "#1769e0", x: 60, y: 64 }, { l: "DF", c: "#1769e0", x: 80, y: 64 },
+    { l: "MF", c: "#e9a000", x: 35, y: 40 }, { l: "MF", c: "#e9a000", x: 65, y: 40 },
+    { l: "FW", c: "#e63946", x: 50, y: 18 },
+  ];
+  const eleven = [
+    { l: "GK", c: "#7b2d8b", x: 50, y: 90 },
+    { l: "DF", c: "#1769e0", x: 18, y: 70 }, { l: "DF", c: "#1769e0", x: 39, y: 70 }, { l: "DF", c: "#1769e0", x: 61, y: 70 }, { l: "DF", c: "#1769e0", x: 82, y: 70 },
+    { l: "MF", c: "#2b9348", x: 38, y: 50 }, { l: "MF", c: "#2b9348", x: 62, y: 50 },
+    { l: "MF", c: "#e9a000", x: 25, y: 30 }, { l: "MF", c: "#e9a000", x: 50, y: 30 }, { l: "MF", c: "#e9a000", x: 75, y: 30 },
+    { l: "FW", c: "#e63946", x: 50, y: 12 },
+  ];
+  const dots = fmt === "8" ? eight : eleven;
+  const arrows: number[][] = fmt === "8"
+    ? [[50,24,30,40,20,58],[50,24,70,40,80,58],[35,46,28,55,22,68],[65,46,72,55,78,68],[35,46,50,52,65,46],[20,70,32,80,30,88],[80,70,68,80,70,88]]
+    : [[50,18,28,32,18,64],[50,18,72,32,82,64],[38,36,28,45,25,62],[62,36,72,45,75,62],[38,56,30,64,18,76],[62,56,70,64,82,76]];
+  return (
+    <div style={{ position: "relative", width: "100%", aspectRatio: "4/3", background: "linear-gradient(#e8f3e2,#dcefe0)", borderRadius: 12, border: "2px solid #cfe6d4", overflow: "hidden" }}>
+      <div style={{ position: "absolute", inset: "8%", border: "2px solid rgba(255,255,255,.8)", borderRadius: 4 }} />
+      <div style={{ position: "absolute", left: "50%", top: "8%", bottom: "8%", width: 2, background: "rgba(255,255,255,.8)", transform: "translateX(-50%)" }} />
+      <div style={{ position: "absolute", left: "50%", top: "50%", width: "26%", aspectRatio: "1", border: "2px solid rgba(255,255,255,.8)", borderRadius: "50%", transform: "translate(-50%,-50%)" }} />
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+        <defs>
+          <marker id="ah" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#2b9348" />
+          </marker>
+        </defs>
+        {arrows.map((a, i) => (
+          <path key={i} d={`M${a[0]},${a[1]} Q${a[2]},${a[3]} ${a[4]},${a[5]}`} fill="none" stroke="#2b9348" strokeWidth="0.8" strokeDasharray="2 2" markerEnd="url(#ah)" opacity="0.85" />
+        ))}
+      </svg>
+      {dots.map((d, i) => <Dot key={i} label={d.l} color={d.c} x={d.x} y={d.y} />)}
+    </div>
+  );
+}
+
 export default function PositionPage() {
   const [tab, setTab] = useState("gk");
   const [fmt, setFmt] = useState<"8"|"11">("8");
@@ -89,11 +133,13 @@ export default function PositionPage() {
             </div>
 
             <div className="kf-card" style={{ padding: 16 }}>
-              <h2 style={{ fontSize: 16, fontWeight: 800, marginBottom: 10 }}>GKの役割</h2>
-              <img src="/images/kf/position/gk-roleicons.jpg" alt="GKの役割" style={{ width: "100%", borderRadius: 10, display: "block", marginBottom: 10 }} />
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                {[["守る","シュートを止め、失点を防ぐ"],["指示する","DFへの声かけで守備を統率"],["つなぐ","素早い展開で攻撃を開始"],["読む","相手の動きを先読みする"]].map(([t,d]) => (
-                  <div key={t} style={{ fontSize: 12, lineHeight: 1.5 }}><b style={{ color: C }}>{t}</b><br /><span style={{ color: "#666" }}>{d}</span></div>
+              <h2 style={{ fontSize: 16, fontWeight: 800, marginBottom: 12 }}>GKの役割</h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {[["🧤","守る","シュートを止め、失点を防ぐ","#e63946"],["📢","指示する","DFへの声かけで守備の連携をつくる","#7b2d8b"],["🎯","つなぐ","素早いスローやキックで攻撃を開始","#457b9d"],["👁","読む","相手の動きを先読みして対応する","#2b9348"]].map(([ic,t,d,col]) => (
+                  <div key={t} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: col+"1a", display: "grid", placeItems: "center", fontSize: 20, flexShrink: 0 }}>{ic}</div>
+                    <div><p style={{ fontSize: 14, fontWeight: 800, margin: 0 }}>{t}</p><p style={{ fontSize: 12, color: "#666", margin: 0, lineHeight: 1.5 }}>{d}</p></div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -113,7 +159,7 @@ export default function PositionPage() {
 
             <div className="kf-card" style={{ padding: 16 }}>
               <h2 style={{ fontSize: 16, fontWeight: 800, marginBottom: 10 }}>{fmt}人制のポジション配置</h2>
-              <img src={fmt === "8" ? "/images/kf/position/gk-formation8.jpg" : "/images/kf/position/gk-formation11.jpg"} alt={`${fmt}人制配置`} style={{ width: "100%", borderRadius: 8, display: "block" }} />
+              <Pitch fmt={fmt} />
             </div>
 
             <div className="kf-card" style={{ padding: 16 }}>
