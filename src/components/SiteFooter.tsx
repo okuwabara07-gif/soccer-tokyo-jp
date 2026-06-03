@@ -26,10 +26,10 @@ const LINKS = {
   ],
   services: [
     { href: "/", label: "ホーム" },
-    { href: "/search", label: "チームを探す" },
+    { href: "/teams", label: "チームを探す" },
     { href: "/selection", label: "セレクション情報" },
-    { href: "/ai", label: "AI診断" },
-    { href: "/plan", label: "料金プラン" },
+    { href: "/foot-check", label: "AI診断" },
+    { href: "/member", label: "料金プラン" },
   ],
 };
 
