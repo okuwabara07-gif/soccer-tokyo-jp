@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 
+// サーバーサイド LINEログイン(OAuth)。LIFF非依存・ループしない。
 export function useLineAuth() {
   const [ready, setReady] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
@@ -12,58 +13,20 @@ export function useLineAuth() {
       const d = await r.json();
       setLoggedIn(!!d.loggedIn);
       setName(d.name ?? null);
-    } catch {}
+    } catch {
+    } finally {
+      setReady(true);
+    }
   }, []);
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
-        if (!liffId) {
-          if (mounted) setReady(true);
-          return;
-        }
-        const liff = (await import("@line/liff")).default;
-        await liff.init({ liffId });
-        if (liff.isLoggedIn()) {
-          const accessToken = liff.getAccessToken();
-          const idToken = liff.getIDToken();
-          if (accessToken || idToken) {
-            await fetch("/api/auth/line", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ accessToken, idToken }),
-            });
-          }
-        }
-        await refresh();
-      } catch (e) {
-        console.error("liff init error", e);
-      } finally {
-        if (mounted) setReady(true);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [refresh]);
+  useEffect(() => { refresh(); }, [refresh]);
 
-  const login = useCallback(async () => {
-    const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
-    if (!liffId) {
-      alert("LIFF未設定です（NEXT_PUBLIC_LIFF_ID）");
-      return;
-    }
-    const liff = (await import("@line/liff")).default;
-    if (!liff.isLoggedIn()) liff.login({ redirectUri: window.location.href });
+  const login = useCallback(() => {
+    const dest = window.location.pathname + window.location.search;
+    window.location.href = `/api/auth/line/login?redirect=${encodeURIComponent(dest)}`;
   }, []);
 
   const logout = useCallback(async () => {
-    try {
-      const liff = (await import("@line/liff")).default;
-      if (liff.isLoggedIn()) liff.logout();
-    } catch {}
     await fetch("/api/auth/logout", { method: "POST" });
     await refresh();
   }, [refresh]);
