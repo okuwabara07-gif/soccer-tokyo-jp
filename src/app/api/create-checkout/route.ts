@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
+import { getSession } from '@/lib/session'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-01-27.acacia' })
 
@@ -16,6 +17,10 @@ export async function POST(req: NextRequest) {
     const selected = plans[plan]
     if (!selected) return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
 
+    const sess = await getSession()
+    const lineUserId = sess?.uid ?? ''
+    const isSub = plan !== 'papa_mama'
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
@@ -23,11 +28,13 @@ export async function POST(req: NextRequest) {
           currency: 'jpy',
           product_data: { name: selected.name },
           unit_amount: selected.price,
-          ...(plan !== 'papa_mama' && { recurring: { interval: 'month' } }),
+          ...(isSub && { recurring: { interval: 'month' } }),
         },
         quantity: 1,
       }],
-      mode: plan === 'papa_mama' ? 'payment' : 'subscription',
+      mode: isSub ? 'subscription' : 'payment',
+      metadata: { line_user_id: lineUserId, plan },
+      ...(isSub && { subscription_data: { metadata: { line_user_id: lineUserId, plan } } }),
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/member/success?plan=${plan}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/member`,
     })

@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
 
     const amount = session.amount_total ?? 0
     const plan = planFromAmount(amount)
+    const lineUserId = (session.metadata?.line_user_id as string) || null
 
     // membersへ記録（service_roleキーがあれば。無ければ検証のみで継続）
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
           stripe_customer_id: (session.customer as string) ?? null,
           stripe_subscription_id: (session.subscription as string) ?? null,
           amount,
+          line_user_id: lineUserId,
           updated_at: new Date().toISOString(),
         }, { onConflict: 'stripe_session_id' })
       } catch (e) { /* 記録失敗は会員化を妨げない */ }
