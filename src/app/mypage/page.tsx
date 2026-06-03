@@ -1,9 +1,10 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
+import { useLineAuth } from "@/components/LineLogin";
 
 const QUICK = [
   { label: "チームを探す", href: "/teams", img: "/images/kf/panels/p_teams.jpg" },
@@ -13,8 +14,11 @@ const QUICK = [
 ];
 
 export default function MyPage() {
-  const [memberPlan, setMemberPlan] = useState<string | null>(null);
-  const [trialDaysLeft, setTrialDaysLeft] = useState<number | null>(null);
+  const { ready, loggedIn, login } = useLineAuth();
+  const [plan, setPlan] = useState<string | null>(null);
+  const [trialDaysLeft, setTrialDaysLeft] = useState<number>(0);
+  const [active, setActive] = useState(false);
+  const [memLoaded, setMemLoaded] = useState(false);
   const [aiAdvice, setAiAdvice] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [childName, setChildName] = useState("");
@@ -23,14 +27,15 @@ export default function MyPage() {
   const [bodyResult, setBodyResult] = useState<any>(null);
   const [tab, setTab] = useState<"home" | "status" | "settings">("home");
 
+  const loadMembership = useCallback(async () => {
+    try {
+      const r = await fetch("/api/membership", { cache: "no-store" });
+      const d = await r.json();
+      setActive(!!d.active); setPlan(d.plan ?? null); setTrialDaysLeft(d.trialDaysLeft ?? 0);
+    } catch {} finally { setMemLoaded(true); }
+  }, []);
+
   useEffect(() => {
-    const plan = localStorage.getItem("memberPlan");
-    setMemberPlan(plan);
-    const trialStart = localStorage.getItem("trialStart");
-    if (!plan && trialStart) {
-      const days = 3 - Math.floor((Date.now() - new Date(trialStart).getTime()) / (1000 * 60 * 60 * 24));
-      setTrialDaysLeft(days > 0 ? days : 0);
-    }
     setChildName(localStorage.getItem("childName") || "");
     setChildGrade(localStorage.getItem("childGrade") || "");
     try { const f = localStorage.getItem("footDiagnosis"); if (f) setFootResult(JSON.parse(f)); } catch {}
@@ -38,20 +43,28 @@ export default function MyPage() {
   }, []);
 
   useEffect(() => {
+    if (!ready) return;
+    if (loggedIn) loadMembership();
+    else setMemLoaded(true);
+  }, [ready, loggedIn, loadMembership]);
+
+  useEffect(() => {
     if (tab !== "home") return;
     setAiLoading(true);
     const ctx = `名前:${childName || "未設定"} 学年:${childGrade || "未設定"}`;
     fetch("/api/mypage-advice", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ context: ctx }) })
-      .then(r => r.json()).then(d => setAiAdvice(d.advice || "今日も楽しくプレーしよう！⚽")).catch(() => setAiAdvice("今日も楽しくプレーしよう！⚽")).finally(() => setAiLoading(false));
+      .then((r) => r.json()).then((d) => setAiAdvice(d.advice || "今日も楽しくプレーしよう！⚽")).catch(() => setAiAdvice("今日も楽しくプレーしよう！⚽")).finally(() => setAiLoading(false));
   }, [tab, childName, childGrade]);
 
-  const startTrial = () => {
-    localStorage.setItem("trialStart", new Date().toISOString());
-    setTrialDaysLeft(3);
+  const startTrial = async () => {
+    if (!loggedIn) { login(); return; }
+    await fetch("/api/trial/start", { method: "POST" });
+    await loadMembership();
     alert("3日間の無料お試しを開始しました！");
   };
 
-  const isActive = !!(memberPlan || (trialDaysLeft !== null && trialDaysLeft > 0));
+  const showTrialOffer = ready && loggedIn && memLoaded && !plan && !active;
+  const showTrialRemaining = ready && loggedIn && !plan && active && trialDaysLeft > 0;
 
   return (
     <div style={{ background: "var(--kf-bg)", minHeight: "100vh", color: "var(--kf-text)" }}>
@@ -68,25 +81,36 @@ export default function MyPage() {
               <div style={{ fontSize: 28, fontWeight: 800 }}>{childName ? `${childName}選手` : "マイページ"}</div>
             </div>
             <div style={{ position: "absolute", right: 20, bottom: 20 }}>
-              {memberPlan
-                ? <span className="kf-badge" style={{ background: "var(--kf-accent)", color: "#3a2e0a" }}>{memberPlan}会員</span>
-                : <Link href="/member" className="kf-btn kf-btn--primary" style={{ padding: "10px 18px" }}>登録する ›</Link>}
+              {plan
+                ? <span className="kf-badge" style={{ background: "var(--kf-accent)", color: "#3a2e0a" }}>{plan}会員</span>
+                : loggedIn
+                  ? <Link href="/member" className="kf-btn kf-btn--primary" style={{ padding: "10px 18px" }}>登録する ›</Link>
+                  : <button onClick={login} className="kf-btn kf-btn--primary" style={{ padding: "10px 18px", border: "none", cursor: "pointer" }}>LINEでログイン</button>}
             </div>
           </div>
         </div>
 
-        {/* 3日間無料お試し（未登録・未トライアル時のみ） */}
-        {!memberPlan && trialDaysLeft === null && (
+        {/* 未ログイン案内 */}
+        {ready && !loggedIn && (
+          <div className="kf-card" style={{ marginTop: 14, padding: 16, textAlign: "center" }}>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>LINEでログインすると会員機能が使えます</div>
+            <div style={{ fontSize: 12, color: "var(--kf-muted)", marginBottom: 10 }}>無料お試し・セレクション情報・会員ステータスの保存</div>
+            <button onClick={login} className="kf-btn kf-btn--primary" style={{ padding: "10px 20px", border: "none", cursor: "pointer" }}>LINEでログイン</button>
+          </div>
+        )}
+
+        {/* 3日間無料お試し（ログイン・未登録・未トライアル時のみ） */}
+        {showTrialOffer && (
           <div className="kf-card" style={{ marginTop: 14, padding: 0, overflow: "hidden", display: "flex", alignItems: "center", position: "relative", minHeight: 96 }}>
             <img src="/images/kf/panels/p_shoes.jpg" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: .25 }} />
             <div style={{ position: "relative", padding: "16px 20px", flex: 1 }}>
               <div style={{ fontWeight: 800 }}>🎁 3日間無料お試し</div>
-              <div style={{ fontSize: 12, color: "var(--kf-muted)", marginTop: 2 }}>登録不要・カード不要で全機能を体験</div>
+              <div style={{ fontSize: 12, color: "var(--kf-muted)", marginTop: 2 }}>カード不要で全機能を体験</div>
             </div>
             <button onClick={startTrial} className="kf-btn kf-btn--ghost" style={{ position: "relative", marginRight: 16, padding: "10px 18px", background: "#fff" }}>今すぐ試す ›</button>
           </div>
         )}
-        {!memberPlan && trialDaysLeft !== null && trialDaysLeft > 0 && (
+        {showTrialRemaining && (
           <div className="kf-card" style={{ marginTop: 14, padding: 16, textAlign: "center", background: "var(--kf-primary-soft)", border: "none" }}>
             <span style={{ fontWeight: 700 }}>無料お試し残り {trialDaysLeft} 日</span>
             <Link href="/member" style={{ marginLeft: 12, color: "var(--kf-primary)", fontWeight: 700, fontSize: 13 }}>プレミアムに登録 ›</Link>
@@ -107,7 +131,6 @@ export default function MyPage() {
 
         {tab === "home" && (
           <>
-            {/* TODAY'S ADVICE */}
             <div className="kf-card" style={{ padding: 18, marginBottom: 18 }}>
               <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                 <span style={{ width: 40, height: 40, borderRadius: 999, background: "var(--kf-primary)", display: "grid", placeItems: "center", flexShrink: 0, color: "#fff", fontSize: 18 }}>⚽</span>
@@ -118,10 +141,9 @@ export default function MyPage() {
               </div>
             </div>
 
-            {/* QUICK ACCESS */}
             <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1, color: "var(--kf-muted)", marginBottom: 10 }}>QUICK ACCESS</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              {QUICK.map(q => (
+              {QUICK.map((q) => (
                 <Link key={q.label} href={q.href} style={{ position: "relative", borderRadius: "var(--kf-radius)", overflow: "hidden", height: 90, textDecoration: "none", display: "block" }}>
                   <img src={q.img} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
                   <span style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg,rgba(0,0,0,.7),rgba(0,0,0,.25))" }} />
@@ -152,16 +174,16 @@ export default function MyPage() {
           <div className="kf-card" style={{ padding: 18 }}>
             <div style={{ fontWeight: 800, marginBottom: 12 }}>選手情報</div>
             <label style={{ fontSize: 12, color: "var(--kf-muted)" }}>お名前</label>
-            <input value={childName} onChange={e => setChildName(e.target.value)} placeholder="例: 太郎"
+            <input value={childName} onChange={(e) => setChildName(e.target.value)} placeholder="例: 太郎"
               style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--kf-border)", margin: "4px 0 12px", fontSize: 14 }} />
             <label style={{ fontSize: 12, color: "var(--kf-muted)" }}>学年</label>
-            <input value={childGrade} onChange={e => setChildGrade(e.target.value)} placeholder="例: 小5"
+            <input value={childGrade} onChange={(e) => setChildGrade(e.target.value)} placeholder="例: 小5"
               style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--kf-border)", margin: "4px 0 14px", fontSize: 14 }} />
             <button onClick={() => { localStorage.setItem("childName", childName); localStorage.setItem("childGrade", childGrade); alert("保存しました！"); }}
               className="kf-btn kf-btn--primary" style={{ padding: "10px 20px" }}>保存する</button>
             <div style={{ marginTop: 18, paddingTop: 14, borderTop: "1px solid var(--kf-border)", fontSize: 13 }}>
-              会員状態: {memberPlan ? `${memberPlan}会員` : trialDaysLeft && trialDaysLeft > 0 ? `無料お試し（残り${trialDaysLeft}日）` : "未登録"}
-              {!memberPlan && <Link href="/member" style={{ marginLeft: 10, color: "var(--kf-primary)" }}>プレミアムを見る ›</Link>}
+              会員状態: {plan ? `${plan}会員` : active && trialDaysLeft > 0 ? `無料お試し（残り${trialDaysLeft}日）` : "未登録"}
+              {!plan && <Link href="/member" style={{ marginLeft: 10, color: "var(--kf-primary)" }}>プレミアムを見る ›</Link>}
             </div>
           </div>
         )}
