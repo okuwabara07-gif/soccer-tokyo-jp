@@ -70,7 +70,7 @@ export default function TeamInteractive({ team }: TeamInteractiveProps) {
         <Row
           label="会費"
           value={
-            team.is_free ? "無料" : team.fee ? `¥${team.fee.toLocaleString()}` : undefined
+            team.fee && team.fee > 0 ? `¥${team.fee.toLocaleString()}` : undefined
           }
         />
         <Row label="部員数" value={team.members ? `${team.members}名` : undefined} />
