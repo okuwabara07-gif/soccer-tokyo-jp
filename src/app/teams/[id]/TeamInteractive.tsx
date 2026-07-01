@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import LineAddPanel from "@/components/LineAddPanel";
 
 interface TeamData {
   id: string;
@@ -208,6 +209,7 @@ export default function TeamInteractive({ team }: TeamInteractiveProps) {
           </div>
         )}
       </div>
+      <LineAddPanel message="このエリアのセレクション情報をLINEで受け取る" />
     </>
   );
 }
