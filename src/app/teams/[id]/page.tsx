@@ -39,8 +39,9 @@ export async function generateStaticParams() {
   return (data || []).map((t) => ({ id: t.id as string }));
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const team = await getTeam(params.id);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const team = await getTeam(id);
   if (!team) return { title: "チームが見つかりません" };
   const location = [team.prefecture, team.area].filter(Boolean).join("");
   const desc = team.description && team.description.trim()
@@ -55,8 +56,9 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   };
 }
 
-export default async function TeamDetailPage({ params }: { params: { id: string } }) {
-  const team = await getTeam(params.id);
+export default async function TeamDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const team = await getTeam(id);
   if (!team) notFound();
 
   const location = [team.prefecture, team.area].filter(Boolean).join("");

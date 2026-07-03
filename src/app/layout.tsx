@@ -9,12 +9,11 @@ export const metadata: Metadata = {
   title: "サッカーセレクション | 関東のジュニアチーム検索・セレクション情報",
   description: "関東のジュニアサッカーチーム・セレクション情報を検索。チーム選びに役立つ情報を提供する総合サッカー情報サイト。",
   manifest: "/manifest.json",
-  themeColor: "#0a0a0a",
   appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "サッカーセレクション" },
 };
 
 export const viewport = {
-  width: "device-width", initialScale: 1, maximumScale: 1,
+  width: "device-width", initialScale: 1, maximumScale: 1, themeColor: "#0a0a0a",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
