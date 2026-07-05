@@ -20,6 +20,7 @@ export const metadata: Metadata = {
   description:
     "サッカーセレクション(AOKAE合同会社)が定める、利用者の個人情報の取扱いに関する方針。",
   robots: { index: true, follow: true },
+  alternates: { canonical: "https://soccer-selection.jp/privacy" },
 };
 
 export default function PrivacyPage() {

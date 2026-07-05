@@ -10,6 +10,7 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env
 export const metadata = {
   title: "サッカー育成コラム | 上達・セレクション・進路の考え方",
   description: "ジュニアサッカーの上達・セレクション準備・ポジション・メンタル・進路の考え方を保護者向けに解説するコラムです。",
+  alternates: { canonical: "https://soccer-selection.jp/column" },
 };
 
 export default async function ColumnPage() {

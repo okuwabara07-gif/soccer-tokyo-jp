@@ -18,6 +18,7 @@ export const metadata: Metadata = {
   title: "利用規約 | サッカーセレクション",
   description:
     "サッカーセレクション(AOKAE合同会社)が提供する全サービスに適用される利用規約。",
+  alternates: { canonical: "https://soccer-selection.jp/terms" },
 };
 
 export default function TermsPage() {

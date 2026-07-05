@@ -23,6 +23,7 @@ export const metadata: Metadata = {
   title: "お問合せ | サッカーセレクション",
   description:
     "サッカーセレクションへのお問合せフォーム。サービス・料金・取材・不具合等のご連絡をお待ちしています。",
+  alternates: { canonical: "https://soccer-selection.jp/contact" },
 };
 
 export default function ContactPage() {

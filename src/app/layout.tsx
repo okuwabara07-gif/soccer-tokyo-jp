@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://soccer-selection.jp"),
   title: "サッカーセレクション | 関東のジュニアチーム検索・セレクション情報",
   description: "関東のジュニアサッカーチーム・セレクション情報を検索。チーム選びに役立つ情報を提供する総合サッカー情報サイト。",
+  alternates: { canonical: "https://soccer-selection.jp" },
   manifest: "/manifest.json",
   appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "サッカーセレクション" },
 };

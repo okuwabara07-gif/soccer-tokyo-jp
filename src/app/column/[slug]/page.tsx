@@ -11,7 +11,11 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const { data } = await supabase.from("articles").select("title,excerpt").eq("slug", slug).single();
-  return { title: data ? `${data.title} | サッカー育成コラム` : "コラム", description: data?.excerpt || "" };
+  return {
+    title: data ? `${data.title} | サッカー育成コラム` : "コラム",
+    description: data?.excerpt || "",
+    alternates: { canonical: `https://soccer-selection.jp/column/${slug}` },
+  };
 }
 
 export default async function ColumnArticlePage({ params }: { params: Promise<{ slug: string }> }) {

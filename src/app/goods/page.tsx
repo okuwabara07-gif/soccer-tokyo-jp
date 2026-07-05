@@ -5,7 +5,10 @@ import SiteFooter from "@/components/SiteFooter";
 import { GOODS_CATEGORIES } from "@/lib/goodsCategories";
 import GoodsCatImage from "@/components/GoodsCatImage";
 
-export const metadata = { title: "準備物・グッズガイド | サッカーセレクション" };
+export const metadata = {
+  title: "準備物・グッズガイド | サッカーセレクション",
+  alternates: { canonical: "https://soccer-selection.jp/goods" },
+};
 
 export default function GoodsPage() {
   return (

@@ -21,6 +21,7 @@ export const metadata: Metadata = {
   title: "運営者情報 | サッカーセレクション",
   description:
     "AOKAE合同会社が運営する、関東4都県のジュニアサッカー保護者向け情報プラットフォーム「サッカーセレクション」の運営者情報。",
+  alternates: { canonical: "https://soccer-selection.jp/company" },
   openGraph: {
     title: "運営者情報 | サッカーセレクション",
     description:
