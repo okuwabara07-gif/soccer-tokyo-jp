@@ -4,7 +4,7 @@ import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
 import ClubsClient from "@/components/ClubsClient";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
