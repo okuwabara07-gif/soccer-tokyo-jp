@@ -6,13 +6,12 @@ type Club = {
   slug: string;
   name: string;
   name_kana?: string;
-  category: string;
+  club_type: string;
   area?: string;
   prefecture: string;
-  block?: string;
+  city?: string;
   description?: string;
   monthly_fee?: number;
-  is_free?: boolean;
   practice_days?: string;
   strength_label?: string;
   official_url?: string;
@@ -36,9 +35,24 @@ const PREFS = [
   { key: "和歌山県", label: "和歌山" },
 ];
 
-const CATS = ["すべて", "U6", "U7", "U8", "U9", "U10", "U11", "U12", "U13", "U14", "U15", "U18", "ジュニア", "ジュニアユース", "女子"];
+const CLUB_TYPES = [
+  { key: "club", label: "クラブ" },
+  { key: "j_academy", label: "Jリーグアカデミー" },
+  { key: "school", label: "学校" },
+];
+
+const STRENGTH = [
+  "すべて",
+  "全国トップクラス",
+  "関東トップクラス",
+  "関西トップクラス",
+  "府県トップクラス",
+  "府県上位",
+  "府県中位",
+  "地域リーグ",
+];
+
 const PRACTICE = ["指定なし", "週1回", "週2回", "週3回以上"];
-const STRENGTH = ["すべて", "全国トップクラス", "県内トップクラス", "県内上位", "県内中位", "地域上位"];
 
 function normalize(s: string) {
   if (!s) return "";
@@ -50,14 +64,19 @@ function initial(name: string) {
 }
 
 function feeLabel(c: Club) {
-  if (c.is_free) return "無料";
+  if (c.monthly_fee === 0) return "無料";
   if (c.monthly_fee && c.monthly_fee > 0) return `月謝 ${c.monthly_fee.toLocaleString()}円〜`;
   return "月謝 要問合せ";
 }
 
+function typeLabel(type: string): string {
+  const t = CLUB_TYPES.find(x => x.key === type);
+  return t ? t.label : type;
+}
+
 export default function ClubsClient({ clubs }: { clubs: Club[] }) {
   const [pref, setPref] = useState("東京都");
-  const [cat, setCat] = useState("すべて");
+  const [clubType, setClubType] = useState("club");
   const [strength, setStrength] = useState("すべて");
   const [q, setQ] = useState("");
   const [feeMax, setFeeMax] = useState(30000);
@@ -77,9 +96,9 @@ export default function ClubsClient({ clubs }: { clubs: Club[] }) {
 
   const filtered = useMemo(() =>
     prefClubs.filter(c => {
-      if (cat !== "すべて" && c.category !== cat) return false;
+      if (c.club_type !== clubType) return false;
       if (strength !== "すべて" && c.strength_label !== strength) return false;
-      if (nq && ![c.name, c.name_kana, c.area, c.block, c.description].some(v => v && normalize(v).includes(nq))) return false;
+      if (nq && ![c.name, c.name_kana, c.city, c.area, c.description].some(v => v && normalize(v).includes(nq))) return false;
       if (feeMax < 30000 && c.monthly_fee && c.monthly_fee > feeMax) return false;
       if (practice !== "指定なし" && c.practice_days) {
         const p = c.practice_days;
@@ -89,7 +108,7 @@ export default function ClubsClient({ clubs }: { clubs: Club[] }) {
       }
       return true;
     }),
-    [prefClubs, cat, strength, nq, feeMax, practice]
+    [prefClubs, clubType, strength, nq, feeMax, practice]
   );
 
   return (
@@ -124,31 +143,18 @@ export default function ClubsClient({ clubs }: { clubs: Club[] }) {
           <input
             value={q}
             onChange={e => setQ(e.target.value)}
-            placeholder="クラブ名・特徴で検索"
+            placeholder="クラブ名で検索"
             style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--kf-border)", fontSize: 13, marginBottom: 16 }}
           />
 
-          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--kf-muted)", marginBottom: 8 }}>カテゴリ</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
-            {CATS.map(c => (
-              <button
-                key={c}
-                onClick={() => setCat(c)}
-                style={{
-                  padding: "5px 10px",
-                  borderRadius: 8,
-                  border: "1px solid var(--kf-border)",
-                  cursor: "pointer",
-                  fontSize: 11,
-                  fontWeight: 600,
-                  background: cat === c ? "var(--kf-primary)" : "transparent",
-                  color: cat === c ? "#fff" : "var(--kf-text)",
-                }}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--kf-muted)", marginBottom: 8 }}>クラブ種別</div>
+          <select
+            value={clubType}
+            onChange={e => setClubType(e.target.value)}
+            style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1px solid var(--kf-border)", fontSize: 12, marginBottom: 16 }}
+          >
+            {CLUB_TYPES.map(t => <option key={t.key} value={t.key}>{t.label}</option>)}
+          </select>
 
           <div style={{ fontSize: 12, fontWeight: 700, color: "var(--kf-muted)", marginBottom: 8 }}>レベル</div>
           <select
@@ -174,7 +180,7 @@ export default function ClubsClient({ clubs }: { clubs: Club[] }) {
 
           <button
             onClick={() => {
-              setCat("すべて");
+              setClubType("club");
               setStrength("すべて");
               setQ("");
               setFeeMax(30000);
@@ -230,7 +236,7 @@ export default function ClubsClient({ clubs }: { clubs: Club[] }) {
                       </button>
                     </div>
                     <div style={{ fontSize: 12, color: "var(--kf-muted)", marginTop: 4 }}>
-                      {c.category}／{c.area || c.block || c.prefecture}
+                      {typeLabel(c.club_type)}／{c.city || c.prefecture}
                     </div>
                     {c.strength_label && <div style={{ fontSize: 12, color: "var(--kf-primary)", fontWeight: 600, marginTop: 2 }}>{c.strength_label}</div>}
                     {c.description && (

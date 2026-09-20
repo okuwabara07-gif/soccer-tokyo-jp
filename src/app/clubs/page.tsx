@@ -21,13 +21,11 @@ type Club = {
   slug: string;
   name: string;
   name_kana?: string;
-  category: string;
-  area?: string;
+  club_type: string;
+  city?: string;
   prefecture: string;
-  block?: string;
   description?: string;
   monthly_fee?: number;
-  is_free?: boolean;
   practice_days?: string;
   strength_label?: string;
   official_url?: string;
@@ -38,7 +36,7 @@ type Club = {
 export default async function ClubsPage() {
   const { data: clubs } = await supabase
     .from("clubs")
-    .select("slug,name,name_kana,category,area,prefecture,block,description,monthly_fee,is_free,practice_days,strength_label,official_url,instagram,is_published")
+    .select("slug,name,name_kana,club_type,city,prefecture,description,monthly_fee,practice_days,strength_label,official_url,instagram,is_published")
     .eq("is_published", true)
     .order("name");
 

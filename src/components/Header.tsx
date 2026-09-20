@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 const NAV = [
-  { label: "チームを探す", href: "/teams" },
+  { label: "クラブを探す", href: "/clubs" },
   { label: "セレクション", href: "/selection" },
   { label: "口コミ", href: "/reviews" },
   { label: "学ぶ・楽しむ", href: "/performance" },

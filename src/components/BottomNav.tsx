@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const TABS = [
   { label: "ホーム", href: "/", icon: "M3 11l9-8 9 8M5 10v10h14V10" },
-  { label: "探す", href: "/teams", icon: "M11 19a8 8 0 100-16 8 8 0 000 16zM21 21l-4.3-4.3" },
+  { label: "探す", href: "/clubs", icon: "M11 19a8 8 0 100-16 8 8 0 000 16zM21 21l-4.3-4.3" },
   { label: "セレクション", href: "/selection", icon: "M8 2v4M16 2v4M3 9h18M5 5h14v15H5z" },
   { label: "口コミ", href: "/reviews", icon: "M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" },
   { label: "マイページ", href: "/mypage", icon: "M12 12a4 4 0 100-8 4 4 0 000 8zM4 20a8 8 0 0116 0" },

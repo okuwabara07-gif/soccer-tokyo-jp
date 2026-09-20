@@ -26,7 +26,7 @@ const LINKS = {
   ],
   services: [
     { href: "/", label: "ホーム" },
-    { href: "/teams", label: "チームを探す" },
+    { href: "/clubs", label: "クラブを探す" },
     { href: "/selection", label: "セレクション情報" },
     { href: "/foot-check", label: "AI診断" },
     { href: "/member", label: "料金プラン" },
@@ -55,7 +55,7 @@ export default function SiteFooter() {
             className="text-[12px] leading-[1.85] text-white/70"
             style={{ fontFamily: FONT_SANS }}
           >
-            関東4都県のジュニアサッカー保護者と子どもたちのための、独立系情報プラットフォーム。
+            関東8都県・関西6府県のジュニアサッカー保護者と子どもたちのための、独立系情報プラットフォーム。
           </p>
         </div>
 

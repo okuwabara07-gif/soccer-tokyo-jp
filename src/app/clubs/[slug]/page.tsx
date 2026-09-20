@@ -14,15 +14,10 @@ type PageClub = {
   name_kana?: string;
   prefecture: string;
   city?: string;
-  area?: string;
-  block?: string;
-  league_name?: string;
-  division?: string;
-  category: string;
+  club_type: string;
   official_url?: string;
   instagram?: string;
   monthly_fee?: number;
-  is_free?: boolean;
   practice_days?: string;
   practice_ground?: string;
   description?: string;
@@ -112,14 +107,13 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
         <section style={{ marginTop: 24, borderTop: "1px solid var(--kf-border)", paddingTop: 20 }}>
           <h2 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 12px", color: "var(--kf-primary)" }}>基本情報</h2>
           <div className="kf-card" style={{ padding: 16 }}>
-            {club.category && <div style={{ marginBottom: 12 }}><strong>カテゴリ:</strong> {club.category}</div>}
-            {club.league_name && <div style={{ marginBottom: 12 }}><strong>リーグ:</strong> {club.league_name}{club.division ? ` ${club.division}` : ""}</div>}
+            {club.club_type && <div style={{ marginBottom: 12 }}><strong>種別:</strong> {club.club_type === 'j_academy' ? 'Jリーグアカデミー' : club.club_type === 'school' ? '学校' : 'クラブ'}</div>}
             {club.strength_label && <div style={{ marginBottom: 12 }}><strong>レベル:</strong> {club.strength_label}</div>}
             {club.practice_days && <div style={{ marginBottom: 12 }}><strong>練習頻度:</strong> {club.practice_days}</div>}
             {club.practice_ground && <div style={{ marginBottom: 12 }}><strong>練習地:</strong> {club.practice_ground}</div>}
             {club.monthly_fee !== undefined && (
               <div style={{ marginBottom: 12 }}>
-                <strong>月謝:</strong> {club.is_free ? "無料" : club.monthly_fee ? `${club.monthly_fee.toLocaleString()}円` : "要問合せ"}
+                <strong>月謝:</strong> {club.monthly_fee === 0 ? "無料" : club.monthly_fee ? `${club.monthly_fee.toLocaleString()}円` : "要問合せ"}
               </div>
             )}
           </div>
