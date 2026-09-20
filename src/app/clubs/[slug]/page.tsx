@@ -9,7 +9,7 @@ import SiteFooter from "@/components/SiteFooter";
 export const revalidate = 3600;
 
 type PageClub = {
-  id: string;
+  slug: string;
   name: string;
   name_kana?: string;
   prefecture: string;
@@ -39,7 +39,7 @@ async function getClub(slug: string): Promise<PageClub | null> {
   const { data } = await supabase
     .from("v_page_club")
     .select("*")
-    .eq("id", slug)
+    .eq("slug", slug)
     .single();
   return (data as PageClub) ?? null;
 }
@@ -47,23 +47,23 @@ async function getClub(slug: string): Promise<PageClub | null> {
 export async function generateStaticParams() {
   const { data } = await supabase
     .from("clubs")
-    .select("id")
+    .select("slug")
     .eq("is_published", true)
     .order("strength_label", { ascending: false })
     .limit(346);
-  return (data || []).map((c) => ({ id: c.id as string }));
+  return (data || []).map((c) => ({ slug: c.slug as string }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-  const { id } = await params;
-  const club = await getClub(id);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const club = await getClub(slug);
   if (!club) return { title: "クラブが見つかりません" };
 
   const location = [club.prefecture, club.city, club.area].filter(Boolean).join("");
   const desc = club.description && club.description.trim()
     ? club.description.slice(0, 120)
     : `${location}のジュニアサッカークラブ。${club.strength_label || "クラブ情報"}、セレクション、実績など詳細をご覧いただけます。`;
-  const canonical = `https://soccer-selection.jp/clubs/${club.id}`;
+  const canonical = `https://soccer-selection.jp/clubs/${slug}`;
   const title = `${club.name}｜${location}のジュニアサッカークラブ`;
 
   return {
@@ -73,9 +73,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   };
 }
 
-export default async function ClubDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const club = await getClub(id);
+export default async function ClubDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const club = await getClub(slug);
   if (!club) notFound();
 
   const location = [club.prefecture, club.city, club.area].filter(Boolean).join("");

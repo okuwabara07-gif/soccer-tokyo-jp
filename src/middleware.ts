@@ -41,10 +41,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // /teams/[id] → /clubs/[id]
+  // /teams/[slug] → /clubs/[slug]
   if (pathname.match(/^\/teams\/[^/]+$/)) {
-    const clubId = pathname.replace(/^\/teams\//, "");
-    url.pathname = `/clubs/${clubId}`;
+    const clubSlug = pathname.replace(/^\/teams\//, "");
+    url.pathname = `/clubs/${clubSlug}`;
     return NextResponse.redirect(url, { status: 301 });
   }
 

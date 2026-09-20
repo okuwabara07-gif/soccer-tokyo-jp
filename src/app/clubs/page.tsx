@@ -18,7 +18,7 @@ export const metadata = {
 };
 
 type Club = {
-  id: string;
+  slug: string;
   name: string;
   name_kana?: string;
   category: string;
@@ -38,7 +38,7 @@ type Club = {
 export default async function ClubsPage() {
   const { data: clubs } = await supabase
     .from("clubs")
-    .select("id,name,name_kana,category,area,prefecture,block,description,monthly_fee,is_free,practice_days,strength_label,official_url,instagram,is_published")
+    .select("slug,name,name_kana,category,area,prefecture,block,description,monthly_fee,is_free,practice_days,strength_label,official_url,instagram,is_published")
     .eq("is_published", true)
     .order("name");
 

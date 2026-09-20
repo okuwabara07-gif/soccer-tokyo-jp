@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 
 type Club = {
-  id: string;
+  slug: string;
   name: string;
   name_kana?: string;
   category: string;
@@ -64,8 +64,8 @@ export default function ClubsClient({ clubs }: { clubs: Club[] }) {
   const [practice, setPractice] = useState("指定なし");
   const [favs, setFavs] = useState<string[]>([]);
 
-  const toggleFav = (id: string) => {
-    const next = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id];
+  const toggleFav = (slug: string) => {
+    const next = favs.includes(slug) ? favs.filter(x => x !== slug) : [...favs, slug];
     setFavs(next);
     if (typeof window !== "undefined") {
       localStorage.setItem("favClubs", JSON.stringify(next));
@@ -200,7 +200,7 @@ export default function ClubsClient({ clubs }: { clubs: Club[] }) {
           ) : (
             <div style={{ display: "grid", gap: 12 }}>
               {filtered.slice(0, 100).map(c => (
-                <div key={c.id} className="kf-card" style={{ padding: 14, display: "flex", gap: 14, alignItems: "flex-start" }}>
+                <div key={c.slug} className="kf-card" style={{ padding: 14, display: "flex", gap: 14, alignItems: "flex-start" }}>
                   <div
                     style={{
                       width: 56,
@@ -219,14 +219,14 @@ export default function ClubsClient({ clubs }: { clubs: Club[] }) {
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start" }}>
-                      <Link href={`/clubs/${c.id}`} style={{ fontWeight: 800, fontSize: 15, textDecoration: "none", color: "var(--kf-text)" }}>
+                      <Link href={`/clubs/${c.slug}`} style={{ fontWeight: 800, fontSize: 15, textDecoration: "none", color: "var(--kf-text)" }}>
                         {c.name}
                       </Link>
                       <button
-                        onClick={() => toggleFav(c.id)}
-                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: favs.includes(c.id) ? "#E0245E" : "var(--kf-border)" }}
+                        onClick={() => toggleFav(c.slug)}
+                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: favs.includes(c.slug) ? "#E0245E" : "var(--kf-border)" }}
                       >
-                        {favs.includes(c.id) ? "♥" : "♡"}
+                        {favs.includes(c.slug) ? "♥" : "♡"}
                       </button>
                     </div>
                     <div style={{ fontSize: 12, color: "var(--kf-muted)", marginTop: 4 }}>
@@ -243,7 +243,7 @@ export default function ClubsClient({ clubs }: { clubs: Club[] }) {
                       {c.practice_days && <span>練習: {c.practice_days}</span>}
                     </div>
                     <div style={{ marginTop: 10 }}>
-                      <Link href={`/clubs/${c.id}`} className="kf-btn kf-btn--primary" style={{ padding: "7px 16px", fontSize: 12 }}>
+                      <Link href={`/clubs/${c.slug}`} className="kf-btn kf-btn--primary" style={{ padding: "7px 16px", fontSize: 12 }}>
                         詳細を見る
                       </Link>
                     </div>
