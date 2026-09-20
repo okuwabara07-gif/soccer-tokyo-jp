@@ -94,7 +94,15 @@ is_published (boolean): true のみ表示
 
 ---
 
-## 次にやること（優先順）
+## 進行状況（2026-09-20 続き）
+
+### 実装済み（本セッション）
+1. **トップページ SSR 化** 
+   - clubs テーブルから prefecture ごとの件数を動的集計
+   - AREAS を `prefecture` カウント + `?prefecture=` パラメータ付きに変更
+   - デプロイ中（bg task bi5mmhyg4）
+
+### 次にやること（優先順）
 
 ### 1. 「0件のクラブ」の解決
 ```
