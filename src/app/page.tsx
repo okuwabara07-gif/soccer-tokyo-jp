@@ -8,7 +8,7 @@ import SectionHeader from "@/components/SectionHeader";
 import SiteFooter from "@/components/SiteFooter";
 
 const BIG = [
-  { label: "チームを探す", href: "/teams", img: "/images/kf/panels/p_teams.jpg", desc: "全国6,000チームから検索", color: "var(--kf-primary)" },
+  { label: "クラブを探す", href: "/clubs", img: "/images/kf/panels/p_teams.jpg", desc: "関東・関西346クラブから検索", color: "var(--kf-primary)" },
   { label: "セレクション情報", href: "/selection", img: "/images/kf/panels/p_selection.jpg", desc: "最新の募集・セレクションをチェック", color: "#2F6FDB" },
   { label: "口コミランキング", href: "/reviews", img: "/images/kf/panels/p_reviews.jpg", desc: "保護者のリアルな声をチェック", color: "var(--kf-accent-dark)" },
 ];
@@ -27,10 +27,10 @@ const FUN = [
   { label: "チームマッチング", href: "/matching", img: "/images/kf/panels/p_matching.jpg", desc: "あなたに合うチームを紹介" },
 ];
 const AREAS = [
-  { label: "東京 2,239チーム", href: "/teams?area=tokyo", img: "/images/kf/area_tokyo.jpg" },
-  { label: "神奈川 1,576チーム", href: "/teams?area=kanagawa", img: "/images/kf/area_kanagawa.jpg" },
-  { label: "埼玉 1,332チーム", href: "/teams?area=saitama", img: "/images/kf/area_saitama.jpg" },
-  { label: "千葉 1,176チーム", href: "/teams?area=chiba", img: "/images/kf/area_chiba.jpg" },
+  { label: "東京 46クラブ", href: "/clubs", img: "/images/kf/area_tokyo.jpg" },
+  { label: "神奈川 38クラブ", href: "/clubs", img: "/images/kf/area_kanagawa.jpg" },
+  { label: "埼玉 29クラブ", href: "/clubs", img: "/images/kf/area_saitama.jpg" },
+  { label: "千葉 21クラブ", href: "/clubs", img: "/images/kf/area_chiba.jpg" },
 ];
 const GOODS = ["入団準備ガイド","遠征準備ガイド","夏の暑さ対策ガイド","冬の寒さ対策ガイド","GK専用ガイド","ジュニアユース準備"];
 
@@ -61,12 +61,12 @@ export default function HomePage() {
             <img src="/images/kf/hero.jpg" alt="サッカーボールを持つ子ども" style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", objectPosition:"right center" }} />
             <div style={{ position:"absolute", inset:0, background:"linear-gradient(90deg,#fff 26%,rgba(255,255,255,.82) 44%,rgba(255,255,255,0) 68%)" }} />
             <div style={{ position:"relative", padding:"48px 16px", maxWidth:640 }}>
-              <h1 style={{ margin:0, fontSize:42, lineHeight:1.2, fontWeight:800 }}>子どもに合う<br/>サッカーチームを探そう</h1>
-              <p style={{ margin:"16px 0 8px", fontSize:18, fontWeight:700, color:"var(--kf-primary)" }}>関東 6,000チーム掲載</p>
-              <p style={{ margin:0, color:"var(--kf-muted)", fontSize:14, lineHeight:1.7 }}>東京・神奈川・埼玉・千葉のジュニアサッカー・ジュニアユース・スクールまで完全網羅</p>
+              <h1 style={{ margin:0, fontSize:42, lineHeight:1.2, fontWeight:800 }}>お子さんに合う<br/>サッカークラブを探そう</h1>
+              <p style={{ margin:"16px 0 8px", fontSize:18, fontWeight:700, color:"var(--kf-primary)" }}>関東・関西 346クラブ掲載</p>
+              <p style={{ margin:0, color:"var(--kf-muted)", fontSize:14, lineHeight:1.7 }}>東京・神奈川・埼玉・千葉・茨城・栃木・群馬・山梨・大阪・兵庫・京都・滋賀・奈良・和歌山のジュニアサッカー・ジュニアユース・スクール完全網羅</p>
               <div style={{ display:"flex", gap:12, marginTop:24, flexWrap:"wrap" }}>
-                <Link href="/teams" className="kf-btn kf-btn--primary" style={{ padding:"14px 24px" }}>チームを探す</Link>
-                <Link href="/teams#area" className="kf-btn kf-btn--ghost" style={{ padding:"14px 24px" }}>エリアから探す</Link>
+                <Link href="/clubs" className="kf-btn kf-btn--primary" style={{ padding:"14px 24px" }}>クラブを探す</Link>
+                <Link href="/clubs" className="kf-btn kf-btn--ghost" style={{ padding:"14px 24px" }}>全国から探す</Link>
               </div>
             </div>
           </div>
