@@ -33,8 +33,23 @@ async function getRedirects() {
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  const redirects = await getRedirects();
+  const url = request.nextUrl.clone();
 
+  // ハードコード: /teams → /clubs
+  if (pathname === "/teams") {
+    url.pathname = "/clubs";
+    return NextResponse.redirect(url, { status: 301 });
+  }
+
+  // /teams/[id] → /clubs/[id]
+  if (pathname.match(/^\/teams\/[^/]+$/)) {
+    const clubId = pathname.replace(/^\/teams\//, "");
+    url.pathname = `/clubs/${clubId}`;
+    return NextResponse.redirect(url, { status: 301 });
+  }
+
+  // DB リダイレクト（redirects テーブル）
+  const redirects = await getRedirects();
   for (const redirect of redirects) {
     if (pathname === redirect.from_path) {
       const status = redirect.status || 301;
