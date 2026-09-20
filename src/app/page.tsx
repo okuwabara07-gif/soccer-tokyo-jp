@@ -118,11 +118,6 @@ export default async function HomePage() {
 
       <section className="kf-container" style={{ padding:"24px 16px 0" }}><StatBar /></section>
 
-      <section className="kf-container" style={{ padding: "40px 16px 0" }}>
-        <SectionHeader title="今月のJリーグセレクション情報" moreHref="/selection" />
-        <JleagueRailClient selections={(selections as Selection[]) || []} />
-      </section>
-
       <section className="kf-container" style={{ padding:"48px 16px 0" }}>
         <h2 style={{ margin:0, fontSize:24, fontWeight:800 }}>何をしたいですか？</h2>
         <p style={{ margin:"6px 0 18px", fontSize:14, color:"var(--kf-muted)" }}>目的に合わせてコンテンツを選ぼう</p>
