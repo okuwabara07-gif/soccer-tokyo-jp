@@ -6,6 +6,9 @@ import BottomNav from "@/components/BottomNav";
 import StatBar from "@/components/StatBar";
 import SectionHeader from "@/components/SectionHeader";
 import SiteFooter from "@/components/SiteFooter";
+import { createClient } from "@supabase/supabase-js";
+
+export const revalidate = 3600;
 
 const BIG = [
   { label: "クラブを探す", href: "/clubs", img: "/images/kf/panels/p_teams.jpg", desc: "関東・関西346クラブから検索", color: "var(--kf-primary)" },
@@ -26,11 +29,11 @@ const FUN = [
   { label: "新ルール・用語", href: "/rules", img: "/images/kf/panels/p_rules.jpg", desc: "最新ルールを分かりやすく解説" },
   { label: "チームマッチング", href: "/matching", img: "/images/kf/panels/p_matching.jpg", desc: "あなたに合うチームを紹介" },
 ];
-const AREAS = [
-  { label: "東京 46クラブ", href: "/clubs", img: "/images/kf/area_tokyo.jpg" },
-  { label: "神奈川 38クラブ", href: "/clubs", img: "/images/kf/area_kanagawa.jpg" },
-  { label: "埼玉 29クラブ", href: "/clubs", img: "/images/kf/area_saitama.jpg" },
-  { label: "千葉 21クラブ", href: "/clubs", img: "/images/kf/area_chiba.jpg" },
+const AREA_PREFS = [
+  { pref: "東京都", label: "東京", img: "/images/kf/area_tokyo.jpg" },
+  { pref: "神奈川県", label: "神奈川", img: "/images/kf/area_kanagawa.jpg" },
+  { pref: "埼玉県", label: "埼玉", img: "/images/kf/area_saitama.jpg" },
+  { pref: "千葉県", label: "千葉", img: "/images/kf/area_chiba.jpg" },
 ];
 const GOODS = ["入団準備ガイド","遠征準備ガイド","夏の暑さ対策ガイド","冬の寒さ対策ガイド","GK専用ガイド","ジュニアユース準備"];
 
@@ -51,7 +54,27 @@ function PanelCard({ p, big=false }: { p:{label:string;href:string;img:string;de
   );
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const { data: clubs } = await supabase
+    .from("clubs")
+    .select("prefecture")
+    .eq("is_published", true);
+
+  const prefectureCount = (clubs || []).reduce((acc: Record<string, number>, c: any) => {
+    acc[c.prefecture] = (acc[c.prefecture] || 0) + 1;
+    return acc;
+  }, {});
+
+  const AREAS = AREA_PREFS.map(ap => ({
+    label: `${ap.label} ${prefectureCount[ap.pref] || 0}クラブ`,
+    href: `/clubs?prefecture=${encodeURIComponent(ap.pref)}`,
+    img: ap.img
+  }));
   return (
     <div style={{ background: "var(--kf-bg)", minHeight: "100vh", color: "var(--kf-text)" }}>
       <Header />
