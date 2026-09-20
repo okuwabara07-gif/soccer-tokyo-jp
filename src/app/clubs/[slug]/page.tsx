@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const club = await getClub(slug);
   if (!club) return { title: "クラブが見つかりません" };
 
-  const location = [club.prefecture, club.city, club.area].filter(Boolean).join("");
+  const location = [club.prefecture, club.city].filter(Boolean).join("");
   const desc = club.description && club.description.trim()
     ? club.description.slice(0, 120)
     : `${location}のジュニアサッカークラブ。${club.strength_label || "クラブ情報"}、セレクション、実績など詳細をご覧いただけます。`;
@@ -73,7 +73,7 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
   const club = await getClub(slug);
   if (!club) notFound();
 
-  const location = [club.prefecture, club.city, club.area].filter(Boolean).join("");
+  const location = [club.prefecture, club.city].filter(Boolean).join("");
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SportsActivityLocation",
@@ -82,7 +82,7 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
     address: {
       "@type": "PostalAddress",
       addressRegion: club.prefecture,
-      addressLocality: club.city || club.area,
+      addressLocality: club.city,
       addressCountry: "JP",
     },
     ...(club.official_url && { url: club.official_url }),
