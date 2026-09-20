@@ -1,6 +1,6 @@
 # Handoff: soccer-selection.jp フロント実装
 
-**最終更新**: 2026-09-20  
+**最終更新**: 2026-09-21 (本セッション完了後)  
 **プロジェクト**: soccer-selection (Vercel)  
 **Supabase**: bhgvpikwhbphodswzfip (soccer-kanto)
 
@@ -27,21 +27,25 @@
 - Header/Footer/BottomNav から `/teams` → `/clubs` 統一
 - フッター説明を「関東8都県・関西6府県」に修正
 
-### ❌ 未完了
+### ✅ 本セッションで完了
 
-1. **`/clubs` で「0件のクラブ」が表示される**
-   - 原因: クライアント側で `prefClubs` が空配列になっている
-   - clubs テーブルから正しくデータが取得されていない可能性
-   - SSR 時点では初期 HTML に空配列が埋め込まれている
+1. `/clubs` の「0件のクラブ」表示を解決
+   - 初期フィルタ clubType を "club" → "" (すべて) に修正
+   - フィルタロジックを `clubType && ...` に修正
+   - select タグに「すべて」オプション追加
+   - 旧 `/api/diagnose` ルート削除（build エラー回避）
 
-2. **フィルタUI の旧選択肢が残っていないか検証**
-   - 現在のコード: `club_type`（クラブ/J-アカデミー/学校）
-   - 現在のコード: `strength_label` の実値（全国トップ/関東トップ/...）
-   - 旧「カテゴリ U6〜U18」は削除済み
+2. トップページの「読み込み中」2箇所を SSR 化
+   - ReviewRankClient: props 受け取り型に変更
+   - JleagueRailClient: props 受け取り型に変更
+   - page.tsx で reviews・selections を SSR fetch
 
-3. **Header 旧リンク `/teams`**
-   - 現在: `/clubs` に統一完了
-   - 本番確認済み
+3. タイトル・説明の「関東の」→「関東・関西」に統一
+   - layout.tsx、/selection/page.tsx 更新
+
+4. StatBar・company ページを実値に修正
+   - 「6,000+」→「544」クラブ
+   - 「4都県」→「14都府県」
 
 ---
 
@@ -94,9 +98,9 @@ is_published (boolean): true のみ表示
 
 ---
 
-## 進行状況（2026-09-21）
+## 進行状況（2026-09-21 本セッション完了）
 
-### 実装済み（最新セッション）
+### 実装済み（前セッション）
 1. ✅ **トップページ SSR 化 + エリア別件数の動的生成**
    - clubs テーブルから prefecture ごとの件数を動的集計
    - AREAS を `prefecture` カウント + `?prefecture=` パラメータ付きに変更
@@ -104,38 +108,22 @@ is_published (boolean): true のみ表示
 
 ### 次にやること（優先順）
 
-### 1. 「0件のクラブ」の解決
-```
-原因特定が必要:
-- ClubsClient で clubs prop が空か？
-- prefecture フィルタが正しく機能しているか？
-- Supabase クエリが実際に 346 件を返すか？
-```
+### 1. 本番確認待機中
+- /clubs ページで実際に都道府県別クラブ数が表示されているか確認
+- StatBar で「544」「14都府県」が表示されているか確認
+- トップページで口コミランキング・Jリーグセレクション情報が SSR で埋め込まれているか確認
 
-実装:
-```tsx
-// /clubs/page.tsx で clubs 数をログ出力（ISR 時点）
-console.log(`Fetched ${clubs?.length || 0} clubs`);
-
-// ClubsClient で initial state をチェック
-console.log('Initial clubs:', clubs.length, 'prefClubs:', prefClubs.length);
-```
-
-### 2. initial state でも表示されるようにする
-- SSR 時点で初期 6 クラブ分くらいを HTML に埋め込む
-- 「読み込み中」状態を削除
-
-### 3. P1 の残りルート実装
+### 2. P1 の残りルート実装
 - `/leagues/[league]/[block]` — 73 ブロック
 - `/areas/[pref]/[city]` — 29 市区町村
 - `/selection/[id]` — 255 セレクション
 - 回遊導線: `related_clubs` の理由表示
 
-### 4. P2: sitemap.xml + IndexNow
+### 3. P2: sitemap.xml + IndexNow
 - `v_sitemap` から全 URL を生成
 - 1 ファイル 5 万 URL 上限で分割
 
-### 5. P3: 投稿フォーム
+### 4. P3: 投稿フォーム
 - 口コミ (`club_reviews`)
 - セレクション結果報告 (`selection_reports`)
 
@@ -168,8 +156,8 @@ e8ec9a4 fix: /teams → /clubs 301リダイレクト追加（ハードコード�
 ## メモ
 
 - Supabase anon key: `sb_publishable_jI1EG0g1M-jEM1nx68ZCww_0eApZZ4V`
-- 本番で「0件」が表示されるのは非常におかしい
-  - 指示書では「346 件の公開クラブ確定」
-  - `v_health_check` は OK だった
-  - クライアント側フィルタの初期値が問題か
-  - または `/clubs` ページの SSR で clubs 配列が空になっている可能性
+- 本セッションの修正内容
+  - `/clubs` の 0件表示は初期フィルタ `clubType="club"` が原因 → "" に変更
+  - 「読み込み中」状態の削除で初期 HTML に reviews・selections が埋め込まれる
+  - StatBar・company ページの旧数字をすべて実値に更新
+  - 本番反映待機中
