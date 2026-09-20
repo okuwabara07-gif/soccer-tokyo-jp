@@ -3,14 +3,14 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 
 type Club = {
+  id: string;
   slug: string;
   name: string;
   name_kana?: string;
   club_type: string;
-  area?: string;
   prefecture: string;
   city?: string;
-  description?: string;
+  nearest_station?: string;
   monthly_fee?: number;
   practice_days?: string;
   strength_label?: string;
@@ -98,7 +98,7 @@ export default function ClubsClient({ clubs }: { clubs: Club[] }) {
     prefClubs.filter(c => {
       if (clubType && c.club_type !== clubType) return false;
       if (strength !== "すべて" && c.strength_label !== strength) return false;
-      if (nq && ![c.name, c.name_kana, c.city, c.area, c.description].some(v => v && normalize(v).includes(nq))) return false;
+      if (nq && ![c.name, c.name_kana, c.city, c.nearest_station].some(v => v && normalize(v).includes(nq))) return false;
       if (feeMax < 30000 && c.monthly_fee && c.monthly_fee > feeMax) return false;
       if (practice !== "指定なし" && c.practice_days) {
         const p = c.practice_days;

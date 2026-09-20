@@ -27,25 +27,18 @@
 - Header/Footer/BottomNav から `/teams` → `/clubs` 統一
 - フッター説明を「関東8都県・関西6府県」に修正
 
-### ✅ 本セッションで完了
+### ✅ 本セッション対応内容
 
-1. `/clubs` の「0件のクラブ」表示を解決
-   - 初期フィルタ clubType を "club" → "" (すべて) に修正
-   - フィルタロジックを `clubType && ...` に修正
-   - select タグに「すべて」オプション追加
-   - 旧 `/api/diagnose` ルート削除（build エラー回避）
+**真因: /clubs の 0件表示**
+- `src/app/clubs/page.tsx` の `.select()` に clubs テーブルに存在しない列が含まれ、PostgREST が 400 を返していた
+- area / block / description / is_free などの列が存在しないため、Supabase クエリが失敗し空配列が返却されていた
 
-2. トップページの「読み込み中」2箇所を SSR 化
-   - ReviewRankClient: props 受け取り型に変更
-   - JleagueRailClient: props 受け取り型に変更
-   - page.tsx で reviews・selections を SSR fetch
-
-3. タイトル・説明の「関東の」→「関東・関西」に統一
-   - layout.tsx、/selection/page.tsx 更新
-
-4. StatBar・company ページを実値に修正
-   - 「6,000+」→「544」クラブ
-   - 「4都県」→「14都府県」
+**修正内容**
+1. `.select()` を clubs テーブルに実在する列のみに置換
+2. ClubsClient から不在の列参照を削除
+3. トップページ SSR 化（ReviewRankClient, JleagueRailClient）
+4. title/description の「関東の」→「関東・関西」統一
+5. StatBar・company を実値に修正（「6,000+」→「544」、「4都県」→「14都府県」）
 
 ---
 
