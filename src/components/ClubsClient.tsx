@@ -240,11 +240,6 @@ export default function ClubsClient({ clubs }: { clubs: Club[] }) {
                       {typeLabel(c.club_type)}／{c.city || c.prefecture}
                     </div>
                     {c.strength_label && <div style={{ fontSize: 12, color: "var(--kf-primary)", fontWeight: 600, marginTop: 2 }}>{c.strength_label}</div>}
-                    {c.description && (
-                      <p style={{ fontSize: 12, color: "var(--kf-muted)", margin: "6px 0 0", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
-                        {c.description}
-                      </p>
-                    )}
                     <div style={{ display: "flex", gap: 14, marginTop: 8, fontSize: 12, color: "var(--kf-text)", flexWrap: "wrap" }}>
                       <span>{feeLabel(c)}</span>
                       {c.practice_days && <span>練習: {c.practice_days}</span>}
