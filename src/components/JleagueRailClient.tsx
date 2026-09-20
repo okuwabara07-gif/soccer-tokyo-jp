@@ -1,27 +1,11 @@
-"use client";
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 type Sel = { id: string; name: string; category: string; prefecture: string; area: string; selection_start: string; selection_end: string; is_jleague: boolean; };
 
 function fmt(d: string) { if (!d) return ""; const p = d.split("-"); return `${p[1]}/${p[2]}`; }
 
-export default function JleagueRailClient() {
-  const [rows, setRows] = useState<Sel[]>([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    supabase.from("teams").select("id,name,category,prefecture,area,selection_start,selection_end,is_jleague")
-      .eq("is_jleague", true).not("selection_start", "is", null).order("selection_start").limit(12)
-      .then(({ data }) => { setRows((data as Sel[]) ?? []); setLoading(false); });
-  }, []);
-
-  if (loading) return <div style={{ padding: 24, color: "var(--kf-muted)", fontSize: 13 }}>読み込み中…</div>;
+export default function JleagueRailClient({ selections }: { selections: Sel[] }) {
+  const rows = selections || [];
   if (rows.length === 0) return (
     <div className="kf-empty"><div className="kf-empty__title">現在掲載中のJリーグセレクションはありません</div><div className="kf-empty__hint">確定次第ここに掲載します。</div></div>
   );

@@ -1,12 +1,4 @@
-"use client";
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 type R = { id: string; team_name: string; nickname: string; axis: string; rating: number; body: string };
 
@@ -14,17 +6,8 @@ function Stars({ value }: { value: number }) {
   return <span style={{ display: "inline-flex", gap: 1 }}>{[1,2,3,4,5].map(n => <span key={n} style={{ color: n <= value ? "#F5B400" : "#D8D8D2", fontSize: 16 }}>★</span>)}</span>;
 }
 
-export default function ReviewRankClient() {
-  const [rows, setRows] = useState<R[]>([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    supabase.from("reviews").select("id,team_name,nickname,axis,rating,body")
-      .neq("status", "hidden").not("rating", "is", null)
-      .order("rating", { ascending: false }).order("created_at", { ascending: false }).limit(5)
-      .then(({ data }) => { setRows((data as R[]) ?? []); setLoading(false); });
-  }, []);
-
-  if (loading) return <div style={{ padding: 20, color: "var(--kf-muted)", fontSize: 13 }}>読み込み中…</div>;
+export default function ReviewRankClient({ reviews }: { reviews: R[] }) {
+  const rows = reviews || [];
   if (rows.length === 0) return (
     <div className="kf-empty">
       <div className="kf-empty__title">口コミ募集中</div>

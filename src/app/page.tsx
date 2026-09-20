@@ -54,6 +54,9 @@ function PanelCard({ p, big=false }: { p:{label:string;href:string;img:string;de
   );
 }
 
+type Review = { id: string; team_name: string; nickname: string; axis: string; rating: number; body: string };
+type Selection = { id: string; name: string; category: string; prefecture: string; area: string; selection_start: string; selection_end: string; is_jleague: boolean };
+
 export default async function HomePage() {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -64,6 +67,23 @@ export default async function HomePage() {
     .from("clubs")
     .select("prefecture")
     .eq("is_published", true);
+
+  const { data: reviews } = await supabase
+    .from("reviews")
+    .select("id,team_name,nickname,axis,rating,body")
+    .neq("status", "hidden")
+    .not("rating", "is", null)
+    .order("rating", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  const { data: selections } = await supabase
+    .from("teams")
+    .select("id,name,category,prefecture,area,selection_start,selection_end,is_jleague")
+    .eq("is_jleague", true)
+    .not("selection_start", "is", null)
+    .order("selection_start")
+    .limit(12);
 
   const prefectureCount = (clubs || []).reduce((acc: Record<string, number>, c: any) => {
     acc[c.prefecture] = (acc[c.prefecture] || 0) + 1;
@@ -100,7 +120,7 @@ export default async function HomePage() {
 
       <section className="kf-container" style={{ padding: "40px 16px 0" }}>
         <SectionHeader title="今月のJリーグセレクション情報" moreHref="/selection" />
-        <JleagueRailClient />
+        <JleagueRailClient selections={(selections as Selection[]) || []} />
       </section>
 
       <section className="kf-container" style={{ padding:"48px 16px 0" }}>
@@ -140,7 +160,7 @@ export default async function HomePage() {
 
       <section className="kf-container" style={{ padding:"48px 16px 0" }}>
         <SectionHeader title="保護者口コミランキング" subtitle="送迎負担・雰囲気・育成・費用感などで比較" moreHref="/reviews" />
-        <ReviewRankClient />
+        <ReviewRankClient reviews={(reviews as Review[]) || []} />
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(170px,1fr))", gap:14 }}>
           {GOODS.map(g=>(<Link key={g} href="/goods" className="kf-card" style={{ textDecoration:"none", color:"var(--kf-text)", padding:18, fontWeight:700, fontSize:14, display:"flex", justifyContent:"space-between", alignItems:"center" }}>{g}<span style={{ color:"var(--kf-primary)" }}>›</span></Link>))}
         </div>
