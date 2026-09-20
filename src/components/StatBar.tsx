@@ -1,8 +1,8 @@
 type Stat = { value: string; label: string };
 
 const DEFAULTS: Stat[] = [
-  { value: "6,000+", label: "掲載チーム" },
-  { value: "4都県", label: "対応エリア" },
+  { value: "544", label: "掲載クラブ" },
+  { value: "14都府県", label: "対応エリア" },
   { value: "無料", label: "基本機能" },
   { value: "—", label: "口コミ件数" },
 ];
