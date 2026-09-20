@@ -41,6 +41,11 @@ export default async function ClubsPage() {
     .order("name");
 
   const allClubs = (clubs as Club[]) ?? [];
+  console.log(`[/clubs] SSR: Fetched ${allClubs.length} clubs; Tokyo: ${allClubs.filter(c => c.prefecture === "東京都").length}`);
+  const sampleClub = allClubs[0];
+  if (sampleClub) {
+    console.log(`[/clubs] Sample club:`, { slug: sampleClub.slug, name: sampleClub.name, prefecture: sampleClub.prefecture, club_type: sampleClub.club_type, strength_label: sampleClub.strength_label });
+  }
 
   return (
     <div style={{ background: "var(--kf-bg)", minHeight: "100vh", color: "var(--kf-text)" }}>

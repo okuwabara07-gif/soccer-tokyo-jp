@@ -76,7 +76,7 @@ function typeLabel(type: string): string {
 
 export default function ClubsClient({ clubs }: { clubs: Club[] }) {
   const [pref, setPref] = useState("東京都");
-  const [clubType, setClubType] = useState("club");
+  const [clubType, setClubType] = useState("");
   const [strength, setStrength] = useState("すべて");
   const [q, setQ] = useState("");
   const [feeMax, setFeeMax] = useState(30000);
@@ -96,7 +96,7 @@ export default function ClubsClient({ clubs }: { clubs: Club[] }) {
 
   const filtered = useMemo(() =>
     prefClubs.filter(c => {
-      if (c.club_type !== clubType) return false;
+      if (clubType && c.club_type !== clubType) return false;
       if (strength !== "すべて" && c.strength_label !== strength) return false;
       if (nq && ![c.name, c.name_kana, c.city, c.area, c.description].some(v => v && normalize(v).includes(nq))) return false;
       if (feeMax < 30000 && c.monthly_fee && c.monthly_fee > feeMax) return false;
@@ -153,6 +153,7 @@ export default function ClubsClient({ clubs }: { clubs: Club[] }) {
             onChange={e => setClubType(e.target.value)}
             style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1px solid var(--kf-border)", fontSize: 12, marginBottom: 16 }}
           >
+            <option value="">すべて</option>
             {CLUB_TYPES.map(t => <option key={t.key} value={t.key}>{t.label}</option>)}
           </select>
 
@@ -180,7 +181,7 @@ export default function ClubsClient({ clubs }: { clubs: Club[] }) {
 
           <button
             onClick={() => {
-              setClubType("club");
+              setClubType("");
               setStrength("すべて");
               setQ("");
               setFeeMax(30000);
