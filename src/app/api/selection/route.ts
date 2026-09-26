@@ -15,9 +15,8 @@ export async function GET(req: NextRequest) {
   const sb = createClient(url, key, { auth: { persistSession: false } });
 
   let q = sb
-    .from("teams")
+    .from("v_upcoming_selections")
     .select("id,name,category,prefecture,area,selection_start,selection_end,apply_url,is_jleague")
-    .not("selection_start", "is", null)
     .order("selection_start");
   if (pref !== "すべて") q = q.eq("prefecture", pref);
   if (jleague) q = q.eq("is_jleague", true);
