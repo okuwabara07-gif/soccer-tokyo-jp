@@ -34,9 +34,9 @@ type Club = {
 };
 
 export default async function ClubsPage() {
-  const { data: clubs, error } = await supabase
+  const { data: clubs, error, count } = await supabase
     .from("clubs")
-    .select("id,slug,name,name_kana,prefecture,city,nearest_station,club_type,strength_label,monthly_fee,practice_days,official_url,instagram")
+    .select("*", { count: "exact" })
     .eq("is_published", true)
     .order("name");
 
@@ -45,7 +45,7 @@ export default async function ClubsPage() {
   }
 
   const allClubs = (clubs as Club[]) ?? [];
-  console.log(`[ClubsPage] Loaded ${allClubs.length} clubs from is_published=true`);
+  console.log(`[ClubsPage] Loaded ${allClubs.length} clubs (total count in DB: ${count})`);
 
   return (
     <div style={{ background: "var(--kf-bg)", minHeight: "100vh", color: "var(--kf-text)" }}>
