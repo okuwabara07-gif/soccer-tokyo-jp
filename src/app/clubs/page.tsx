@@ -34,11 +34,15 @@ type Club = {
 };
 
 export default async function ClubsPage() {
-  const { data: clubs } = await supabase
+  const { data: clubs, error } = await supabase
     .from("clubs")
     .select("id,slug,name,name_kana,prefecture,city,nearest_station,club_type,strength_label,monthly_fee,practice_days,official_url,instagram")
     .eq("is_published", true)
     .order("name");
+
+  if (error) {
+    console.error("[ClubsPage] Supabase error:", error);
+  }
 
   const allClubs = (clubs as Club[]) ?? [];
 

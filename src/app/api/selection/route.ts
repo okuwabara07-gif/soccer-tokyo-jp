@@ -22,7 +22,8 @@ export async function GET(req: NextRequest) {
   if (pref !== "すべて") q = q.eq("prefecture", pref);
   if (jleague) q = q.eq("is_jleague", true);
 
-  const { data } = await q;
+  const { data, error } = await q;
+  if (error) console.error("[GET /api/selection] Supabase error:", error);
   const rows = (data as any[]) ?? [];
 
   const s = await getSession();

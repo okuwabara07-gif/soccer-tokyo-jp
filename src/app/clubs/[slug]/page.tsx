@@ -31,11 +31,12 @@ const supabase = createClient(
 );
 
 async function getClub(slug: string): Promise<PageClub | null> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("v_page_club")
     .select("*")
     .eq("slug", slug)
     .single();
+  if (error) console.error("[getClub] error:", error);
   return (data as PageClub) ?? null;
 }
 

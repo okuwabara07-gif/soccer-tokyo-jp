@@ -74,12 +74,14 @@ export default async function HomePage() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    const { data: clubs } = await supabase
+    const { data: clubs, error: clubsError } = await supabase
       .from("clubs")
       .select("prefecture")
       .eq("is_published", true);
 
-  const { data: reviews } = await supabase
+  if (clubsError) console.error("[HomePage] clubs query error:", clubsError);
+
+  const { data: reviews, error: reviewsError } = await supabase
     .from("club_reviews")
     .select("id,club_name,nickname,axis,rating,body")
     .eq("status", "approved")
@@ -88,13 +90,17 @@ export default async function HomePage() {
     .order("created_at", { ascending: false })
     .limit(5);
 
-  const { data: selections } = await supabase
+  if (reviewsError) console.error("[HomePage] reviews query error:", reviewsError);
+
+  const { data: selections, error: selectionsError } = await supabase
     .from("selections")
     .select("club_name,apply_deadline,venue")
     .eq("status", "published")
     .not("apply_deadline", "is", null)
     .order("apply_deadline")
     .limit(5);
+
+  if (selectionsError) console.error("[HomePage] selections query error:", selectionsError);
 
   const reviewsCount = await supabase
     .from("club_reviews")
