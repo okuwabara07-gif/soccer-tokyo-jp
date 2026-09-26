@@ -40,19 +40,20 @@ export default async function ClubsPage() {
     .eq("is_published", true)
     .order("name");
 
+  console.log("[ClubsPage] count:", clubs?.length, "error:", error);
+
   if (error) {
     console.error("[ClubsPage] Supabase error:", error);
   }
 
   const allClubs = (clubs as Club[]) ?? [];
-  console.log(`[ClubsPage] Loaded ${allClubs.length} clubs (exact count from DB: ${count}, data length: ${clubs?.length || 0})`);
 
   return (
     <div style={{ background: "var(--kf-bg)", minHeight: "100vh", color: "var(--kf-text)" }}>
       <Header />
       <main className="kf-container" style={{ padding: "20px 16px 56px", maxWidth: 1180 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 2px" }}>クラブを探す</h1>
-        <p style={{ fontSize: 13, color: "var(--kf-muted)", margin: "0 0 14px" }}>関東8都県・関西6府県 {allClubs.length}クラブから検索</p>
+        <p style={{ fontSize: 13, color: "var(--kf-muted)", margin: "0 0 14px" }}>関東8都県・関西6府県 {allClubs.length}クラブから検索 {count && `(DB: ${count})`}</p>
         <ClubsClient clubs={allClubs} />
       </main>
       <SiteFooter />
