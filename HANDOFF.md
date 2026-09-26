@@ -1,6 +1,6 @@
 # Handoff: soccer-selection.jp フロント実装
 
-**最終更新**: 2026-09-21 (本セッション完了後)  
+**最終更新**: 2026-09-26 (本セッション完了後)  
 **プロジェクト**: soccer-selection (Vercel)  
 **Supabase**: bhgvpikwhbphodswzfip (soccer-kanto)
 
@@ -27,18 +27,31 @@
 - Header/Footer/BottomNav から `/teams` → `/clubs` 統一
 - フッター説明を「関東8都県・関西6府県」に修正
 
-### ✅ 本セッション対応内容
+### ✅ 本セッション対応内容（2026-09-26）
 
-**真因: /clubs の 0件表示**
-- `src/app/clubs/page.tsx` の `.select()` に clubs テーブルに存在しない列が含まれ、PostgREST が 400 を返していた
-- area / block / description / is_free などの列が存在しないため、Supabase クエリが失敗し空配列が返却されていた
+**P0: /selection の SSR 化**
+- CSR で API を呼び出していたため、クローラと AdSense が空ページを見ていた
+- サーバー側で `selections` テーブルから全 255 件を直接取得して SSR で描画
+- `/src/components/SelectionClient.tsx` にフィルタ UI を分離
+- 都県リスト 4 → 14 に拡張
 
-**修正内容**
-1. `.select()` を clubs テーブルに実在する列のみに置換
-2. ClubsClient から不在の列参照を削除
-3. トップページ SSR 化（ReviewRankClient, JleagueRailClient）
-4. title/description の「関東の」→「関東・関西」統一
-5. StatBar・company を実値に修正（「6,000+」→「544」、「4都県」→「14都府県」）
+**P1: /clubs の真因判明と対処**
+- 表示が 73 件だった原因は RLS や SERVICE_ROLE_KEY ではなく、ClubsClient の `.slice(0, 100)` の仕様
+- クエリ側で 352 件すべて正常に取得されていることを console.log で確認
+- SERVICE_ROLE_KEY を一時的に使ったが、セキュリティリスク（is_published=false の 188 件が公開される）ため ANON_KEY に戻す
+- **ページネーション実装**: `/clubs?page=2` 形式で SSR ページネーション対応
+  - 100 件/ページで表示
+  - First/Previous/Next/Last ナビゲーション付き
+
+**その他の修正**
+- Supabase エラーを console.error で出力するようにした（デバッグ用）
+- /selection API を `v_upcoming_selections` → `selections` テーブルに変更（255 件対応）
+- /clubs デフォルト表示を東京都のみ → すべての都県に変更
+
+**教訓**
+- RLS が原因ではない 73 件という中途半端な数字は、仕様的な制限の可能性が高い
+- 推測で SERVICE_ROLE_KEY を使わない。必ず `curl で実測` で検証する
+- build ログの「Compiled successfully」は信用できない。`Route (app)` 一覧を確認する
 
 ---
 
@@ -146,11 +159,31 @@ e8ec9a4 fix: /teams → /clubs 301リダイレクト追加（ハードコード�
 
 ---
 
+## 本セッションの検証結果（2026-09-26）
+
+```
+✅ /clubs?page=1: 100 unique clubs
+✅ /clubs?page=2: 100 unique clubs
+✅ /selection: SSR で 255 件の selection データ表示
+✅ Supabase error logging: console.error で出力確認
+```
+
+## 次にやること（優先順）
+
+**P2: sitemap 分割・IndexNow**
+- `/clubs?page=*` すべてのページを sitemap に含める
+- 5 万 URL 上限で分割
+
+**P3: 投稿フォーム**
+- 口コミ (`club_reviews`)
+- 結果報告 (`selection_reports`)
+- 情報提供フォーム
+
+**AdSense 再申請**
+- SSR 化・ページネーション完成後に再申請
+
 ## メモ
 
 - Supabase anon key: `sb_publishable_jI1EG0g1M-jEM1nx68ZCww_0eApZZ4V`
-- 本セッションの修正内容
-  - `/clubs` の 0件表示は初期フィルタ `clubType="club"` が原因 → "" に変更
-  - 「読み込み中」状態の削除で初期 HTML に reviews・selections が埋め込まれる
-  - StatBar・company ページの旧数字をすべて実値に更新
-  - 本番反映待機中
+- docs/SCHEMA.md に全テーブル・ビューの列定義あり
+- CLAUDE.md に作業規約あり
