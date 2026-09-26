@@ -45,7 +45,7 @@ export default async function ClubsPage() {
   }
 
   const allClubs = (clubs as Club[]) ?? [];
-  console.log(`[ClubsPage] Loaded ${allClubs.length} clubs (total count in DB: ${count})`);
+  console.log(`[ClubsPage] Loaded ${allClubs.length} clubs (exact count from DB: ${count}, data length: ${clubs?.length || 0})`);
 
   return (
     <div style={{ background: "var(--kf-bg)", minHeight: "100vh", color: "var(--kf-text)" }}>
