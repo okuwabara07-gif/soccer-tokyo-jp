@@ -19,7 +19,9 @@ interface DiagnosisResult {
 
 type Step = "q1" | "q2" | "q3" | "q4" | "result" | "loading";
 
-const PREFECTURES = ["東京都", "神奈川県", "埼玉県", "千葉県"];
+const PREFECTURES = ["東京都", "神奈川県", "埼玉県", "千葉県",
+  "茨城県", "栃木県", "群馬県", "山梨県",
+  "大阪府", "兵庫県", "京都府", "滋賀県", "奈良県", "和歌山県"];
 
 const AREAS: Record<string, string[]> = {
   "東京都": ["23区", "多摩地区"],
