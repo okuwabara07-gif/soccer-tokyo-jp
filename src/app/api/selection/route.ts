@@ -14,20 +14,17 @@ export async function GET(req: NextRequest) {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
   const sb = createClient(url, key, { auth: { persistSession: false } });
 
-  let q = sb
+  const { data, error } = await sb
     .from("selections")
     .select("id,club_id,intake_year,target_grade,selection_type,event_date,event_date_end,event_time,venue,capacity,fee,requirements,apply_deadline,apply_url,source_url,status,clubs(slug,name,prefecture,city)")
     .eq("status", "published")
     .order("event_date", { ascending: false });
 
-  if (pref !== "すべて") q = q.eq("clubs.prefecture", pref);
-
-  const { data, error } = await q;
   if (error) console.error("[GET /api/selection] Supabase error:", error);
 
   const rows = (data as any[]) ?? [];
 
-  // Transform to expected format and filter by Jリーグ if needed
+  // Transform to expected format and filter by prefecture/jleague
   const transformed = rows
     .map(row => ({
       id: row.id,
@@ -41,7 +38,8 @@ export async function GET(req: NextRequest) {
       venue: row.venue,
       apply_url: row.apply_url,
     }))
-    .filter(row => !jleague || row.club_name); // jleague filter would need more data if specified
+    .filter(row => pref === "すべて" || row.prefecture === pref)
+    .filter(row => !jleague || row.club_name);
 
   const s = await getSession();
   const mem = await getMembership(s?.uid);
