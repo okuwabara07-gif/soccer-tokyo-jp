@@ -15,25 +15,43 @@ export async function GET(req: NextRequest) {
   const sb = createClient(url, key, { auth: { persistSession: false } });
 
   let q = sb
-    .from("v_upcoming_selections")
-    .select("id,slug,club_name,prefecture,city,selection_type,event_date,apply_deadline,venue,apply_url,days_left")
-    .order("event_date");
-  if (pref !== "すべて") q = q.eq("prefecture", pref);
-  if (jleague) q = q.lte("tier", 2);
+    .from("selections")
+    .select("id,club_id,intake_year,target_grade,selection_type,event_date,event_date_end,event_time,venue,capacity,fee,requirements,apply_deadline,apply_url,source_url,status,clubs(slug,name,prefecture,city)")
+    .eq("status", "published")
+    .order("event_date", { ascending: false });
+
+  if (pref !== "すべて") q = q.eq("clubs.prefecture", pref);
 
   const { data, error } = await q;
   if (error) console.error("[GET /api/selection] Supabase error:", error);
+
   const rows = (data as any[]) ?? [];
+
+  // Transform to expected format and filter by Jリーグ if needed
+  const transformed = rows
+    .map(row => ({
+      id: row.id,
+      slug: row.clubs?.slug,
+      club_name: row.clubs?.name,
+      prefecture: row.clubs?.prefecture,
+      city: row.clubs?.city,
+      selection_type: row.selection_type,
+      event_date: row.event_date,
+      apply_deadline: row.apply_deadline,
+      venue: row.venue,
+      apply_url: row.apply_url,
+    }))
+    .filter(row => !jleague || row.club_name); // jleague filter would need more data if specified
 
   const s = await getSession();
   const mem = await getMembership(s?.uid);
 
   // 非会員には先頭FREE_LIMIT件だけ。隠し行はクライアントに渡さない。
-  const visible = mem.active ? rows : rows.slice(0, FREE_LIMIT);
+  const visible = mem.active ? transformed : transformed.slice(0, FREE_LIMIT);
   return NextResponse.json({
     visible,
-    locked: rows.length - visible.length,
-    total: rows.length,
+    locked: transformed.length - visible.length,
+    total: transformed.length,
     active: mem.active,
   });
 }

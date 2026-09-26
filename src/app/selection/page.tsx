@@ -8,7 +8,7 @@ import SiteFooter from "@/components/SiteFooter";
 type Sel = {
   id: string; slug: string; club_name: string; prefecture: string; city: string;
   selection_type: string; event_date: string; apply_deadline: string; venue: string;
-  apply_url: string | null; days_left: number;
+  apply_url: string | null;
 };
 
 const PREFS = ["すべて", "東京都", "神奈川県", "埼玉県", "千葉県",
