@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
   const sb = createClient(url, key, { auth: { persistSession: false } });
 
-  const { data } = await sb.from("teams").select("*").eq("id", id).single();
+  const { data } = await sb.from("teams").select("*").eq("id", id).eq("is_published", true).single();
   if (!data) return NextResponse.json({ team: null, has_selection: false, active: false });
 
   const s = await getSession();
