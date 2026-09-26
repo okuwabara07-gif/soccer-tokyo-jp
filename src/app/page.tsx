@@ -68,15 +68,16 @@ type Review = { id: string; club_name: string; nickname: string; axis: string; r
 type Selection = { club_name: string; apply_deadline: string; venue: string };
 
 export default async function HomePage() {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
-  const { data: clubs } = await supabase
-    .from("clubs")
-    .select("prefecture")
-    .eq("is_published", true);
+    const { data: clubs } = await supabase
+      .from("clubs")
+      .select("prefecture")
+      .eq("is_published", true);
 
   const { data: reviews } = await supabase
     .from("club_reviews")
@@ -243,5 +244,9 @@ export default async function HomePage() {
       <BottomNav />
       <style>{`@media (max-width:760px){.kf-hero-wrap h1{font-size:30px !important}.kf-hero-wrap>div:last-child{background:rgba(255,255,255,.7)}}`}</style>
     </div>
-  );
+    );
+  } catch (error) {
+    console.error("HomePage error:", error);
+    return <div style={{ padding: "40px", textAlign: "center", color: "#999" }}>ページの読み込みに失敗しました</div>;
+  }
 }
