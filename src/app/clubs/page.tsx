@@ -45,7 +45,7 @@ export default async function ClubsPage() {
   }
 
   const allClubs = (clubs as Club[]) ?? [];
-  console.log(`[ClubsPage] Loaded ${allClubs.length} clubs`);
+  console.log(`[ClubsPage] Loaded ${allClubs.length} clubs from is_published=true`);
 
   return (
     <div style={{ background: "var(--kf-bg)", minHeight: "100vh", color: "var(--kf-text)" }}>
