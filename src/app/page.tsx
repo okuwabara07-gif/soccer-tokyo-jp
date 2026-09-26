@@ -65,7 +65,7 @@ function PanelCard({ p, big=false }: { p:{label:string;href:string;img:string;de
 }
 
 type Review = { id: string; club_name: string; nickname: string; axis: string; rating: number; body: string };
-type Selection = { id: string; name: string; category: string; prefecture: string; area: string; selection_start: string; selection_end: string; is_jleague: boolean };
+type Selection = { club_name: string; slug: string; event_date: string; apply_deadline: string; venue: string; days_left: number };
 
 export default async function HomePage() {
   const supabase = createClient(
@@ -88,10 +88,9 @@ export default async function HomePage() {
     .limit(5);
 
   const { data: selections } = await supabase
-    .from("teams")
-    .select("id,name,category,prefecture,area,selection_start,selection_end")
-    .not("selection_start", "is", null)
-    .order("selection_start")
+    .from("v_upcoming_selections")
+    .select("club_name,slug,event_date,apply_deadline,venue,days_left")
+    .order("apply_deadline")
     .limit(5);
 
   const reviewsCount = await supabase
@@ -153,10 +152,11 @@ export default async function HomePage() {
           <SectionHeader title="今月のセレクション情報" subtitle="締切が近い順に表示" moreHref="/selection" />
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:12 }}>
             {selections.map((s: any) => (
-              <Link key={s.id} href="/selection" className="kf-card" style={{ padding:16, textDecoration:"none", color:"var(--kf-text)", display:"block" }}>
-                <div style={{ fontSize:11, color:"var(--kf-muted)", marginBottom:6 }}>{s.prefecture} {s.area || ""}</div>
-                <div style={{ fontWeight:800, fontSize:14, marginBottom:8, lineHeight:1.3 }}>{s.name}</div>
-                <div style={{ fontSize:12, color:"var(--kf-primary)", fontWeight:700 }}>締切 〜{s.selection_end ? s.selection_end.split("-").slice(1).join("/") : ""}</div>
+              <Link key={s.slug} href="/selection" className="kf-card" style={{ padding:16, textDecoration:"none", color:"var(--kf-text)", display:"block" }}>
+                <div style={{ fontSize:11, color:"var(--kf-muted)", marginBottom:6 }}>{s.event_date}</div>
+                <div style={{ fontWeight:800, fontSize:14, marginBottom:8, lineHeight:1.3 }}>{s.club_name}</div>
+                <div style={{ fontSize:11, color:"var(--kf-muted)", marginBottom:8 }}>{s.venue}</div>
+                <div style={{ fontSize:12, color:"var(--kf-primary)", fontWeight:700 }}>締切 〜{s.apply_deadline ? s.apply_deadline.split("-").slice(1).join("/") : ""}</div>
               </Link>
             ))}
           </div>
