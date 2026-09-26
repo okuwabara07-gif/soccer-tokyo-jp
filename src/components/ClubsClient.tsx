@@ -75,7 +75,7 @@ function typeLabel(type: string): string {
 }
 
 export default function ClubsClient({ clubs }: { clubs: Club[] }) {
-  const [pref, setPref] = useState("東京都");
+  const [pref, setPref] = useState("");
   const [clubType, setClubType] = useState("");
   const [strength, setStrength] = useState("すべて");
   const [q, setQ] = useState("");
@@ -91,7 +91,7 @@ export default function ClubsClient({ clubs }: { clubs: Club[] }) {
     }
   };
 
-  const prefClubs = clubs.filter(c => c.prefecture === pref);
+  const prefClubs = pref ? clubs.filter(c => c.prefecture === pref) : clubs;
   const nq = normalize(q);
 
   const filtered = useMemo(() =>
@@ -114,6 +114,22 @@ export default function ClubsClient({ clubs }: { clubs: Club[] }) {
   return (
     <>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16, overflowX: "auto" }}>
+        <button
+          onClick={() => setPref("")}
+          style={{
+            padding: "8px 14px",
+            borderRadius: 999,
+            border: "1px solid var(--kf-border)",
+            cursor: "pointer",
+            background: pref === "" ? "var(--kf-primary)" : "var(--kf-surface)",
+            color: pref === "" ? "#fff" : "var(--kf-text)",
+            fontWeight: 700,
+            fontSize: 12,
+            whiteSpace: "nowrap",
+          }}
+        >
+          すべて
+        </button>
         {PREFS.map(p => (
           <button
             key={p.key}
