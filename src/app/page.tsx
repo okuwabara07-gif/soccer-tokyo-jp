@@ -34,6 +34,16 @@ const AREA_PREFS = [
   { pref: "神奈川県", label: "神奈川", img: "/images/kf/area_kanagawa.jpg" },
   { pref: "埼玉県", label: "埼玉", img: "/images/kf/area_saitama.jpg" },
   { pref: "千葉県", label: "千葉", img: "/images/kf/area_chiba.jpg" },
+  { pref: "茨城県", label: "茨城", img: "" },
+  { pref: "栃木県", label: "栃木", img: "" },
+  { pref: "群馬県", label: "群馬", img: "" },
+  { pref: "山梨県", label: "山梨", img: "" },
+  { pref: "大阪府", label: "大阪", img: "" },
+  { pref: "兵庫県", label: "兵庫", img: "" },
+  { pref: "京都府", label: "京都", img: "" },
+  { pref: "滋賀県", label: "滋賀", img: "" },
+  { pref: "奈良県", label: "奈良", img: "" },
+  { pref: "和歌山県", label: "和歌山", img: "" },
 ];
 const GOODS = ["入団準備ガイド","遠征準備ガイド","夏の暑さ対策ガイド","冬の寒さ対策ガイド","GK専用ガイド","ジュニアユース準備"];
 
@@ -54,7 +64,7 @@ function PanelCard({ p, big=false }: { p:{label:string;href:string;img:string;de
   );
 }
 
-type Review = { id: string; team_name: string; nickname: string; axis: string; rating: number; body: string };
+type Review = { id: string; club_name: string; nickname: string; axis: string; rating: number; body: string };
 type Selection = { id: string; name: string; category: string; prefecture: string; area: string; selection_start: string; selection_end: string; is_jleague: boolean };
 
 export default async function HomePage() {
@@ -69,9 +79,9 @@ export default async function HomePage() {
     .eq("is_published", true);
 
   const { data: reviews } = await supabase
-    .from("reviews")
-    .select("id,team_name,nickname,axis,rating,body")
-    .neq("status", "hidden")
+    .from("club_reviews")
+    .select("id,club_name,nickname,axis,rating,body")
+    .eq("status", "approved")
     .not("rating", "is", null)
     .order("rating", { ascending: false })
     .order("created_at", { ascending: false })
@@ -79,19 +89,27 @@ export default async function HomePage() {
 
   const { data: selections } = await supabase
     .from("teams")
-    .select("id,name,category,prefecture,area,selection_start,selection_end,is_jleague")
-    .eq("is_jleague", true)
+    .select("id,name,category,prefecture,area,selection_start,selection_end")
     .not("selection_start", "is", null)
     .order("selection_start")
-    .limit(12);
+    .limit(5);
+
+  const reviewsCount = await supabase
+    .from("club_reviews")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "approved");
 
   const prefectureCount = (clubs || []).reduce((acc: Record<string, number>, c: any) => {
     acc[c.prefecture] = (acc[c.prefecture] || 0) + 1;
     return acc;
   }, {});
 
+  const clubTotal = (clubs || []).length;
+  const reviewTotal = reviewsCount.count || 0;
+
   const AREAS = AREA_PREFS.map(ap => ({
-    label: `${ap.label} ${prefectureCount[ap.pref] || 0}クラブ`,
+    pref: ap.pref,
+    label: `${ap.label} ${prefectureCount[ap.pref] || 0}`,
     href: `/clubs?prefecture=${encodeURIComponent(ap.pref)}`,
     img: ap.img
   }));
@@ -105,18 +123,22 @@ export default async function HomePage() {
             <div style={{ position:"absolute", inset:0, background:"linear-gradient(90deg,#fff 26%,rgba(255,255,255,.82) 44%,rgba(255,255,255,0) 68%)" }} />
             <div style={{ position:"relative", padding:"48px 16px", maxWidth:640 }}>
               <h1 style={{ margin:0, fontSize:42, lineHeight:1.2, fontWeight:800 }}>お子さんに合う<br/>サッカークラブを探そう</h1>
-              <p style={{ margin:"16px 0 8px", fontSize:18, fontWeight:700, color:"var(--kf-primary)" }}>関東・関西 346クラブ掲載</p>
-              <p style={{ margin:0, color:"var(--kf-muted)", fontSize:14, lineHeight:1.7 }}>東京・神奈川・埼玉・千葉・茨城・栃木・群馬・山梨・大阪・兵庫・京都・滋賀・奈良・和歌山のジュニアサッカー・ジュニアユース・スクール完全網羅</p>
+              <p style={{ margin:"16px 0 8px", fontSize:18, fontWeight:700, color:"var(--kf-primary)" }}>関東・関西 {clubTotal}クラブ掲載</p>
+              <p style={{ margin:0, color:"var(--kf-muted)", fontSize:14, lineHeight:1.7 }}>東京・神奈川・埼玉・千葉・茨城・栃木・群馬・山梨・大阪・兵庫・京都・滋賀・奈良・和歌山のジュニアサッカー・ジュニアユース・スクールの主要リーグを収録</p>
               <div style={{ display:"flex", gap:12, marginTop:24, flexWrap:"wrap" }}>
                 <Link href="/clubs" className="kf-btn kf-btn--primary" style={{ padding:"14px 24px" }}>クラブを探す</Link>
-                <Link href="/clubs" className="kf-btn kf-btn--ghost" style={{ padding:"14px 24px" }}>全国から探す</Link>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="kf-container" style={{ padding:"24px 16px 0" }}><StatBar /></section>
+      <section className="kf-container" style={{ padding:"24px 16px 0" }}><StatBar stats={[
+        { value: clubTotal.toString(), label: "掲載クラブ" },
+        { value: "14都府県", label: "対応エリア" },
+        { value: "無料", label: "基本機能" },
+        { value: reviewTotal.toString(), label: "口コミ件数" },
+      ]} /></section>
 
       <section className="kf-container" style={{ padding:"48px 16px 0" }}>
         <h2 style={{ margin:0, fontSize:24, fontWeight:800 }}>何をしたいですか？</h2>
@@ -125,6 +147,21 @@ export default async function HomePage() {
           {BIG.map(p=><PanelCard key={p.label} p={p} big />)}
         </div>
       </section>
+
+      {selections && selections.length > 0 && (
+        <section className="kf-container" style={{ padding:"48px 16px 0" }}>
+          <SectionHeader title="今月のセレクション情報" subtitle="締切が近い順に表示" moreHref="/selection" />
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:12 }}>
+            {selections.map((s: any) => (
+              <Link key={s.id} href="/selection" className="kf-card" style={{ padding:16, textDecoration:"none", color:"var(--kf-text)", display:"block" }}>
+                <div style={{ fontSize:11, color:"var(--kf-muted)", marginBottom:6 }}>{s.prefecture} {s.area || ""}</div>
+                <div style={{ fontWeight:800, fontSize:14, marginBottom:8, lineHeight:1.3 }}>{s.name}</div>
+                <div style={{ fontSize:12, color:"var(--kf-primary)", fontWeight:700 }}>締切 〜{s.selection_end ? s.selection_end.split("-").slice(1).join("/") : ""}</div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="kf-container" style={{ padding:"32px 16px 0" }}>
         <h3 style={{ margin:"0 0 14px", fontSize:18, fontWeight:800 }}>準備・成長をサポート</h3>
@@ -142,12 +179,14 @@ export default async function HomePage() {
 
       <section id="area" className="kf-container" style={{ padding:"48px 16px 0" }}>
         <SectionHeader title="エリアから人気チームを探す" />
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:14 }}>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))", gap:14 }}>
           {AREAS.map(a=>(
-            <Link key={a.label} href={a.href} style={{ position:"relative", borderRadius:"var(--kf-radius)", overflow:"hidden", height:120, textDecoration:"none", display:"block" }}>
-              <img src={a.img} alt="" style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover" }} />
-              <span style={{ position:"absolute", inset:0, background:"linear-gradient(0deg,rgba(0,0,0,.55),rgba(0,0,0,.15))" }} />
-              <span style={{ position:"absolute", left:16, bottom:14, color:"#fff", fontWeight:800, fontSize:18 }}>{a.label}</span>
+            <Link key={a.label} href={a.href} className="kf-card" style={{ position:"relative", borderRadius:"var(--kf-radius)", overflow:"hidden", height:a.img?120:80, textDecoration:"none", display:"flex", alignItems:a.img?"flex-end":"center", justifyContent:"center", background:a.img?"none":"var(--kf-surface)" }}>
+              {a.img && <img src={a.img} alt="" style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover" }} />}
+              {a.img && <span style={{ position:"absolute", inset:0, background:"linear-gradient(0deg,rgba(0,0,0,.55),rgba(0,0,0,.15))" }} />}
+              <span style={{ position:"relative", color:a.img?"#fff":"var(--kf-text)", fontWeight:800, fontSize:a.img?18:16, textAlign:"center", padding:16 }}>
+                {a.label}<br/>{prefectureCount[a.pref]?`${prefectureCount[a.pref]}件`:""}
+              </span>
             </Link>
           ))}
         </div>
