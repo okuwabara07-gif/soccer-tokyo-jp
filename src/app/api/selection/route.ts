@@ -16,10 +16,10 @@ export async function GET(req: NextRequest) {
 
   let q = sb
     .from("v_upcoming_selections")
-    .select("id,name,category,prefecture,area,selection_start,selection_end,apply_url,is_jleague")
-    .order("selection_start");
+    .select("id,slug,club_name,prefecture,city,selection_type,event_date,apply_deadline,venue,apply_url,days_left")
+    .order("event_date");
   if (pref !== "すべて") q = q.eq("prefecture", pref);
-  if (jleague) q = q.eq("is_jleague", true);
+  if (jleague) q = q.lte("tier", 2);
 
   const { data, error } = await q;
   if (error) console.error("[GET /api/selection] Supabase error:", error);

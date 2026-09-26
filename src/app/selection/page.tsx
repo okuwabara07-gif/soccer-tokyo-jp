@@ -6,8 +6,9 @@ import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
 
 type Sel = {
-  id: string; name: string; category: string; prefecture: string; area: string;
-  selection_start: string; selection_end: string; apply_url: string | null; is_jleague: boolean;
+  id: string; slug: string; club_name: string; prefecture: string; city: string;
+  selection_type: string; event_date: string; apply_deadline: string; venue: string;
+  apply_url: string | null; days_left: number;
 };
 
 const PREFS = ["すべて", "東京都", "神奈川県", "埼玉県", "千葉県"];
@@ -69,13 +70,12 @@ export default function SelectionPage() {
               <div key={s.id} className="kf-card" style={{ padding: 16 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap" }}>
                   <div style={{ fontWeight: 800, fontSize: 15 }}>
-                    {s.name}
-                    {s.is_jleague && <span className="kf-badge" style={{ marginLeft: 8, background: "var(--kf-accent)", color: "#3a2e0a" }}>Jリーグ系</span>}
+                    {s.club_name}
                   </div>
-                  <span className="kf-badge kf-badge--deadline">〜{fmt(s.selection_end)}締切</span>
+                  <span className="kf-badge kf-badge--deadline">〜{fmt(s.apply_deadline)}締切</span>
                 </div>
                 <div style={{ fontSize: 13, color: "var(--kf-muted)", marginTop: 8, lineHeight: 1.8 }}>
-                  開催: {fmt(s.selection_start)}〜{fmt(s.selection_end)}／対象: {s.category}／{s.prefecture} {s.area}
+                  開催: {fmt(s.event_date)}／対象: {s.selection_type}／{s.prefecture} {s.city}
                 </div>
                 <div style={{ marginTop: 10 }}>
                   {s.apply_url
