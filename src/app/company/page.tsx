@@ -36,7 +36,7 @@ export default function CompanyPage() {
       <LegalPageHeader
         kicker="ABOUT"
         title="運営者情報"
-        sub="サッカーセレクションは、関東圏のジュニアサッカー保護者と子どもたちのために運営される、独立系の情報プラットフォームです。"
+        sub="サッカーセレクションは、関東・関西のジュニアサッカー保護者と子どもたちのために運営される、独立系の情報プラットフォームです。"
       />
 
       <LegalSectionHead
@@ -46,7 +46,7 @@ export default function CompanyPage() {
         fig="01.A"
       />
       <LegalBody>
-        関東(東京・神奈川・埼玉・千葉)で活動する小中学生のサッカー選手、その保護者・指導者に向けて、セレクション情報・チーム情報・育成コンテンツを横断的に届けることを目的としています。
+        関東・関西で活動する小中学生のサッカー選手、その保護者・指導者に向けて、セレクション情報・チーム情報・育成コンテンツを横断的に届けることを目的としています。
       </LegalBody>
       <LegalBody>
         競合の少ない領域に特化し、保護者目線のキュレーション・データベース運営・LINE通知・AI診断を組み合わせることで、ジュニアサッカー界の情報格差を縮めることを使命としています。
@@ -55,11 +55,6 @@ export default function CompanyPage() {
       <LegalSectionHead num="02" label="COMPANY" title="会社情報" fig="02.A" />
       <LegalTable>
         <LegalRow label="商号">AOKAE 合同会社</LegalRow>
-        <LegalRow label="所在地">{`{本社所在地を記載}`}</LegalRow>
-        <LegalRow label="代表者">
-          代表社員 {`{代表者氏名を記載}`}
-        </LegalRow>
-        <LegalRow label="設立">{`{設立年月日を記載}`}</LegalRow>
         <LegalRow label="事業内容">
           ジュニアサッカー情報プラットフォーム運営 / 美容関連SaaS開発・運営 /
           コンテンツメディア運営

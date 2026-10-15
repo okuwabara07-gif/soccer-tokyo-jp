@@ -41,15 +41,15 @@ export default function TokushohoPage() {
       />
       <LegalTable>
         <LegalRow label="販売事業者">AOKAE 合同会社</LegalRow>
-        <LegalRow label="代表責任者">{`{代表者氏名を記載}`}</LegalRow>
-        <LegalRow label="所在地">{`{本社所在地を記載}`}</LegalRow>
+        <LegalRow label="代表責任者">請求があれば遅滞なく開示します</LegalRow>
+        <LegalRow label="所在地">請求があれば遅滞なく開示します</LegalRow>
         <LegalRow label="電話番号">
-          {`{電話番号を記載}`}
+          請求があれば遅滞なく開示します
           <div
             className="mt-1 text-[11px] text-[#0B1F3A]/50"
             style={{ fontFamily: FONT_SANS }}
           >
-            ※受付時間 平日10:00〜18:00 / 請求があれば遅滞なく開示します
+            ※お問い合わせはメールまたはお問合せフォームで承ります
           </div>
         </LegalRow>
         <LegalRow label="メール">contact@soccer-selection.jp</LegalRow>
