@@ -10,6 +10,7 @@ export const revalidate = 3600;
 
 type PageClub = {
   slug: string;
+  selection_count?: number | null;
   name: string;
   name_kana?: string;
   prefecture: string;
@@ -35,9 +36,15 @@ async function getClub(slug: string): Promise<PageClub | null> {
     .from("v_page_club")
     .select("*")
     .eq("slug", slug)
-    .single();
+    .order("season", { ascending: false, nullsFirst: false })
+    .limit(1)
+    .maybeSingle();
   if (error) console.error("[getClub] error:", error);
   return (data as PageClub) ?? null;
+}
+
+function isIndexable(club: PageClub): boolean {
+  return (club.selection_count ?? 0) > 0 || !!club.official_url || !!club.instagram;
 }
 
 export async function generateStaticParams() {
@@ -65,6 +72,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title, description: desc,
     alternates: { canonical },
+    // 独自情報（セレクション or 公式リンク）が無いクラブはインデックスさせない
+    robots: isIndexable(club) ? undefined : { index: false, follow: true },
     openGraph: { title, description: desc, url: canonical, type: "website" },
   };
 }

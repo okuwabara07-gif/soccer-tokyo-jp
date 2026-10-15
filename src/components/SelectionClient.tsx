@@ -68,7 +68,7 @@ export default function SelectionClient({ selections }: { selections: Selection[
               <div style={{ marginTop: 10 }}>
                 {s.apply_url
                   ? <a href={s.apply_url} target="_blank" rel="noopener noreferrer" className="kf-btn kf-btn--primary" style={{ padding: "8px 16px", fontSize: 13 }}>公式サイトで確認</a>
-                  : <Link href={`/teams/${s.id}`} className="kf-btn kf-btn--ghost" style={{ padding: "8px 16px", fontSize: 13 }}>チーム詳細を見る</Link>}
+                  : <Link href={`/clubs/${s.slug}`} className="kf-btn kf-btn--ghost" style={{ padding: "8px 16px", fontSize: 13 }}>チーム詳細を見る</Link>}
               </div>
             </div>
           ))}

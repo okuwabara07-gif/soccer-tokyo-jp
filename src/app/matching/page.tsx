@@ -311,7 +311,7 @@ export default function TeamMatchingPage() {
                             <p style={{fontSize:13,fontWeight:700,color:'white',marginBottom:2}}>{team.name}</p>
                             <p style={{fontSize:10,color:'rgba(255,255,255,0.4)'}}>{team.area} · {team.category}</p>
                           </div>
-                          <Link href="/teams"
+                          <Link href="/clubs"
                             style={{padding:'5px 10px',borderRadius:7,background:'rgba(255,255,255,0.1)',
                               color:'white',fontSize:10,textDecoration:'none',flexShrink:0}}>
                             地図で見る
@@ -331,7 +331,7 @@ export default function TeamMatchingPage() {
                     border:'1px solid rgba(255,255,255,0.12)',color:'white',fontSize:12,cursor:'pointer'}}>
                   もう一度診断する
                 </button>
-                <Link href="/teams"
+                <Link href="/clubs"
                   style={{display:'block',padding:'12px',borderRadius:10,background:'#4CAF50',
                     color:'white',fontSize:12,fontWeight:700,textDecoration:'none',textAlign:'center'}}>
                   全チームを検索する →

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
@@ -21,16 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function ColumnArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const { data: article } = await supabase.from("articles").select("*").eq("slug", slug).eq("status", "published").single();
-  if (!article) {
-    return (
-      <div style={{ background: "var(--kf-bg)", minHeight: "100vh" }}><Header />
-        <main className="kf-container" style={{ padding: "40px 16px", maxWidth: 760, textAlign: "center" }}>
-          <div className="kf-empty"><div className="kf-empty__title">記事が見つかりません</div></div>
-          <Link href="/column" style={{ color: "var(--kf-primary)" }}>← 育成コラムへ戻る</Link>
-        </main><SiteFooter /><BottomNav />
-      </div>
-    );
-  }
+  if (!article) notFound();
   const { data: related } = await supabase.from("articles").select("slug,title,category")
     .eq("category", article.category).eq("status", "published").neq("slug", slug).limit(4);
 
@@ -54,7 +46,7 @@ export default async function ColumnArticlePage({ params }: { params: Promise<{ 
           <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 10 }}>あわせて使えます</div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <Link href="/foot-check" className="kf-btn kf-btn--primary" style={{ padding: "10px 18px" }}>足型診断でスパイクを探す</Link>
-            <Link href="/teams" className="kf-btn kf-btn--ghost" style={{ padding: "10px 18px" }}>チームを探す</Link>
+            <Link href="/clubs" className="kf-btn kf-btn--ghost" style={{ padding: "10px 18px" }}>チームを探す</Link>
             <Link href="/selection" className="kf-btn kf-btn--ghost" style={{ padding: "10px 18px" }}>セレクション情報</Link>
           </div>
         </div>
