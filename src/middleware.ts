@@ -41,15 +41,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url, { status: 301 });
   }
 
-  // 旧 /teams/{uuid}（旧teamsテーブル）は clubs.slug と対応しないため 410 Gone を返す
-  // （以前は /clubs/{uuid} へ301していたが、全件404になっていた）
-  if (pathname.startsWith("/teams/")) {
-    return new NextResponse("Gone", {
-      status: 410,
-      headers: { "X-Robots-Tag": "noindex", "Content-Type": "text/plain; charset=utf-8" },
-    });
-  }
-
   // DB リダイレクト（redirects テーブル）
   const redirects = await getRedirects();
   for (const redirect of redirects) {
@@ -57,6 +48,14 @@ export async function middleware(request: NextRequest) {
       const status = redirect.status || 301;
       return NextResponse.redirect(new URL(redirect.to_path, request.url), { status });
     }
+  }
+
+  // 対応クラブの無い旧 /teams/{uuid} は 410 Gone
+  if (pathname.startsWith("/teams/")) {
+    return new NextResponse("Gone", {
+      status: 410,
+      headers: { "X-Robots-Tag": "noindex", "Content-Type": "text/plain; charset=utf-8" },
+    });
   }
 
   return NextResponse.next();
