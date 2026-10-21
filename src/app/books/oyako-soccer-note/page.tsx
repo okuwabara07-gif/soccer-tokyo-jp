@@ -67,7 +67,7 @@ export default function OyakoSoccerNotePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <main className="kf-container" style={{ padding: "24px 16px 56px", maxWidth: 820 }}>
         <p style={{ fontSize: 12, color: "var(--kf-muted)", marginBottom: 12 }}>
-          <Link href="/" style={{ color: "inherit" }}>トップ</Link> ＞ 書籍
+          <Link href="/" style={{ color: "inherit" }}>トップ</Link> ＞ <Link href="/books" style={{ color: "inherit" }}>書籍</Link>
         </p>
 
         <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 24, alignItems: "start" }}>
@@ -132,7 +132,7 @@ export default function OyakoSoccerNotePage() {
         <section style={{ marginTop: 32 }}>
           <a href={AMAZON_URL} target="_blank" rel="noopener noreferrer sponsored" style={btn}>Amazonで見る</a>
           <p style={{ fontSize: 13, marginTop: 16 }}>
-            セレクションの準備には <Link href="/selection">最新のセレクション情報</Link> もあわせてチェックしてください。
+            セレクションの準備には <Link href="/selection">最新のセレクション情報</Link> もあわせてチェックしてください。お金・当番・進路の疑問には <Link href="/books/okane-toban-shinro">『入る前に知りたかった 少年サッカーのお金と当番と進路』</Link> で答えています。
           </p>
           <p style={{ fontSize: 11, color: "var(--kf-muted)", marginTop: 16, lineHeight: 1.7 }}>
             本書はAOKAE合同会社が発行しています。当サイトはAmazonアソシエイト・プログラムに参加しており、リンク経由のご購入で紹介料を受け取る場合があります。
