@@ -4,7 +4,7 @@ import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
 
 // Amazonで発売されたら ASIN を入れる（例: "B0XXXXXXXX"）。空のあいだは書名検索リンクを使う。
-const ASIN = "";
+const ASIN = "B0HNRXVDD2";
 const TAG = "haircolorab22-22";
 const TITLE = "9歳から始める 親子サッカーノート";
 const AMAZON_URL = ASIN
