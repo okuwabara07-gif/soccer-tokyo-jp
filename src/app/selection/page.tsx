@@ -3,6 +3,13 @@ import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
 import SelectionClient from "@/components/SelectionClient";
+import { pageMeta } from "@/lib/seo";
+
+export const metadata = pageMeta(
+  "/selection",
+  "セレクション情報｜関東・関西のジュニアユース・ジュニア募集一覧 | サッカーセレクション",
+  "関東・関西のジュニアユース・ジュニアのセレクション・練習会の日程・会場・申込先を、情報元へのリンクつきで一覧にまとめています。"
+);
 
 export const revalidate = 3600;
 

@@ -8,6 +8,17 @@ import ReactMarkdown from "react-markdown";
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
+import { pageMeta } from "@/lib/seo";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const { data } = await supabase.from("goods_articles").select("title,category,body").eq("slug", slug).eq("status", "published").single();
+  if (!data) return pageMeta(`/goods/${slug}`, "記事が見つかりません | サッカーセレクション", "", { noindex: true });
+  const plain = String(data.body || "").replace(/[#*>\[\]()`_-]/g, "").replace(/\s+/g, " ").trim();
+  const desc = plain.slice(0, 110) || `${data.category}の準備・グッズ選びのポイントを解説します。`;
+  return pageMeta(`/goods/${slug}`, `${data.title} | サッカーセレクション`, desc);
+}
+
 const RAKUTEN_KW: Record<string, string> = {
   "入団準備": "ジュニア サッカー スターターセット",
   "遠征準備": "サッカー 遠征 ボストンバッグ",

@@ -7,13 +7,20 @@ import StatBar from "@/components/StatBar";
 import SectionHeader from "@/components/SectionHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { createClient } from "@supabase/supabase-js";
+import { pageMeta } from "@/lib/seo";
+
+export const metadata = pageMeta(
+  "/",
+  "サッカーセレクション | 関東・関西のジュニアチーム検索・セレクション情報",
+  "関東8都県・関西6府県のジュニアサッカークラブ・ジュニアユースのセレクション情報を検索。日程・会場・申込先と情報元へのリンクをまとめています。"
+);
 
 export const revalidate = 3600;
 
 const BIG = [
-  { label: "クラブを探す", href: "/clubs", img: "/images/kf/panels/p_teams.jpg", desc: "関東・関西346クラブから検索", color: "var(--kf-primary)" },
+  { label: "クラブを探す", href: "/clubs", img: "/images/kf/panels/p_teams.jpg", desc: "関東・関西の主要クラブから検索", color: "var(--kf-primary)" },
   { label: "セレクション情報", href: "/selection", img: "/images/kf/panels/p_selection.jpg", desc: "最新の募集・セレクションをチェック", color: "#2F6FDB" },
-  { label: "口コミランキング", href: "/reviews", img: "/images/kf/panels/p_reviews.jpg", desc: "保護者のリアルな声をチェック", color: "var(--kf-accent-dark)" },
+  { label: "口コミランキング", href: "/reviews", img: "/images/kf/panels/p_reviews.jpg", desc: "保護者の口コミを読む・投稿する", color: "var(--kf-accent-dark)" },
 ];
 const SUPPORT = [
   { label: "準備物・グッズ", href: "/goods", img: "/images/kf/panels/p_goods.jpg", desc: "必要なものをチェック" },
@@ -146,7 +153,7 @@ export default async function HomePage() {
         { value: clubTotal.toString(), label: "掲載クラブ" },
         { value: "14都府県", label: "対応エリア" },
         { value: "無料", label: "基本機能" },
-        { value: reviewTotal.toString(), label: "口コミ件数" },
+        ...(reviewTotal > 0 ? [{ value: reviewTotal.toString(), label: "口コミ件数" }] : []),
       ]} /></section>
 
       <section className="kf-container" style={{ padding:"48px 16px 0" }}>
@@ -202,8 +209,10 @@ export default async function HomePage() {
       </section>
 
       <section className="kf-container" style={{ padding:"48px 16px 0" }}>
-        <SectionHeader title="保護者口コミランキング" subtitle="送迎負担・雰囲気・育成・費用感などで比較" moreHref="/reviews" />
-        <ReviewRankClient reviews={(reviews as Review[]) || []} />
+        {reviewTotal > 0 && (<>
+          <SectionHeader title="保護者口コミランキング" subtitle="送迎負担・雰囲気・育成・費用感などで比較" moreHref="/reviews" />
+          <ReviewRankClient reviews={(reviews as Review[]) || []} />
+        </>)}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(170px,1fr))", gap:14 }}>
           {GOODS.map(g=>(<Link key={g} href="/goods" className="kf-card" style={{ textDecoration:"none", color:"var(--kf-text)", padding:18, fontWeight:700, fontSize:14, display:"flex", justifyContent:"space-between", alignItems:"center" }}>{g}<span style={{ color:"var(--kf-primary)" }}>›</span></Link>))}
         </div>

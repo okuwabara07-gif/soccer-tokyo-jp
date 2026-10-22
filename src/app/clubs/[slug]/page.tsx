@@ -94,7 +94,7 @@ export async function generateStaticParams() {
     .select("slug")
     .eq("is_published", true)
     .order("strength_label", { ascending: false })
-    .limit(346);
+    .limit(1000);
   return (data || []).map((c) => ({ slug: c.slug as string }));
 }
 
@@ -104,9 +104,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!club) return { title: "クラブが見つかりません" };
 
   const location = [club.prefecture, club.city].filter(Boolean).join("");
+  const typeName = club.club_type === "j_academy" ? "Jリーグアカデミー" : club.club_type === "school" ? "学校のサッカー部" : "ジュニアサッカークラブ";
+  const leagueLabel = [club.league, club.block].filter(Boolean).join(" ");
+  const sels = await getSelections(club.id);
+  const latest = sels[0];
+  const selLabel = latest
+    ? (latest.title || [latest.intake_year ? `${latest.intake_year}年度` : "", latest.target_grade, latest.selection_type].filter(Boolean).join(" "))
+    : "";
   const desc = club.description && club.description.trim()
     ? club.description.slice(0, 120)
-    : `${location}のジュニアサッカークラブ。${club.strength_label || "クラブ情報"}、セレクション、実績など詳細をご覧いただけます。`;
+    : [
+        `${club.name}（${location}）の${typeName}情報。`,
+        leagueLabel ? `${club.season ? `${club.season}年度` : ""}所属リーグ：${leagueLabel}。` : "",
+        selLabel ? `${selLabel}の日程・会場・申込先と情報元を掲載。` : "セレクション・練習会の情報と公式サイトへのリンクを掲載。",
+      ].join("").slice(0, 150);
   const canonical = `https://soccer-selection.jp/clubs/${slug}`;
   const title = `${club.name}｜${location}のジュニアサッカークラブ`;
 
@@ -223,7 +234,7 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
                 );
               })}
               <p style={{ fontSize: 12, color: "var(--kf-muted)" }}>
-                ※掲載内容はクラブ公式の発表をもとにまとめたものです。参加前に必ず公式情報をご確認ください。実施済みの情報は、例年の実施時期の目安として掲載しています。
+                ※掲載内容はクラブの発表や公開情報をもとにまとめたものです（情報元リンク参照）。参加前に必ず公式情報をご確認ください。実施済みの情報は、例年の実施時期の目安として掲載しています。
               </p>
             </div>
           )}

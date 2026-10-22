@@ -7,6 +7,11 @@ import SiteFooter from "@/components/SiteFooter";
 import ReactMarkdown from "react-markdown";
 
 export const revalidate = 3600;
+
+function fmtDate(iso: string) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+}
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -32,7 +37,12 @@ export default async function ColumnArticlePage({ params }: { params: Promise<{ 
       <main className="kf-container" style={{ padding: "24px 16px 56px", maxWidth: 760 }}>
         <Link href="/column" style={{ fontSize: 13, color: "var(--kf-muted)", textDecoration: "none" }}>← 育成コラム一覧へ</Link>
         <div style={{ margin: "12px 0 4px" }}><span className="kf-badge">{article.category}</span></div>
-        <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 16px", lineHeight: 1.4 }}>{article.title}</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 8px", lineHeight: 1.4 }}>{article.title}</h1>
+        <p style={{ fontSize: 12, color: "var(--kf-muted)", margin: "0 0 16px" }}>
+          サッカーセレクション編集部
+          {article.published_at && <> ・ 公開 <time dateTime={article.published_at}>{fmtDate(article.published_at)}</time></>}
+          {article.updated_at && article.updated_at.slice(0, 10) !== (article.published_at || "").slice(0, 10) && <> ・ 更新 <time dateTime={article.updated_at}>{fmtDate(article.updated_at)}</time></>}
+        </p>
         <div className="kf-article-body" style={{ fontSize: 15, lineHeight: 2 }}>
           <ReactMarkdown components={{
             h2: ({children}) => <h2 style={{ fontSize: 18, fontWeight: 800, margin: "24px 0 8px" }}>{children}</h2>,

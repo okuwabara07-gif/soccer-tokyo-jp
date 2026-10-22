@@ -244,7 +244,7 @@ export default function PositionPage() {
 
             <div className="kf-card" style={{ padding: 20, borderRadius: 16, background: "linear-gradient(135deg,#0a3d62,#1a6ba0)" }}>
               <p style={{ color: "#fff", fontSize: 16, fontWeight: 700, marginBottom: 8 }}>自分に合うチームを見つけよう</p>
-              <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 12, marginBottom: 16 }}>関東1,000チーム以上からAIが無料診断</p>
+              <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 12, marginBottom: 16 }}>関東・関西の掲載クラブから無料で探せます</p>
               <Link href="/matching" style={{ display: "block", padding: "12px", borderRadius: 12, background: "#4CAF50", color: "#fff", fontSize: 14, fontWeight: 700, textDecoration: "none", textAlign: "center" }}>無料でチームを探す →</Link>
             </div>
 

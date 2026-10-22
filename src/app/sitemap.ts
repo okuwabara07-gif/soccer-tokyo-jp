@@ -55,6 +55,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .range(from, to)
   );
 
+  const goods = await fetchAll<{ slug: string; updated_at: string | null }>((from, to) =>
+    supabase
+      .from("goods_articles")
+      .select("slug, updated_at")
+      .eq("status", "published")
+      .range(from, to)
+  );
+
   const staticPages: MetadataRoute.Sitemap = [
     { url: BASE, lastModified: now, changeFrequency: "daily", priority: 1 },
     { url: `${BASE}/selection`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
@@ -64,6 +72,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/books`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE}/books/oyako-soccer-note`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE}/books/okane-toban-shinro`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE}/goods`, lastModified: now, changeFrequency: "weekly", priority: 0.6 },
+    { url: `${BASE}/shoes`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${BASE}/nutrition`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${BASE}/position`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${BASE}/rules`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${BASE}/manga`, changeFrequency: "monthly", priority: 0.4 },
     { url: `${BASE}/company`, changeFrequency: "yearly", priority: 0.2 },
     { url: `${BASE}/contact`, changeFrequency: "yearly", priority: 0.2 },
     { url: `${BASE}/privacy`, changeFrequency: "yearly", priority: 0.1 },
@@ -83,5 +97,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticPages, ...clubPages, ...articlePages];
+  const goodsPages: MetadataRoute.Sitemap = goods.map((g) => ({
+    url: `${BASE}/goods/${g.slug}`,
+    lastModified: g.updated_at ? new Date(g.updated_at) : undefined,
+    changeFrequency: "monthly",
+    priority: 0.5,
+  }));
+
+  return [...staticPages, ...clubPages, ...articlePages, ...goodsPages];
 }

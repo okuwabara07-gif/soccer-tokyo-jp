@@ -1,6 +1,13 @@
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
+import { pageMeta } from "@/lib/seo";
+
+export const metadata = pageMeta(
+  "/performance",
+  "ゴールパフォーマンス図鑑 | サッカーセレクション",
+  "子どもたちのゴールパフォーマンスのアイデアを、名前・難易度・やり方つきで紹介します。"
+);
 
 const IMAGES = Array.from({ length: 9 }, (_, i) => `/images/kf/performance/${String(i + 1).padStart(2, "0")}.jpg`);
 
