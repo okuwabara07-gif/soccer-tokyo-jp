@@ -1,6 +1,7 @@
 import ReviewRankClient from "@/components/ReviewRankClient";
 import JleagueRailClient from "@/components/JleagueRailClient";
 import Link from "next/link";
+import { todayJst } from "@/lib/club-quality";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import StatBar from "@/components/StatBar";
@@ -102,11 +103,11 @@ export default async function HomePage() {
 
   const { data: selections, error: selectionsError } = await supabase
     .from("selections")
-    .select("club_name,apply_deadline,venue")
+    .select("event_date,apply_deadline,venue,selection_type,clubs(name,slug)")
     .eq("status", "published")
-    .not("apply_deadline", "is", null)
-    .order("apply_deadline")
-    .limit(5);
+    .gte("event_date", todayJst())
+    .order("event_date")
+    .limit(6);
 
   if (selectionsError) console.error("[HomePage] selections query error:", selectionsError);
 
@@ -166,13 +167,13 @@ export default async function HomePage() {
 
       {selections && selections.length > 0 && (
         <section className="kf-container" style={{ padding:"48px 16px 0" }}>
-          <SectionHeader title="今月のセレクション情報" subtitle="締切が近い順に表示" moreHref="/selection" />
+          <SectionHeader title="開催が近いセレクション・練習会" subtitle="開催日が近い順に表示" moreHref="/selection" />
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:12 }}>
             {selections.map((s: any, idx: number) => (
-              <Link key={idx} href="/selection" className="kf-card" style={{ padding:16, textDecoration:"none", color:"var(--kf-text)", display:"block" }}>
-                <div style={{ fontWeight:800, fontSize:14, marginBottom:8, lineHeight:1.3 }}>{s.club_name}</div>
-                <div style={{ fontSize:11, color:"var(--kf-muted)", marginBottom:8 }}>{s.venue}</div>
-                <div style={{ fontSize:12, color:"var(--kf-primary)", fontWeight:700 }}>締切 〜{s.apply_deadline ? s.apply_deadline.split("-").slice(1).join("/") : ""}</div>
+              <Link key={idx} href={s.clubs?.slug ? `/clubs/${s.clubs.slug}` : "/selection"} className="kf-card" style={{ padding:16, textDecoration:"none", color:"var(--kf-text)", display:"block" }}>
+                <div style={{ fontWeight:800, fontSize:14, marginBottom:8, lineHeight:1.3 }}>{s.clubs?.name}</div>
+                <div style={{ fontSize:11, color:"var(--kf-muted)", marginBottom:8 }}>{s.selection_type}{s.venue ? `／${s.venue}` : ""}</div>
+                <div style={{ fontSize:12, color:"var(--kf-primary)", fontWeight:700 }}>開催 {s.event_date.split("-").slice(1).join("/")}{s.apply_deadline ? `（締切 ${s.apply_deadline.split("-").slice(1).join("/")}）` : ""}</div>
               </Link>
             ))}
           </div>

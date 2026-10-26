@@ -4,8 +4,8 @@ import Link from "next/link";
 
 type Selection = {
   id: string; slug: string; club_name: string; prefecture: string; city: string;
-  selection_type: string; event_date: string; apply_deadline: string; venue: string;
-  apply_url: string | null;
+  selection_type: string; event_date: string; event_date_end: string; apply_deadline: string; venue: string;
+  apply_url: string | null; title: string; is_jleague: boolean;
 };
 
 const PREFS = ["すべて", "東京都", "神奈川県", "埼玉県", "千葉県",
@@ -27,7 +27,7 @@ export default function SelectionClient({ selections }: { selections: Selection[
   const filtered = useMemo(() =>
     selections
       .filter(s => pref === "すべて" || s.prefecture === pref)
-      .filter(s => !jleagueOnly || s.club_name),
+      .filter(s => !jleagueOnly || s.is_jleague),
     [selections, pref, jleagueOnly]
   );
 
@@ -60,10 +60,13 @@ export default function SelectionClient({ selections }: { selections: Selection[
                 <div style={{ fontWeight: 800, fontSize: 15 }}>
                   {s.club_name}
                 </div>
-                <span className="kf-badge kf-badge--deadline">〜{fmt(s.apply_deadline)}締切</span>
+                {s.apply_deadline
+                  ? <span className="kf-badge kf-badge--deadline">〜{fmt(s.apply_deadline)}締切</span>
+                  : !s.event_date && <span className="kf-badge">随時受付</span>}
               </div>
               <div style={{ fontSize: 13, color: "var(--kf-muted)", marginTop: 8, lineHeight: 1.8 }}>
-                開催: {fmt(s.event_date)}／対象: {s.selection_type}／{s.prefecture} {s.city}
+                {s.title && <div style={{ color: "var(--kf-text)", fontWeight: 600 }}>{s.title}</div>}
+                開催: {s.event_date ? fmt(s.event_date) + (s.event_date_end && s.event_date_end !== s.event_date ? `〜${fmt(s.event_date_end)}` : "") : "随時"}／種別: {s.selection_type}／{s.prefecture} {s.city}
               </div>
               <div style={{ marginTop: 10 }}>
                 {s.apply_url

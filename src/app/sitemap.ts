@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
+import { isClubIndexable } from "@/lib/club-quality";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,15 +11,20 @@ const BASE = "https://soccer-selection.jp";
 
 // 旧 teams テーブル（/teams/{uuid}）は使用しない。
 // 掲載するのは「実在確定の clubs のうち独自情報があるもの」＋コラム＋静的ページのみ。
-// clubs/[slug] の robots 判定（isIndexable）と条件を揃えること。
+// clubs/[slug] の robots 判定と同じ条件（lib/club-quality.ts の isClubIndexable）を使う。
 export const revalidate = 3600;
 
 type ClubRow = {
+  id: string;
   slug: string;
-  selection_count: number | null;
-  official_url: string | null;
-  instagram: string | null;
+  monthly_fee: number | null;
+  practice_days: string | null;
+  practice_ground: string | null;
+  nearest_station: string | null;
+  notes: string | null;
 };
+
+type SelRow = { club_id: string; event_date: string | null; event_date_end: string | null };
 
 async function fetchAll<T>(build: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: unknown }>) {
   const out: T[] = [];
@@ -37,14 +43,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const clubRows = await fetchAll<ClubRow>((from, to) =>
     supabase
-      .from("v_page_club")
-      .select("slug, selection_count, official_url, instagram")
+      .from("clubs")
+      .select("id, slug, monthly_fee, practice_days, practice_ground, nearest_station, notes")
       .eq("is_published", true)
       .range(from, to)
   );
+  const selRows = await fetchAll<SelRow>((from, to) =>
+    supabase
+      .from("selections")
+      .select("club_id, event_date, event_date_end")
+      .eq("status", "published")
+      .range(from, to)
+  );
+  const selByClub = new Map<string, SelRow[]>();
+  for (const r of selRows) {
+    const list = selByClub.get(r.club_id) ?? [];
+    list.push(r);
+    selByClub.set(r.club_id, list);
+  }
   const clubSlugs = new Set<string>();
   for (const c of clubRows) {
-    if ((c.selection_count ?? 0) > 0 || c.official_url || c.instagram) clubSlugs.add(c.slug);
+    if (isClubIndexable(c, selByClub.get(c.id) ?? [])) clubSlugs.add(c.slug);
   }
 
   const articles = await fetchAll<{ slug: string; updated_at: string | null; published_at: string | null }>((from, to) =>

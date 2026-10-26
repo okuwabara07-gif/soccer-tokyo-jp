@@ -5,6 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
+import { isActiveSelection, isClubIndexable, todayJst } from "@/lib/club-quality";
 
 export const revalidate = 3600;
 
@@ -24,6 +25,7 @@ type PageClub = {
   official_url?: string;
   instagram?: string;
   monthly_fee?: number;
+  nearest_station?: string;
   practice_days?: string;
   practice_ground?: string;
   description?: string;
@@ -48,8 +50,28 @@ async function getClub(slug: string): Promise<PageClub | null> {
   return (data as PageClub) ?? null;
 }
 
-function isIndexable(club: PageClub): boolean {
-  return (club.selection_count ?? 0) > 0 || !!club.official_url || !!club.instagram;
+type ClubExtra = { notes: string | null; updated_at: string | null };
+
+// v_page_club に含まれない列（公式サイトで確認した費用・所属の補足など）を clubs から取る
+async function getClubExtra(clubId?: string): Promise<ClubExtra> {
+  if (!clubId) return { notes: null, updated_at: null };
+  const { data, error } = await supabase
+    .from("clubs")
+    .select("notes,updated_at")
+    .eq("id", clubId)
+    .maybeSingle();
+  if (error) console.error("[getClubExtra] error:", error);
+  return (data as ClubExtra) ?? { notes: null, updated_at: null };
+}
+
+function profileOf(club: PageClub & { nearest_station?: string | null }, extra: ClubExtra) {
+  return {
+    monthly_fee: club.monthly_fee ?? null,
+    practice_days: club.practice_days ?? null,
+    practice_ground: club.practice_ground ?? null,
+    nearest_station: club.nearest_station ?? null,
+    notes: extra.notes,
+  };
 }
 
 type ClubSelection = {
@@ -76,8 +98,8 @@ async function getSelections(clubId?: string): Promise<ClubSelection[]> {
     .select("id,intake_year,target_grade,selection_type,title,event_date,event_date_end,event_time,venue,apply_deadline,apply_url,requirements,notes,source_url")
     .eq("club_id", clubId)
     .eq("status", "published")
-    .order("event_date", { ascending: false, nullsFirst: false })
-    .limit(10);
+    .order("event_date", { ascending: false, nullsFirst: true })
+    .limit(30);
   if (error) console.error("[getSelections] error:", error);
   return (data as ClubSelection[]) ?? [];
 }
@@ -107,7 +129,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const typeName = club.club_type === "j_academy" ? "Jリーグアカデミー" : club.club_type === "school" ? "学校のサッカー部" : "ジュニアサッカークラブ";
   const leagueLabel = [club.league, club.block].filter(Boolean).join(" ");
   const sels = await getSelections(club.id);
-  const latest = sels[0];
+  const extra = await getClubExtra(club.id);
+  const active = sels.filter((s) => isActiveSelection(s));
+  const latest = active[0] ?? sels[0];
   const selLabel = latest
     ? (latest.title || [latest.intake_year ? `${latest.intake_year}年度` : "", latest.target_grade, latest.selection_type].filter(Boolean).join(" "))
     : "";
@@ -116,7 +140,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     : [
         `${club.name}（${location}）の${typeName}情報。`,
         leagueLabel ? `${club.season ? `${club.season}年度` : ""}所属リーグ：${leagueLabel}。` : "",
-        selLabel ? `${selLabel}の日程・会場・申込先と情報元を掲載。` : "セレクション・練習会の情報と公式サイトへのリンクを掲載。",
+        club.monthly_fee ? `月謝${club.monthly_fee.toLocaleString()}円。` : "",
+        club.practice_days ? `練習：${club.practice_days.slice(0, 30)}。` : "",
+        active.length > 0 && selLabel ? `${selLabel}の日程・会場・申込先を掲載。` : "練習日・練習場所・費用などを公式サイトの掲載内容から整理。",
       ].join("").slice(0, 150);
   const canonical = `https://soccer-selection.jp/clubs/${slug}`;
   const title = `${club.name}｜${location}のジュニアサッカークラブ`;
@@ -124,8 +150,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title, description: desc,
     alternates: { canonical },
-    // 独自情報（セレクション or 公式リンク）が無いクラブはインデックスさせない
-    robots: isIndexable(club) ? undefined : { index: false, follow: true },
+    // 今後の募集も、公式サイトで確認したクラブ情報も乏しいページはインデックスさせない（lib/club-quality.ts）
+    robots: isClubIndexable(profileOf(club, extra), sels) ? undefined : { index: false, follow: true },
     openGraph: { title, description: desc, url: canonical, type: "website" },
   };
 }
@@ -137,7 +163,14 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
 
   const location = [club.prefecture, club.city].filter(Boolean).join("");
   const selections = await getSelections(club.id);
-  const today = new Date().toISOString().slice(0, 10);
+  const extra = await getClubExtra(club.id);
+  const today = todayJst();
+  const current = selections
+    .filter((s) => isActiveSelection(s, today))
+    .sort((a, b) => (a.event_date ?? "9999").localeCompare(b.event_date ?? "9999"));
+  const past = selections.filter((s) => !isActiveSelection(s, today));
+  const noteLines = (extra.notes ?? "").split("\n").map((l) => l.trim()).filter(Boolean);
+  const checkedLabel = extra.updated_at ? `${new Date(extra.updated_at).getFullYear()}年${new Date(extra.updated_at).getMonth() + 1}月` : "";
   const leagueLabel = [club.league, club.block].filter(Boolean).join(" ");
   const jsonLd = {
     "@context": "https://schema.org",
@@ -176,9 +209,23 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
             {club.strength_label && <div style={{ marginBottom: 12 }}><strong>レベル:</strong> {club.strength_label}</div>}
             {club.practice_days && <div style={{ marginBottom: 12 }}><strong>練習頻度:</strong> {club.practice_days}</div>}
             {club.practice_ground && <div style={{ marginBottom: 12 }}><strong>練習地:</strong> {club.practice_ground}</div>}
+            {club.nearest_station && <div style={{ marginBottom: 12 }}><strong>最寄駅:</strong> {club.nearest_station}</div>}
             {club.monthly_fee !== undefined && (
               <div style={{ marginBottom: 12 }}>
                 <strong>月謝:</strong> {club.monthly_fee === 0 ? "無料" : club.monthly_fee ? `${club.monthly_fee.toLocaleString()}円` : "要問合せ"}
+              </div>
+            )}
+            {noteLines.map((l, i) => {
+              const m = l.match(/^(費用|所属)：(.*)$/);
+              return (
+                <div key={i} style={{ marginBottom: 12 }}>
+                  {m ? <><strong>{m[1] === "費用" ? "その他の費用" : "所属・カテゴリー"}:</strong> {m[2]}</> : l}
+                </div>
+              );
+            })}
+            {(club.practice_days || club.practice_ground || club.monthly_fee || noteLines.length > 0) && (
+              <div style={{ fontSize: 12, color: "var(--kf-muted)" }}>
+                ※クラブ公式サイトの掲載内容をもとに整理しています{checkedLabel ? `（${checkedLabel}確認）` : ""}。年度により変わるため、入団前に公式サイトで最新情報をご確認ください。
               </div>
             )}
           </div>
@@ -199,16 +246,16 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
 
         <section style={{ marginTop: 24, borderTop: "1px solid var(--kf-border)", paddingTop: 20 }}>
           <h2 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 12px", color: "var(--kf-primary)" }}>セレクション・練習会情報</h2>
-          {selections.length === 0 ? (
-            <p style={{ fontSize: 14, color: "var(--kf-muted)" }}>現在掲載中のセレクション情報はありません。最新情報はクラブ公式の発表をご確認ください。</p>
+          {current.length === 0 ? (
+            <p style={{ fontSize: 14, color: "var(--kf-muted)" }}>現在受付中・開催予定のセレクション情報はありません。{past.length > 0 ? "下の「過去の実施例」で例年の時期を確認できます。" : ""}最新情報はクラブ公式の発表をご確認ください。</p>
           ) : (
             <div style={{ display: "grid", gap: 12 }}>
-              {selections.map((sel) => {
+              {current.map((sel) => {
                 const end = sel.event_date_end || sel.event_date;
                 const isPast = !!end && end < today;
                 const dateLabel = sel.event_date
                   ? fmtDate(sel.event_date) + (sel.event_date_end && sel.event_date_end !== sel.event_date ? `〜${fmtDate(sel.event_date_end)}` : "")
-                  : "日程未定";
+                  : "随時受付";
                 return (
                   <div key={sel.id} className="kf-card" style={{ padding: 16, fontSize: 14, lineHeight: 1.8 }}>
                     <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 6 }}>
@@ -234,11 +281,27 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
                 );
               })}
               <p style={{ fontSize: 12, color: "var(--kf-muted)" }}>
-                ※掲載内容はクラブの発表や公開情報をもとにまとめたものです（情報元リンク参照）。参加前に必ず公式情報をご確認ください。実施済みの情報は、例年の実施時期の目安として掲載しています。
+                ※掲載内容はクラブの発表をもとにまとめたものです（情報元リンク参照）。参加前に必ず公式情報をご確認ください。
               </p>
             </div>
           )}
         </section>
+
+        {past.length > 0 && (
+          <section style={{ marginTop: 24, borderTop: "1px solid var(--kf-border)", paddingTop: 20 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 6px", color: "var(--kf-primary)" }}>過去の実施例（参考）</h2>
+            <p style={{ fontSize: 12, color: "var(--kf-muted)", margin: "0 0 10px" }}>受付は終了しています。翌年度の募集時期の目安としてご覧ください。</p>
+            <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, lineHeight: 1.9 }}>
+              {past.map((sel) => (
+                <li key={sel.id}>
+                  {sel.event_date ? fmtDate(sel.event_date) : ""}{sel.event_date_end && sel.event_date_end !== sel.event_date ? `〜${fmtDate(sel.event_date_end)}` : ""}
+                  {"　"}{sel.title || [sel.intake_year ? `${sel.intake_year}年度入団` : "", sel.selection_type].filter(Boolean).join(" ")}
+                  {sel.source_url && <>{"　"}<a href={sel.source_url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--kf-primary)" }}>情報元</a></>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {club.description && (
           <section style={{ marginTop: 24, borderTop: "1px solid var(--kf-border)", paddingTop: 20 }}>
