@@ -215,7 +215,11 @@ export default async function CalendarPage() {
             <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, lineHeight: 1.9 }}>
               {upcoming.map((r) => (
                 <li key={r.id}>
-                  {fmt(r.event_date)}
+                  {r.event_date_end && r.event_date_end !== r.event_date
+                    ? r.event_date! < today
+                      ? `開催中（〜${fmt(r.event_date_end)}）`
+                      : `${fmt(r.event_date)}〜${fmt(r.event_date_end)}`
+                    : fmt(r.event_date)}
                   <Link href={`/clubs/${r.clubs!.slug}`} style={{ color: "var(--kf-primary)" }}>{r.clubs!.name}</Link>
                   　{r.selection_type}（{r.clubs!.prefecture}）
                 </li>
