@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useLineAuth } from "@/components/LineLogin";
 
 const PLANS = [
-  { id: "papa_mama", name: "パパママ応援プラン", price: "¥4,500", sub: "6ヶ月一括", badge: "一番お得", badgeColor: "#854F0B", badgeBg: "#FAEEDA", features: ["Jリーグ/JFL下部組織セレクション情報フル閲覧", "セレクション締切リマインド通知", "AI診断フル開放（足型・体格・栄養）", "お気に入りチーム無制限", "診断結果・締切一覧のPDF保存"], highlight: true },
-  { id: "standard", name: "スタンダード", price: "¥500", sub: "月額", badge: "まずはここから", badgeColor: "#0C447C", badgeBg: "#E6F1FB", features: ["Jリーグ/JFL下部組織セレクション情報フル閲覧", "セレクション締切リマインド通知", "AI診断フル開放（足型・体格・栄養）", "お気に入りチーム無制限"], highlight: false },
+  { id: "papa_mama", name: "パパママ応援プラン", price: "¥4,500", sub: "6ヶ月一括", badge: "一番お得", badgeColor: "#854F0B", badgeBg: "#FAEEDA", features: ["セレクション締切リマインド通知", "AI診断フル開放（足型・体格・栄養）", "お気に入りチーム無制限", "診断結果・締切一覧のPDF保存"], highlight: true },
+  { id: "standard", name: "スタンダード", price: "¥500", sub: "月額", badge: "まずはここから", badgeColor: "#0C447C", badgeBg: "#E6F1FB", features: ["セレクション締切リマインド通知", "AI診断フル開放（足型・体格・栄養）", "お気に入りチーム無制限"], highlight: false },
   { id: "premium", name: "プレミアム", price: "¥1,500", sub: "月額", badge: "しっかりサポート", badgeColor: "#3C3489", badgeBg: "#EEEDFE", features: ["スタンダード全機能", "診断結果・締切一覧のPDF保存", "過去のセレクション開催履歴", "新着セレクションの優先通知"], highlight: false },
 ];
 
@@ -60,7 +60,7 @@ export default function MemberPage() {
         <div style={{ background: "#0a0a0a", padding: "20px 16px 16px" }}>
           <button onClick={() => window.history.back()} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: 12, display: "block", marginBottom: 8, cursor: "pointer", padding: 0 }}>← 戻る</button>
           <h1 style={{ color: "white", fontSize: 22, fontWeight: 300, marginBottom: 4 }}>会員プランを選ぶ</h1>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>セレクション申込URL・詳細情報を閲覧できます</p>
+          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>締切リマインド・AI診断・お気に入り登録が使えます</p>
         </div>
         <div style={{ padding: 16 }}>
 

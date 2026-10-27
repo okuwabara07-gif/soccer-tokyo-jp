@@ -46,10 +46,10 @@ function SuccessContent() {
       <div style={{maxWidth:400,padding:24,textAlign:'center'}}>
         <div style={{fontSize:48,marginBottom:16}}>🎉</div>
         <h1 style={{fontSize:20,fontWeight:700,marginBottom:8}}>登録完了！</h1>
-        <p style={{fontSize:13,color:'#666',marginBottom:8,lineHeight:1.7}}>ご登録ありがとうございます。<br/>すべてのセレクション情報にアクセスできます。</p>
+        <p style={{fontSize:13,color:'#666',marginBottom:8,lineHeight:1.7}}>ご登録ありがとうございます。<br/>締切リマインドなどの会員機能が使えます。</p>
         <div style={{background:'#f0f7f0',borderRadius:10,padding:'10px 14px',marginBottom:20,border:'1px solid #c8e6c9'}}>
-          <p style={{fontSize:12,color:'#2d6a2d',fontWeight:600}}>✓ セレクション情報がすべて閲覧可能になりました</p>
-          <p style={{fontSize:12,color:'#2d6a2d'}}>✓ チーム詳細・公式/SNSリンクが閲覧可能になりました</p>
+          <p style={{fontSize:12,color:'#2d6a2d',fontWeight:600}}>✓ セレクション締切リマインドが使えるようになりました</p>
+          <p style={{fontSize:12,color:'#2d6a2d'}}>✓ AI診断・お気に入り登録がフルで使えます</p>
         </div>
         <Link href="/selection" style={{display:'block',padding:'12px',borderRadius:10,background:'#168342',color:'#fff',fontSize:13,textDecoration:'none',marginBottom:10}}>セレクション情報を見る →</Link>
         <Link href="/mypage" style={{display:'block',padding:'12px',borderRadius:10,background:'#B08D5E',color:'#fff',fontSize:13,textDecoration:'none',marginBottom:10}}>マイページへ →</Link>

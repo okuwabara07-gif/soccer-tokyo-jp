@@ -12,7 +12,6 @@ const PREFS = ["すべて", "東京都", "神奈川県", "埼玉県", "千葉県
   "茨城県", "栃木県", "群馬県", "山梨県",
   "大阪府", "兵庫県", "京都府", "滋賀県", "奈良県", "和歌山県"];
 
-const FREE_LIMIT = 3;
 
 function fmt(d: string) {
   if (!d) return "";
@@ -31,8 +30,7 @@ export default function SelectionClient({ selections }: { selections: Selection[
     [selections, pref, jleagueOnly]
   );
 
-  const visible = filtered.slice(0, FREE_LIMIT);
-  const locked = filtered.length - visible.length;
+  const visible = filtered;
 
   return (
     <>
@@ -76,13 +74,11 @@ export default function SelectionClient({ selections }: { selections: Selection[
             </div>
           ))}
 
-          {locked > 0 && (
-            <div className="kf-card" style={{ padding: 28, textAlign: "center", background: "var(--kf-primary-soft)", border: "none" }}>
-              <div style={{ fontWeight: 800, fontSize: 18 }}>続き{locked}件はプレミアム会員限定</div>
-              <p style={{ fontSize: 13, color: "var(--kf-muted)", margin: "8px 0 14px" }}>関東全エリアのセレクション情報をすべて閲覧＋締切リマインドが使えます。</p>
-              <Link href="/member" className="kf-btn kf-btn--pay" style={{ padding: "12px 24px" }}>プレミアムを見る</Link>
-            </div>
-          )}
+          <div className="kf-card" style={{ padding: 20, textAlign: "center", background: "var(--kf-primary-soft)", border: "none" }}>
+            <div style={{ fontWeight: 800, fontSize: 16 }}>締切を見逃さないために</div>
+            <p style={{ fontSize: 13, color: "var(--kf-muted)", margin: "8px 0 14px" }}>会員になると、セレクションの締切リマインド通知やお気に入りチームの登録が使えます。</p>
+            <Link href="/member" className="kf-btn kf-btn--pay" style={{ padding: "10px 22px" }}>会員プランを見る</Link>
+          </div>
         </div>
       )}
     </>
