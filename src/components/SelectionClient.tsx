@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 
 type Selection = {
@@ -22,6 +22,12 @@ function fmt(d: string) {
 export default function SelectionClient({ selections }: { selections: Selection[] }) {
   const [pref, setPref] = useState("すべて");
   const [jleagueOnly, setJleagueOnly] = useState(false);
+
+  // /selection?pref=東京都 で県を選んだ状態で開く（サッカー人生シミュレーターの結末画面からの導線）
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get("pref");
+    if (q && PREFS.includes(q)) setPref(q);
+  }, []);
 
   const filtered = useMemo(() =>
     selections

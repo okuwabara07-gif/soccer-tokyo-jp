@@ -41,6 +41,10 @@ const mergedColumns: Record<string, string> = {
 };
 
 const nextConfig: NextConfig = {
+  // サッカー人生シミュレーター本体（public/life/play.html）を /life/play で配信する。exact-match のみ。
+  async rewrites() {
+    return [{ source: "/life/play", destination: "/life/play.html" }];
+  },
   async redirects() {
     return Object.entries(mergedColumns).map(([from, to]) => ({
       source: `/column/${from}`,

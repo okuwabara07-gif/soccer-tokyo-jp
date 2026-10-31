@@ -88,6 +88,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/clubs`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
     { url: `${BASE}/column`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${BASE}/calendar`, lastModified: now, changeFrequency: "weekly", priority: 0.6 },
+    { url: `${BASE}/life`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE}/books`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE}/books/oyako-soccer-note`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE}/books/okane-toban-shinro`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },

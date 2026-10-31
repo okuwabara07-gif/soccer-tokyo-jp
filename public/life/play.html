@@ -1,0 +1,815 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>4.5万分の1｜サッカー人生シミュレーターで遊ぶ | サッカーセレクション</title>
+<meta name="description" content="年長から70歳まで、全国4.5万人のうち1人のサッカー人生を5分で。県も誕生月も家庭も選べない、統計ベースの無料シミュレーター。">
+<link rel="canonical" href="https://soccer-selection.jp/life/play">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="サッカーセレクション">
+<meta property="og:title" content="4.5万分の1｜サッカー人生シミュレーター">
+<meta property="og:description" content="年長から70歳まで、全国4.5万人のうち1人のサッカー人生を5分で。">
+<meta property="og:url" content="https://soccer-selection.jp/life/play">
+<meta property="og:image" content="https://soccer-selection.jp/life/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#14213a">
+<style>html,body{margin:0}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@500;700;800&display=swap">
+<style>
+/* Layout: スマホ縦1カラム。上に試合時計、その下に4.5万人の点の海、選手カード、1年ごとの記録 */
+:root{
+  --bg:#f4f6f9; --surface:#ffffff; --fg:#16202e; --muted:#5a6576; --line:#dde3ea;
+  --navy:#14213a; --navy-fg:#eef2f8; --navy-dim:#9aa7bc; --blue:#1d5fa8; --blue-soft:#e6eef8; --blue-ink:#ffffff;
+  --you:#e8590c; --you-ink:#c2410c; --mate:#5b9be6; --dot:#c4cfdd; --dot-off:#e9edf2;
+  --yellow:#e5b300; --red:#d93a2b; --yellow-ink:#8a6400; --red-ink:#b3261b;
+  --f-display:"Dela Gothic One","Hiragino Kaku Gothic StdN","Noto Sans JP",sans-serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;
+  --f-num:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e131c; --surface:#161d29; --fg:#e8edf5; --muted:#99a4b5; --line:#263042;
+  --navy:#0a0f18; --navy-fg:#e8edf5; --navy-dim:#8692a6; --blue:#7fb0ee; --blue-soft:#1b2a40; --blue-ink:#0b1626;
+  --you:#ff7a33; --you-ink:#ff9a5c; --mate:#7fb0ee; --dot:#3a4a64; --dot-off:#1c2433;
+  --yellow:#f2c230; --red:#ff6b5c; --yellow-ink:#f2c230; --red-ink:#ff8a7d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e131c; --surface:#161d29; --fg:#e8edf5; --muted:#99a4b5; --line:#263042;
+  --navy:#0a0f18; --navy-fg:#e8edf5; --navy-dim:#8692a6; --blue:#7fb0ee; --blue-soft:#1b2a40; --blue-ink:#0b1626;
+  --you:#ff7a33; --you-ink:#ff9a5c; --mate:#7fb0ee; --dot:#3a4a64; --dot-off:#1c2433;
+  --yellow:#f2c230; --red:#ff6b5c; --yellow-ink:#f2c230; --red-ink:#ff8a7d; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 56px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
+.wrap{max-width:620px;margin:0 auto}
+button,select,input{font:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 24px;border-radius:999px;border:0;font-weight:700;font-size:16px}
+.btn-main{background:var(--navy);color:#fff}
+:root[data-theme="dark"] .btn-main{background:var(--blue);color:var(--blue-ink)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn-main{background:var(--blue);color:var(--blue-ink)}}
+.btn-ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.btn-you{background:var(--you);color:#fff}
+
+/* スタート */
+.hero{padding-block:36px 20px;display:grid;gap:18px}
+.back{justify-self:start;font-size:13px;font-weight:700;color:var(--blue);text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:8px;align-self:start;justify-self:start;padding:4px 12px;border:1px solid var(--line);border-radius:999px;font-size:12px;font-weight:700;color:var(--muted)}
+.chip i{width:8px;height:8px;border-radius:4px;background:var(--you)}
+.big{margin:0;display:grid;gap:2px}
+.big .n{font-family:var(--f-num);font-weight:800;font-size:clamp(64px,19vw,112px);line-height:.9;letter-spacing:-.04em;color:var(--navy)}
+:root[data-theme="dark"] .big .n{color:var(--fg)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .big .n{color:var(--fg)}}
+.big .s{font-family:var(--f-display);font-weight:400;font-size:clamp(26px,7vw,40px);color:var(--blue)}
+.lead{margin:0;font-size:16px;color:var(--muted);max-width:32em}
+.starts{display:grid;gap:10px}
+.mode{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;color:var(--fg)}
+.mode:hover{border-color:var(--blue)}
+.mode .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--blue-soft);color:var(--blue)}
+.mode b{display:block;font-size:16px}
+.mode span{font-size:13px;color:var(--muted)}
+.kid{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;display:grid;gap:14px}
+.kid h2{margin:0;font-size:17px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.field select,.field input{width:100%;min-height:46px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--fg);padding:0 12px}
+.fine{font-size:12px;color:var(--muted);margin:0}
+
+/* 試合時計 */
+.clock{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--navy);color:var(--navy-fg);margin:0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:10px max(16px,env(safe-area-inset-left,0px)) 12px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 14px;align-items:center}
+.clock .min{font-family:var(--f-num);font-weight:800;font-size:30px;line-height:1;min-width:2.6em}
+.clock .gr{font-family:var(--f-display);font-size:18px;line-height:1.1}
+.clock .gr small{display:block;font-family:var(--f-body);font-size:11px;color:var(--navy-dim);font-weight:500}
+.clock .left{text-align:right;line-height:1.2}
+.clock .left b{font-family:var(--f-num);font-size:17px}
+.clock .left span{display:block;font-size:10px;color:var(--navy-dim)}
+.bar{grid-column:1/-1;position:relative;height:6px;border-radius:3px;background:rgba(255,255,255,.14);margin-top:4px}
+.bar i{position:absolute;inset:0 auto 0 0;width:0;border-radius:3px;background:var(--you);transition:width .6s ease}
+.bar b{position:absolute;top:-3px;left:75%;width:2px;height:12px;background:rgba(255,255,255,.35)}
+.bar em{position:absolute;top:9px;left:75%;transform:translateX(-50%);font-style:normal;font-size:9px;color:var(--navy-dim);font-family:var(--f-num)}
+
+/* 点の海 */
+.sea{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 12px 10px;display:grid;gap:8px}
+.sea canvas{width:100%;height:auto;display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);align-items:center}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:5px;margin-right:5px;vertical-align:0}
+
+/* 選手カード */
+.pcard{margin-top:12px;background:var(--navy);color:var(--navy-fg);border-radius:18px;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 16px;position:relative;overflow:hidden}
+.pcard::after{content:"";position:absolute;inset:8px;border:1px solid rgba(255,255,255,.08);border-radius:12px;pointer-events:none}
+.pcard .team{font-weight:700;font-size:16px;line-height:1.3}
+.pcard .sub{font-size:12px;color:var(--navy-dim)}
+.pcard .pos{font-family:var(--f-display);font-size:30px;line-height:1;text-align:right}
+.pcard .stars{color:var(--yellow);letter-spacing:2px;font-size:14px;text-align:right}
+.stats{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;border-top:1px solid rgba(255,255,255,.12);padding-top:10px}
+.stats div{display:grid;line-height:1.25}
+.stats span{font-size:10px;color:var(--navy-dim)}
+.stats b{font-family:var(--f-num);font-size:14px}
+
+/* 記録 */
+.log{list-style:none;margin:16px 0 0;padding:0;display:grid}
+.log li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;padding:7px 0;animation:in .35s ease both}
+.log li.yr{grid-template-columns:auto 1fr;gap:10px;padding:16px 0 4px;align-items:baseline;border-top:1px solid var(--line);margin-top:6px}
+.log li.yr b{font-family:var(--f-display);font-size:18px;font-weight:400}
+.log li.yr span{font-family:var(--f-num);font-size:12px;color:var(--muted)}
+.log li.ch2{border-top:2px solid var(--you);margin-top:18px}
+.log li.ch2 b{color:var(--you-ink)}
+.after{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.after div{background:var(--bg);border-radius:12px;padding:10px 12px;display:grid;line-height:1.3}
+.after span{font-size:11px;color:var(--muted)}
+.after b{font-family:var(--f-num);font-size:20px}
+.merit{margin:0;padding-left:1.1em;display:grid;gap:4px;font-size:14px}
+.ico{width:14px;height:14px;margin-top:5px;border-radius:7px;background:var(--dot)}
+.ico.good{background:var(--blue)} .ico.end{background:var(--you)}
+.ico.mild{width:10px;height:14px;border-radius:2px;background:var(--yellow);margin-left:2px}
+.ico.bad{width:10px;height:14px;border-radius:2px;background:var(--red);margin-left:2px}
+.ico.mate{background:transparent;border:2px solid var(--mate)}
+.log .t{min-width:0}
+.log li.good .t{font-weight:700;color:var(--blue)}
+.log li.mild .t{color:var(--yellow-ink)}
+.log li.bad .t{color:var(--red-ink)}
+.log li.end .t{font-weight:700}
+.log li.mate .t{font-size:13px;color:var(--muted)}
+.log li.mate .t b{color:var(--fg)}
+.log li.pick .t{font-size:13px;color:var(--muted)}
+.log li.pick .t b{color:var(--fg)}
+.tag{display:inline-block;margin-left:6px;font-size:11px;line-height:1.55;padding:0 7px;border-radius:999px;background:var(--blue-soft);color:var(--muted);font-weight:500;vertical-align:1px}
+@keyframes in{from{opacity:.001;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.log li{animation:none}.bar i{transition:none}}
+.ctrl{display:flex;justify-content:flex-end;margin-top:8px}
+.ctrl button{background:none;border:0;color:var(--blue);font-weight:700;font-size:13px;min-height:44px;padding:0 4px}
+
+/* 岐路カード */
+.cross{margin-top:16px;display:grid;gap:10px}
+.cross h3{margin:0;font-family:var(--f-display);font-weight:400;font-size:20px;line-height:1.35;text-wrap:balance}
+.cross .hint{font-size:12px;color:var(--muted)}
+.deck{display:grid;grid-auto-flow:column;grid-auto-columns:min(78%,300px);gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 14px;margin:0 -2px}
+.opt{scroll-snap-align:start;display:grid;align-content:space-between;gap:16px;text-align:left;min-height:190px;padding:18px;border-radius:20px;border:2px solid var(--line);background:var(--surface);color:var(--fg);box-shadow:0 14px 30px -22px rgba(20,33,58,.55);transition:transform .15s ease,border-color .15s ease}
+.opt:hover,.opt:focus-visible{border-color:var(--blue);transform:translateY(-3px)}
+.opt .k{font-family:var(--f-num);font-size:12px;color:var(--muted)}
+.opt b{display:block;font-size:18px;line-height:1.4}
+.opt span{font-size:13px;color:var(--muted)}
+.opt .go{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--blue)}
+
+/* 結果 */
+.result{margin-top:26px;display:grid;gap:18px}
+.endhead{background:var(--navy);color:var(--navy-fg);border-radius:22px;padding:22px;display:grid;gap:6px}
+.endhead .lab{font-size:12px;color:var(--navy-dim);font-weight:700}
+.endhead h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(28px,8vw,40px);line-height:1.2;color:#8ab8f0}
+.endhead .top{font-family:var(--f-num);font-weight:800;font-size:clamp(34px,10vw,52px);line-height:1}
+.endhead .new{justify-self:start;background:var(--you);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:10px}
+.box h3{margin:0;font-size:15px}
+.route{width:100%;height:auto;display:block}
+.cta{background:var(--blue-soft);border:2px solid var(--blue);border-radius:20px;padding:18px;display:grid;gap:10px}
+.cta b{font-size:17px;line-height:1.45}
+.cta p{margin:0;font-size:13px;color:var(--muted)}
+.cta a{justify-self:start;text-decoration:none}
+.result canvas.card{width:100%;max-width:100%;height:auto;border-radius:16px;border:1px solid var(--line)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.toast{font-size:13px;color:var(--blue);min-height:1.4em}
+.redo{display:grid;gap:8px}
+.redo .q{display:grid;gap:6px;border-top:1px dashed var(--line);padding-top:8px}
+.redo .q:first-child{border-top:0;padding-top:0}
+.redo .q span{font-size:13px;color:var(--muted)}
+.redo .alts{display:flex;gap:8px;flex-wrap:wrap}
+.redo .alts button{background:var(--bg);border:1px solid var(--line);color:var(--fg);border-radius:999px;padding:6px 14px;font-size:13px;min-height:40px}
+.redo .alts button:hover{border-color:var(--blue)}
+.zukan{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.zukan div{border:1px solid var(--line);border-radius:12px;padding:8px 6px;text-align:center;font-size:11px;line-height:1.35;min-height:64px;display:grid;place-content:center;gap:2px;color:var(--muted);background:var(--bg)}
+.zukan div.got{background:var(--blue-soft);color:var(--fg);border-color:var(--blue);font-weight:700}
+.zukan div.now{border-color:var(--you);box-shadow:0 0 0 2px var(--you) inset}
+.zukan div i{font-style:normal;font-size:16px}
+.src{margin-top:30px;font-size:12px;color:var(--muted)}
+.src summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}
+.src ul{padding-left:1.2em}
+.src a{color:inherit}
+@media (max-width:380px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.zukan{grid-template-columns:repeat(3,minmax(0,1fr))}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <section id="start" class="hero">
+    <a class="back" href="/life">4.5万分の1 トップへ</a>
+    <div class="chip"><i></i>サッカー人生シミュレーター・無料</div>
+    <h1 class="big"><span class="n">45,000</span><span class="s">分の、あなた。</span></h1>
+    <p class="lead">小学生でサッカー選手として登録している子は1学年およそ4.5万人。毎年プロになるのは約180人。その中の1人として、年長の春から70歳までを5分で生きる。プロにならなかった人生にも、サッカーは続いていく。</p>
+    <div class="starts" id="starts">
+      <button class="mode" id="goRandom"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor"/></svg></span><span><b>ランダムに生まれる</b><span>県も誕生月も家庭も、統計の確率で決まる</span></span></button>
+      <button class="mode" id="goKid"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="7.5" r="3.5"/><path d="M5 20c1.2-4 4-6 7-6s5.8 2 7 6"/></svg></span><span><b>うちの子の条件で始める</b><span>県・誕生月・学年・身長を入れて、その条件で生きる</span></span></button>
+    </div>
+    <form class="kid" id="kidForm" hidden>
+      <h2>うちの子の条件</h2>
+      <div class="grid2">
+        <div class="field"><label for="kPref">住んでいる都道府県</label><select id="kPref"></select></div>
+        <div class="field"><label for="kMonth">生まれ月</label><select id="kMonth"></select></div>
+        <div class="field"><label for="kGrade">いまの学年</label><select id="kGrade"></select></div>
+        <div class="field"><label for="kHeight">いまの身長（cm）</label><input id="kHeight" type="number" inputmode="decimal" min="90" max="200" step="0.1" value="146.0"></div>
+      </div>
+      <p class="fine">身長は同じ学年の全国平均と比べて体格の個性に変換します。入力内容は保存されません。</p>
+      <div class="row"><button class="btn btn-main" type="submit">この条件で年長から始める</button><button class="btn btn-ghost" type="button" id="kidBack">戻る</button></div>
+    </form>
+  </section>
+
+  <section id="game" hidden>
+    <div class="clock">
+      <div class="min num" id="cMin">0′</div>
+      <div class="gr" id="cGr">年長<small>キックオフ</small></div>
+      <div class="left"><b id="cLeft">45,000</b><span id="cLeftL">まだ続けている同学年</span></div>
+      <div class="bar" aria-hidden="true"><i id="cBar"></i><b></b><em>90′</em></div>
+    </div>
+    <div class="sea">
+      <canvas id="dots" width="900" height="400" aria-label="同じ学年でサッカーを始めた子どもたちの点。年を追うごとに減っていく"></canvas>
+      <div class="legend"><span><i style="background:var(--you)"></i>あなた</span><span><i style="background:var(--mate)"></i>同じチームの5人</span><span><i style="background:var(--dot)"></i>点1つ＝約50人</span></div>
+    </div>
+    <div class="pcard" id="pcard"></div>
+    <ol class="log" id="log"></ol>
+    <div id="choice"></div>
+    <div class="ctrl"><button id="skip" type="button">この年代を一気に進める</button></div>
+    <section id="result" class="result" hidden></section>
+  </section>
+
+  <details class="src">
+    <summary>統計の出典と精度</summary>
+    <ul>
+      <li><a href="https://www.jfa.jp/about_jfa/organization/databox/player.html" target="_blank" rel="noopener">JFA サッカー選手登録数 2025年度</a>：誕生する都道府県の比率、各年代の1学年人数、1チームあたりの人数</li>
+      <li><a href="https://www.jleague.jp/news/article/14061/" target="_blank" rel="noopener">Jリーグ 新人研修参加者の出身内訳</a>：プロ入りの経路</li>
+      <li><a href="https://bunshun.jp/articles/-/40137" target="_blank" rel="noopener">2020年Jリーガー1,606人の生まれ月</a>：4〜6月生まれ32.8%、1〜3月生まれ14.6%</li>
+      <li>文部科学省 学校保健統計調査 令和6年度：年齢別の平均身長</li>
+      <li><a href="https://web.gekisaka.jp/news/jleague/detail/?415650-415650-fl" target="_blank" rel="noopener">Jリーグ選手契約制度の改定</a>：1年目の年俸上限、年俸下限</li>
+      <li>日本プロサッカー選手会：Jリーガーの平均引退年齢26歳</li>
+    </ul>
+    <p>16万回の自動プレイで照合：プロ入り1学年約177人（実績約180人）、経路 大学55%・ユース28%・高校16%（実績52・31・13%）、プロの4〜6月生まれ35%・1〜3月生まれ15%（実績33%・15%）、平均引退26.7歳（実績26.0歳）。親の負担、ケガ、トレセン選出率、年俸の中央値は想定値です。</p>
+  </details>
+</div>
+
+<script>
+// サッカー人生シミュレーター エンジン v2（ブラウザ／Node共用）
+// 統計：JFA登録者数2025・学校保健統計2024・Jリーグ新人内訳・Jリーガー生まれ月2020・選手契約制度2026
+const PREFS = [
+["北海道",31968,"北海道",1174],["青森県",6601,"東北",253],["岩手県",7345,"東北",269],["宮城県",13530,"東北",464],["秋田県",4098,"東北",155],["山形県",7427,"東北",248],["福島県",9817,"東北",351],
+["茨城県",22535,"関東",712],["栃木県",14014,"関東",483],["群馬県",13447,"関東",487],["埼玉県",50203,"関東",1605],["千葉県",42805,"関東",1115],["東京都",93508,"関東",2236],["神奈川県",54081,"関東",1675],["山梨県",8046,"関東",230],
+["長野県",13471,"北信越",507],["新潟県",12651,"北信越",411],["富山県",6317,"北信越",211],["石川県",8486,"北信越",269],["福井県",5770,"北信越",191],
+["静岡県",35399,"東海",959],["愛知県",43111,"東海",1148],["三重県",11322,"東海",374],["岐阜県",13346,"東海",406],
+["滋賀県",10043,"関西",335],["京都府",18108,"関西",572],["大阪府",38735,"関西",1244],["兵庫県",39796,"関西",1184],["奈良県",8045,"関西",281],["和歌山県",5683,"関西",204],
+["鳥取県",4999,"中国",190],["島根県",5611,"中国",188],["岡山県",12860,"中国",427],["広島県",16499,"中国",518],["山口県",9063,"中国",319],
+["香川県",7866,"四国",238],["徳島県",6023,"四国",234],["愛媛県",10029,"四国",361],["高知県",5528,"四国",210],
+["福岡県",26657,"九州",813],["佐賀県",7957,"九州",260],["長崎県",11184,"九州",374],["熊本県",14868,"九州",455],["大分県",10152,"九州",342],["宮崎県",8900,"九州",301],["鹿児島県",14573,"九州",518],["沖縄県",13820,"九州",474]];
+const MONTHS = [4,5,6,7,8,9,10,11,12,1,2,3];
+// 学校保健統計（令和6年度・男子・全国平均身長cm）
+const HEIGHT = {5:110.6,6:116.7,7:122.6,8:128.5,9:134.0,10:139.7,11:146.0,12:154.0,13:161.1,14:166.1,15:168.6,16:169.9,17:170.8};
+const HSD = {5:4.7,6:4.9,7:5.1,8:5.4,9:5.7,10:6.2,11:7.0,12:7.9,13:7.8,14:6.9,15:6.1,16:5.9,17:5.8}; // 想定：年齢別のばらつき
+const TEAMS = {
+  kinder:   {name:"幼稚園のサッカー教室", env:0.8, fee:4000, extra:10000, toban:0, drive:1},
+  kids:     {name:"キッズスクール", env:1.0, fee:6000, extra:15000, toban:0, drive:2},
+  park:     {name:"公園でボール遊び", env:0.5, fee:0, extra:0, toban:0, drive:0},
+  shonen:   {name:"少年団", env:0.6, fee:3000, extra:50000, toban:2, drive:3},
+  machi12:  {name:"街クラブ", env:1.0, fee:8000, extra:100000, toban:1, drive:4},
+  jac12:    {name:"JクラブU-12", env:1.6, fee:10000, extra:120000, toban:0, drive:6},
+  bukatsu15:{name:"中学部活", env:0.6, fee:0, extra:60000, toban:0, drive:1},
+  machi15:  {name:"街クラブJY", env:1.0, fee:15000, extra:200000, toban:1, drive:5},
+  jac15:    {name:"JクラブU-15", env:1.6, fee:15000, extra:180000, toban:0, drive:6},
+  koritsu:  {name:"高校部活", env:0.6, fee:7000, extra:150000, toban:0, drive:1},
+  kyogo:    {name:"強豪校", env:1.3, fee:60000, extra:300000, toban:0, drive:0},
+  jac18:    {name:"JクラブU-18", env:1.6, fee:15000, extra:200000, toban:0, drive:3},
+  univ:     {name:"大学サッカー部", env:1.0, fee:0, extra:0, toban:0, drive:0},
+};
+const POS = {GK:"GK", DF:"DF", MF:"MF", FW:"FW"};
+// 判定のしきい値（6万回シミュレーションで統計に合わせて調整）
+const T = { jac12:2.25, jac15:2.0, jac15in:1.2, machi15:0.2, jac18:2.25, jac18in:1.45, kyogoRec:1.3,
+  proHS:3.37, univRec:1.15, proUni:3.15, jfl:2.0, raeK:1.05 };
+// シミュレーションで測った実際の確率（RATESは calibrate 後に埋める）
+let RATES = {};
+const TRECEN = [["地区トレセン",1.05],["都道府県トレセン",1.9],["地域トレセン（9地域）",2.6],["ナショナルトレセン",3.6]];
+
+function rngFrom(seed){ let a = seed>>>0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const pctTag = (k) => RATES[k]!=null ? (RATES[k] >= 10 ? Math.round(RATES[k]) : RATES[k] >= 1 ? RATES[k].toFixed(1) : RATES[k].toFixed(2)) : null;
+
+function* life(seed, opt){
+  opt = opt || {};
+  const R = rngFrom(seed);
+  const norm = () => { let u=0,v=0; while(!u) u=R(); while(!v) v=R(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
+  const pick = arr => arr[Math.floor(R()*arr.length)];
+  const total = PREFS.reduce((s,p)=>s+p[1],0);
+  let r = R()*total, pi = 0; while(r > PREFS[pi][1]) { r -= PREFS[pi][1]; pi++; }
+  if (opt.prefIdx!=null) pi = opt.prefIdx;
+  const P = PREFS[pi];
+  const st = {
+    seed, prefIdx:pi, pref:P[0], region:P[2], small: P[1] < 9000, perTeam: Math.round(P[1]/P[3]),
+    mIdx: Math.floor(R()*12), wealth: R()<0.3?0:(R()<0.75?1:2), growth: pick(["早熟","普通","普通","晩熟"]),
+    hz: norm(), talent: 50 + 10*norm(), dev: 0, effort: 0.5, team:null, teamFit:0, injuredYear:false,
+    age:5, cost:0, toban:0, drive:0, level:0, career:[], pro:null, ending:"", pos:null, trecen:-1, height:0,
+    earn:0, f:{}
+  };
+  st.month = MONTHS[st.mIdx];
+  if (opt.mIdx!=null) { st.mIdx = opt.mIdx; st.month = MONTHS[st.mIdx]; }
+  if (opt.hz!=null) st.hz = opt.hz;
+  if (opt.growth) st.growth = opt.growth;
+  const heightAt = a => { const k = Math.min(17, Math.max(5, a)); let h = HEIGHT[k] + st.hz*HSD[k];
+    const sh = a>=10 && a<=15 ? [0,0,0,0,1.5,3,3.5,3,2,1][a-6]||0 : 0; if (st.growth==="早熟") h += sh; if (st.growth==="晩熟") h -= sh; return Math.round(h*10)/10; };
+  const rae = () => { const base = (5.5 - st.mIdx)*T.raeK; return st.age<=15 ? base : st.age<=18 ? base/2 : 0; };
+  const body = () => { const a = Math.min(17,st.age); if (a < 10) return 0; const zH = (heightAt(st.age) - HEIGHT[a]) / HSD[a]; return zH * (a<=15 ? 1.6 : 0.6); };
+  const abil = () => st.talent + st.dev + rae() + body();
+  const z = (noise=0.55) => (abil()-50)/10 + noise*norm();
+  const setTeam = key => { st.team=key; st.teamFit = (R()-0.5)*0.8; st.career.push({age:st.age, team:TEAMS[key].name}); };
+  const log = (txt, tone, tag) => ({t:"log", age:st.age, txt, tone, tag});
+  const year = function*(lines){
+    st.injuredYear = false; st.height = heightAt(st.age);
+    const tm = TEAMS[st.team];
+    if (st.age < 18 && tm){ st.cost += tm.fee*12 + tm.extra; st.toban += tm.toban*12; st.drive += tm.drive*48; }
+    const injP = 0.05 + st.effort*0.05;
+    if (R() < injP){ const bad = R()<0.3; if(bad){ st.injuredYear=true; st.dev -= 1.2; st.f.bigInj=(st.f.bigInj||0)+1;
+        yield log(pick(["右膝の靭帯を痛め、半年以上ボールを蹴れなかった。","疲労骨折で長期離脱。試合をスタンドから見る1年になった。","足首の大ケガ。復帰しても、元の感覚が戻るまで時間がかかった。"]), "bad", pctTag("bigInj") && `長期離脱は1人あたり一生で${pctTag("bigInj")}%`); }
+      else yield log(pick(["捻挫で1か月離脱。","打撲で大会を1つ欠場した。", st.age>=10&&st.age<=14?"オスグッドで練習を控えた時期があった。":"太ももの肉離れで3週間離脱。"]), "mild"); }
+    if (!st.injuredYear) st.dev += tm.env*0.9 + st.effort*0.8 + st.teamFit + norm()*0.9 - 1.17;
+    for (const l of (lines||[])) if (l) yield (typeof l === "string" ? log(l) : l);
+    st.age++;
+  };
+  const choose = function*(q, opts){ const v = yield {t:"choice", age:st.age, q, opts:opts.map(o=>({label:o[1], note:o[2]||""}))}; const i = (v==null||v<0||v>=opts.length)?0:v; return opts[i][0]; };
+  const quit = function*(txt, lvl, label){ st.level = Math.max(st.level,lvl); st.ending = label; yield log(txt, "end"); st.endAge = st.age; yield {t:"end", st}; yield* afterLife(); yield {t:"end2", st}; return st; };
+  const trecen = function*(){
+    const zz = z(0.4); let got = -1; for (let i=0;i<TRECEN.length;i++) if (zz > TRECEN[i][1]) got = i;
+    if (got > st.trecen){ st.trecen = got; const name = TRECEN[got][0]; st.f["tr"+got]=1;
+      yield log(`${name}に選ばれた。`, got>=2?"good":null, pctTag("tr"+got) && `同学年の約${pctTag("tr"+got)}%`); }
+  };
+  const heightLine = () => { const h = heightAt(st.age), a = Math.min(17,st.age), d = h - HEIGHT[a];
+    return log(`身長${h.toFixed(1)}cm。全国平均（${HEIGHT[a]}cm）より${Math.abs(d).toFixed(1)}cm${d>=0?"高い":"低い"}。`, null, "学校保健統計 2024"); };
+
+  yield {t:"birth", st:{pref:st.pref, region:st.region, month:st.month, wealth:["切りつめ家計","ふつうの家計","ゆとりのある家計"][st.wealth], growth:st.growth, perTeam:st.perTeam, height:heightAt(5)}, ref:st};
+  // ── 年長 ──
+  const c0 = yield* choose("年長の春。サッカーとの出会いは？", [["kinder","幼稚園のサッカー教室","月4,000円・園庭で週1回"],["kids","地域のキッズスクール","月6,000円・送迎あり"],["park","公園で親とボール遊び","0円"]]);
+  setTeam(c0);
+  yield* year([log(c0==="park"?"休みの日は公園で、親とボールを蹴った。":`${TEAMS[c0].name}に通い始めた。最初はボールより虫が気になった。`), heightLine()]);
+  // ── 小学 ──
+  st.level = 1;
+  const c1 = yield* choose("小1の春。どこでボールを蹴る？", [["shonen","地元の少年団","月3,000円・当番あり"],["machi12","街クラブ", st.wealth===0?"月8,000円・家計はきつい":"月8,000円・送迎は週4時間"]]);
+  setTeam(c1);
+  yield* year([log(`${TEAMS[c1].name}に入った。同じ学年でボールを蹴り始めた子は全国に約4.5万人。`, null, "JFA第4種 270,188人÷6"), log(`${st.pref}には1チームあたり約${st.perTeam}人の登録選手がいる。`, null, "JFA都道府県別 2025")]);
+  yield* year([pick(["初めての公式戦。ボールに全員で群がる“団子サッカー”だった。","リフティングが10回を超えた。","コーチに名前を覚えてもらえた。"])]);
+  yield* year([abil()>55?"学年のなかで目立つ存在になってきた。":pick(["ベンチの時間が長い試合もあった。","練習には休まず通った。"]), heightLine()]);
+  // 小4：ポジション
+  { const hz = (heightAt(9)-HEIGHT[9])/HSD[9]; const w = [hz>0.8?0.25:0.05, 0.3+Math.max(0,hz)*0.1, 0.35, 0.3];
+    let s=w.reduce((a,b)=>a+b), x=R()*s, k=0; while(x>w[k]){x-=w[k];k++;} st.pos = ["GK","DF","MF","FW"][k]; }
+  const c2 = yield* choose("小4。もっと上を目指す？", [["both","Jクラブのセレクションを受け、スクールにも通う","月+5,000円"],["sel","セレクションだけ受ける",""],["stay","今のチームで楽しむ",""]]);
+  if (c2==="both"){ st.dev += 0.6; st.cost += 5000*12*3; st.drive += 2*48*3; }
+  if (c2!=="stay"){ st.f.tryJ12=1; if (z() > T.jac12 + (st.small?0.3:0)){ st.f.passJ12=1; setTeam("jac12");
+      yield* year([log("JクラブU-12のセレクションに合格。", "good", pctTag("passJ12") && `受験者の合格率 約${pctTag("passJ12")}%`), `ポジションは${st.pos}。`]); }
+    else yield* year([log("JクラブU-12のセレクションは不合格。悔しくて帰りの車で泣いた。", "mild", pctTag("passJ12") && `受験者の合格率 約${pctTag("passJ12")}%`), `ポジションは${st.pos}に決まった。`]); }
+  else yield* year([pick(["週末は友だちとボールを蹴るのが一番楽しかった。","チームの夏合宿で、初めて親元を離れた。"]), `ポジションは${st.pos}に決まった。`]);
+  yield* year([...[...trecen()], pick(["全日本U-12選手権の都道府県予選に出た。","6年生にまじって試合に出た。","バーモントカップ（フットサル）の予選に出た。"])]);
+  yield* year([heightLine(), `小学生年代が終わる。${st.region}の${st.pref}で、6年間を戦った。`]);
+  // ── 中学 ──
+  if (R() < 0.05) return yield* quit("中学では別の部活を選び、サッカーは小学校で卒業した。", 1, "小学校で卒業");
+  st.level = 2;
+  const inJ = st.team==="jac12";
+  let c3 = yield* choose("中学年代はどこでプレーする？", [["jac15", inJ?"JクラブU-15へ昇格を目指す":"JクラブU-15のセレクションを受ける", inJ?"内部昇格の判定":"倍率は数十倍"],["machi15","街クラブJYのセレクションを受ける","月15,000円・遠征多め"],["bukatsu15","中学の部活に入る","費用は少ない"]]);
+  const pre = [];
+  if (c3==="jac15"){ st.f.tryJ15=1; if (z() > (inJ?T.jac15in:T.jac15)) { st.f.passJ15=1; setTeam("jac15"); pre.push(log(inJ?"JクラブU-15に昇格した。":"JクラブU-15のセレクションに合格。", "good", !inJ && pctTag("passJ15") && `受験者の合格率 約${pctTag("passJ15")}%`)); }
+    else { pre.push(log(inJ?"JクラブU-15への昇格は見送られた。":"JクラブU-15のセレクションは不合格。", "mild", !inJ && pctTag("passJ15") && `受験者の合格率 約${pctTag("passJ15")}%`)); c3 = z() > T.machi15 ? "machi15":"bukatsu15"; } }
+  if (c3==="machi15" && st.team!=="jac15"){ if (z() > T.machi15) setTeam("machi15"); else { pre.push(log("街クラブJYは不合格。部活でやると決めた。", "mild")); setTeam("bukatsu15"); } }
+  if (c3==="bukatsu15") setTeam("bukatsu15");
+  yield* year([...pre, log(`${TEAMS[st.team].name}で中学年代がスタート。同学年の登録選手は約7.2万人（部活を含む）。`, null, "JFA第3種 216,612人÷3"),
+    st.growth==="早熟"?"体が一気に大きくなり、当たり負けしなくなった。":st.growth==="晩熟"?"周りの子が急に大きくなり、体格差に苦しんだ。":""]);
+  const c4 = yield* choose("中学の3年間、練習量はどうする？", [["mid","チームの練習をしっかり",""],["high","毎朝の自主練も追加","伸びるがケガも増える"],["low","勉強と両立して控えめに",""]]);
+  st.effort = c4==="high"?1:c4==="low"?0.1:0.5;
+  yield* year([heightLine(), pick(["夏の大会で初めてスタメンに入った。","U-13リーグで1年戦い抜いた。","監督が代わり、ポジションの役割が変わった。"])]);
+  yield* year([...[...trecen()], abil()>62?"高校のスカウトが練習を見に来るようになった。":pick(["高校をどこにするか、親と話す夜が増えた。","3年最後の大会は地区予選で敗退した。"])]);
+  // ── 高校 ──
+  if (R() < 0.32 && abil() < 55) return yield* quit("高校ではサッカーを続けなかった。中学で区切りをつけた。", 2, "中学で卒業");
+  st.level = 3;
+  const inJ15 = st.team==="jac15";
+  let c5 = yield* choose("中3の秋。高校年代の進路は？", [["jac18", inJ15?"JクラブU-18への昇格を目指す":"JクラブU-18のセレクションを受ける", inJ15?"昇格は半数以下":"狭き門"],["kyogo","全国常連の強豪校へ","寮生活・月6万円前後"],["koritsu","地元の高校のサッカー部","通学も費用も軽い"],["quit","高校ではサッカーをやめる",""]]);
+  if (c5==="quit") return yield* quit("サッカー部には入らず、高校生活を別のことに使った。", 2, "中学で卒業");
+  const pre2 = [];
+  if (c5==="jac18"){ st.f.tryJ18=1; if (z() > (inJ15?T.jac18in:T.jac18)) { st.f.passJ18=1; setTeam("jac18"); pre2.push(log(inJ15?"JクラブU-18に昇格した。":"JクラブU-18のセレクションに合格。","good")); }
+    else { pre2.push(log(inJ15?"U-18への昇格は叶わなかった。":"U-18のセレクションは不合格。", "mild")); c5 = z() > T.kyogoRec ? "kyogo" : "koritsu"; } }
+  if (c5==="kyogo" && st.team!=="jac18"){ setTeam("kyogo"); if (z() <= T.kyogoRec){ st.teamFit -= 0.9; pre2.push(log("推薦は取れず一般入学。部員は200人近く、まずはCチームからだった。","mild")); } else { st.f.rec=1; pre2.push(log("スポーツ推薦で強豪校に入学した。","good")); } }
+  if (c5==="koritsu") setTeam("koritsu");
+  const lg = `プリンスリーグ${st.region}`;
+  yield* year([...pre2, log(`${TEAMS[st.team].name}で高校年代へ。登録選手は1学年約5万人に減った。`, null, "JFA第2種 148,967人÷3")]);
+  yield* year([heightLine(), abil()>68?`${lg}で出場を重ね、スカウトの姿を見かけるようになった。`:pick(["Bチームで公式戦に出た。","選手権予選はスタンドから応援した。","県リーグで1年間戦った。"])]);
+  // 高3：トレセン・選手権
+  const hs = [...trecen()];
+  if (st.team!=="jac18" && st.team){ const zz = z(0.6) + (st.team==="kyogo"?0.9:0);
+    if (zz > 3.0){ st.f.senshuken=1; hs.push(log("全国高校サッカー選手権に出場。国立のピッチには届かなかったが、テレビに名前が映った。","good", pctTag("senshuken") && `同学年の約${pctTag("senshuken")}%が経験`)); }
+    else hs.push(pick(["選手権の都道府県予選、あと1勝で全国だった。","選手権予選は2回戦で敗れた。","最後の選手権予選、ベンチから声を出し続けた。"])); }
+  else hs.push(abil()>70?"プレミアリーグで強豪ユースと渡り合った。":"クラブユース選手権の予選を戦った。");
+  const offer = (z(0.5) > T.proHS && st.team!=="koritsu") || (z(0.5) > T.proHS+0.6);
+  if (offer) { st.f.offerHS=1; hs.push(log("Jクラブからオファーが届いた。","good")); }
+  yield* year(hs);
+  // ── 18歳 ──
+  const opts22 = [];
+  if (offer) opts22.push(["pro","プロ契約を結ぶ","1年目の年俸は上限1,200万円"]);
+  opts22.push(["univ", z()>T.univRec?"推薦で大学サッカー部へ":"大学に入りサッカー部に挑戦", ""]);
+  opts22.push(["work","就職・進学してサッカーは趣味に",""]);
+  const c6 = yield* choose("高3の冬。次の4年をどうする？", opts22);
+  if (c6==="work") return yield* quit("サッカーは週末の楽しみになった。社会人リーグやフットサルで、ボールは蹴り続けた。", 3, "高校で卒業");
+  if (c6==="pro") return yield* proCareer("hs");
+  st.level = 4;
+  setTeam("univ"); const rec = z() > T.univRec; if (!rec) st.teamFit -= 0.7;
+  yield* year([rec?"推薦で大学のサッカー部に入った。関東・関西の1部には元ユース代表がそろう。":"一般入部で大学のサッカー部へ。4年間で公式戦に出られるかの勝負になった。"]);
+  yield* year([pick(["2年で初めてトップチームの試合に出た。","リーグ戦の途中から、スタメンに定着した。","Iリーグ（大学の下位リーグ）で経験を積んだ。"])]);
+  yield* year([abil()>70?"特別指定選手としてJクラブの練習に呼ばれた。":"就職活動とサッカーの両立が始まった。"]);
+  const offer2 = z(0.5) > T.proUni;
+  if (offer2) st.f.offerUni=1;
+  yield* year([offer2?log("大学4年の夏、Jクラブから加入内定のオファー。","good"):"プロからの声はかからなかった。"]);
+  const opts23 = [];
+  if (offer2) opts23.push(["pro","プロ契約を結ぶ","大卒でプロへ"]);
+  if (z() > T.jfl) opts23.push(["jfl","JFL・地域リーグのクラブへ","働きながらプレー"]);
+  opts23.push(["work","就職する","サッカーは区切り"]);
+  const c7 = yield* choose("大学4年。卒業後は？", opts23);
+  if (c7==="pro") return yield* proCareer("uni");
+  if (c7==="jfl"){ st.level = 5; yield log("JFL・地域リーグのクラブに入った。昼は会社員、夜と週末に練習する生活。","good"); st.age=26; return yield* quit("26歳。JFL・地域リーグで4年間戦い抜いた。", 5, "JFL・地域リーグでプレー"); }
+  return yield* quit("就職して社会人になった。大学4年間の部活は、一生ものの仲間を残した。", 4, "大学で卒業");
+
+  function* afterLife(){
+    const A = st.after = {friends:0, kids:0, refs:0, years:0, playing:false, title:"", job:"", lic:"", child:false, back:false, mode:""};
+    const at = a => { st.age = Math.max(st.age, a); };
+    A.friends = new Set(st.career.map(c=>c.team)).size*18 + (st.pro ? st.pro.years*25 : 0);
+    if (st.age < 22){
+      at(16);
+      yield log(st.age<18 ? "部活には入らなくても、昼休みと週末のフットサルでボールは蹴り続けた。" : "大学ではサークルでボールを蹴った。勝ち負けより、仲間と笑う時間が増えた。");
+      A.years += 3; at(22);
+    }
+    const jobs = st.pro
+      ? [["coach","指導者の道へ","ライセンスを取りアカデミーで教える"],["staff","クラブスタッフ・スカウト","選手を見つけ、支える側へ"],["biz","一般企業に就職","ゼロから社会人1年生"],["school","サッカースクールを開く","自分の名前で子どもを教える"]]
+      : [["biz","会社員（営業・企画）","土日は自由に使える"],["teacher","教員になり部活の顧問","サッカー部を受け持つ"],["pt","理学療法士・トレーナー","ケガをした選手を支える"],["sports","スポーツ用品メーカーに就職","スパイクやボールを作る側へ"]];
+    const job = yield* choose(st.pro ? `${st.age}歳。引退後の仕事は？` : `${st.age}歳。どんな仕事に就く？`, jobs);
+    A.job = jobs.find(j=>j[0]===job)[1];
+    yield log({coach:"JFAの指導者ライセンスを取り、アカデミーのコーチになった。", staff:"クラブのスカウトになり、週末は全国の試合を見て回るようになった。", biz:"会社員になった。名刺を渡すと「サッカーやってたんですか」と話が弾む。", school:"自分のサッカースクールを開いた。最初の生徒は12人だった。", teacher:"中学校の教員になり、サッカー部の顧問を任された。", pt:"理学療法士の資格を取り、スポーツ整形の病院で働き始めた。", sports:"スポーツ用品メーカーに入り、少年用スパイクの企画を担当した。"}[job], "good");
+    if (job==="coach"||job==="school"||job==="teacher"){ A.lic = "C級"; A.kids += 20; }
+    st.age++;
+    const f = yield* choose(`${st.age}歳。これからサッカーとどう付き合う？`, [["club", st.level>=4 ? "社会人チームで上を目指す" : "社会人チームでプレーを続ける", "都道府県リーグから地域リーグへ"],["futsal","フットサルで週1回","仕事帰りに仲間と"],["coachv","週末だけ少年団のコーチ","D級ライセンスから"],["ref","審判の資格を取る","4級から始められる"],["rest","いったんボールを置く","いつでも戻れる"]]);
+    A.mode = f;
+    if (f==="club"){ A.playing = true; yield log("社会人チームに入った。平日は仕事、土日は都道府県リーグ。", null, "JFA第1種登録 121,696人"); }
+    if (f==="futsal"){ A.playing = true; yield log("会社の同期とフットサルチームを作った。月4回、夜の人工芝が楽しみになった。"); }
+    if (f==="coachv"){ A.lic = A.lic || "D級"; A.kids += 15; yield log("地元の少年団でコーチを始めた。日曜の朝は子どもたちと一緒に走る。", null, "JFA指導者登録 101,764人"); }
+    if (f==="ref"){ A.refs += 10; yield log("4級審判の資格を取った。初めて笛を吹いた試合は、緊張で手が震えた。", null, "JFA審判登録 284,569人"); }
+    if (f==="rest") yield log("仕事に集中するため、ボールを置いた。スパイクは押し入れの奥へ。");
+    at(27);
+    if (f==="club"){
+      const zz = z(0.6);
+      if (zz > 1.4 && !st.pro){
+        const d = yield* choose(`${st.age}歳。JFL入りを目指す地域リーグのクラブから声がかかった。`, [["go","挑戦する","仕事と両立。練習は夜"],["stay","今のチームと仕事を大事にする",""]]);
+        if (d==="go"){ A.dream = true; yield log(R()<0.35 ? "地域リーグで優勝し、全国地域チャンピオンズリーグに出場した。夢の続きは、まだ終わっていなかった。" : "地域リーグで2シーズン戦った。昇格には届かなかったが、毎試合が高校の頃のように濃かった。", "good"); }
+        else yield log("都道府県リーグで戦い続け、キャプテンを任された。");
+      } else yield log(pick(["都道府県リーグ1部で優勝した。","全国社会人サッカー選手権の県予選で決勝まで進んだ。","天皇杯の県予選に出場した。"]), zz>1?"good":null);
+      A.years += 8;
+    } else if (f==="futsal"){ A.years += 8; yield log(pick(["フットサルの社会人リーグに参戦した。","会社対抗の大会で優勝した。"])); }
+    else if (f==="coachv" || A.lic){ A.kids += 40; A.years += 4; if (A.lic==="D級"||!A.lic) A.lic = "C級"; yield log(pick(["C級ライセンスを取った。教え子が県トレセンに選ばれた。","C級ライセンスを取った。チームが市の大会で初優勝した。"]), "good", "C級指導者は全国30,038人"); }
+    else if (f==="ref"){ A.refs += 120; yield log("3級審判に昇級。高校の公式戦で主審を務めるようになった。", "good", "3級審判は全国37,492人"); }
+    else yield log("仕事で大きなプロジェクトを任された。チームで勝つ感覚は、サッカーで覚えたものだった。");
+    at(35);
+    if (R() < 0.6){ A.child = true; yield log(`${pick(["長男","長女","次男"])}が年長になり、ボールを蹴り始めた。今度は自分が当番と送迎をする側になった。`, "good");
+      if (f==="rest"){ A.back = true; A.playing = true; yield log("子どもの少年団で「お父さんチーム」に誘われ、10年ぶりにスパイクを履いた。何歳からでも戻れる。", "good"); } }
+    else if (f==="rest" && R()<0.5){ A.back = true; A.playing = true; yield log("同窓会で再会した仲間と、またボールを蹴り始めた。何歳からでも戻れる。", "good"); }
+    at(40);
+    if (A.playing || A.lic || f==="ref"){ A.years += 10; A.friends += 30; yield log("40歳。O-40のシニアチームに登録した。シニアにも全国大会がある。", null, "JFAシニア登録 51,172人"); }
+    else yield log("40歳。テレビでJリーグを見ながら、子どもにリフティングを教えた。");
+    if (A.lic){ at(45); A.kids += 120; A.lic = "B級"; yield log(pick(["B級ライセンスを取り、ジュニアユースの監督になった。","B級ライセンスを取った。教え子がJクラブのアカデミーに合格した。","B級ライセンスを取った。教え子が高校選手権のピッチに立った。"]), "good", "B級指導者は全国9,180人");
+      if (R() < A.kids*0.003){ A.proPupil = true; yield log("かつての教え子が、Jリーガーになった。", "good"); } }
+    if (f==="ref"){ at(48); A.refs += 300; yield log("審判として通算400試合を超えた。"); }
+    at(50);
+    const still50 = A.playing || A.back || !!A.lic || R()<0.3;
+    if (still50){ A.years += 10; yield log("50歳。O-50の大会に出た。走れる距離は減ったが、パスの読みは若い頃よりうまい。"); }
+    else yield log("50歳。久しぶりにスタジアムへ行き、声を出して応援した。");
+    at(60);
+    if (still50 && R()<0.75){ A.years += 10; yield log("60歳。O-60のチームで、同じ年にボールを蹴り始めた仲間と再会した。"); }
+    at(70);
+    const at70 = still50 && R()<0.6;
+    if (at70){ A.years += 10; yield log("70歳。O-70の大会と、走らずにプレーするウォーキングフットボールに通っている。", "good"); }
+    else yield log(pick(["70歳。孫の試合を見に行くのが、週末いちばんの楽しみだ。","70歳。地元の少年団の試合で、ボランティアの副審として旗を振っている。"]));
+    A.at70 = at70;
+    A.title = A.proPupil ? "Jリーガーを育てた指導者" : at70 ? "70歳でもボールを蹴る人" : A.dream ? "夢をあきらめなかった社会人選手" : A.refs>=300 ? "400試合の笛を吹いた審判" : A.lic ? `${A.kids}人を教えたコーチ` : A.back ? "何歳からでも戻ってきた人" : A.child ? "当番をする側になった元サッカー少年" : "サッカーが好きなままの大人";
+    A.career = (st.endAge - 5) + A.years;
+    yield log(`第2章の称号：「${A.title}」`, "end");
+  }
+
+  function* proCareer(route){
+    st.effort = 0.5; st.f.pro = route;
+    const lv = {J3:6, J2:7, J1:8}, MIN = {J1:480, J2:360, J3:240}, MED = {J1:1600, J2:650, J3:380};
+    let tier = abil() > 84 ? "J1" : abil() > 78 ? "J2" : "J3";
+    st.pro = {start:st.age, years:0, best:tier, caps:false, abroad:false, peak:0};
+    st.level = Math.max(st.level, lv[tier]);
+    const route_ = route==="hs" ? (st.team==="jac18"?"ユースから":"高卒で") : "大卒で";
+    yield log(`${st.age}歳、${route_}${tier}のクラブとプロ契約。ポジションは${st.pos}。`, "good", `新人は毎年約180人・${route==="uni"?"大卒が52%":st.team==="jac18"?"ユース昇格は31%":"高卒は13%"}`);
+    let y = 0, tagTier = null;
+    const man = n => n>=10000 ? `${Math.floor(n/10000)}億${n%10000? (n%10000).toLocaleString()+'万':''}円` : `${n.toLocaleString()}万円`;
+    while (true){
+      y++; st.pro.years = y;
+      st.dev += (st.age<27? 0.9 : st.age<31 ? 0 : -1.4) + norm()*0.8 + (st.injuredYear?-1:0);
+      st.injuredYear = R() < 0.12;
+      const a = abil(); const good = a > (tier==="J1"?86:tier==="J2"?80:74);
+      let sal = y===1 ? Math.min(1200, Math.max(MIN[tier], MED[tier]*Math.exp(0.35*norm())*0.6)) : Math.max(MIN[tier], MED[tier]*Math.exp(0.5*norm())*(good?1.6:0.7));
+      if (st.pro.abroad) sal = Math.max(sal, 3000*Math.exp(0.6*norm()));
+      sal = Math.round(sal/10)*10; st.earn += sal; st.pro.peak = Math.max(st.pro.peak, sal);
+      const salTag = y===1 ? "1年目の年俸上限1,200万円（2026〜）" : tagTier!==tier ? `${tier}の年俸下限${MIN[tier]}万円（2026-27〜）` : null; if (y>1) tagTier = tier;
+      if (st.injuredYear) yield log(`大ケガで長期離脱。リハビリの1年になった。年俸${man(sal)}。`, "bad", salTag);
+      else if (a > 92 && !st.pro.abroad && R()<0.25){ st.pro.abroad = true; st.level = Math.max(st.level,9); st.pro.best = "海外"; yield log("ヨーロッパのクラブへ移籍。", "good"); }
+      else if (a > 97 && !st.pro.caps && R()<0.3){ st.pro.caps = true; st.level = 10; yield log("日本代表に初招集された。", "good"); }
+      else yield log((good ? pick([`${tier}で主力として30試合以上に出場。`,`${tier}でリーグ戦の得点に絡み続けた。`]) : pick([`${tier}で出場は数試合。ベンチ外の週末が多かった。`,"練習試合で結果を出し続けたが、リーグ戦の出番は少なかった。"])) + ` 年俸${man(sal)}。`, null, salTag);
+      st.age++;
+      const keep = 1/(1+Math.exp(-(a - (tier==="J1"?86.6:tier==="J2"?80.6:74.6))/3)) - (st.age>31?0.25:0) - (st.age>34?0.3:0);
+      if (R() < keep) {
+        if (tier!=="J1" && a > (tier==="J2"?85:79) && R()<0.5){ tier = tier==="J3"?"J2":"J1"; st.level=Math.max(st.level,lv[tier]); if(st.pro.best!=="海外" && lv[tier]>lv[st.pro.best]) st.pro.best=tier; yield log(`${tier}のクラブへ完全移籍。`, "good"); }
+        continue;
+      }
+      yield log("契約満了。戦力外通告を受けた。", "bad");
+      if (tier!=="J3" && R()<0.55){ tier = tier==="J1"?"J2":"J3"; yield log(`トライアウトを経て${tier}のクラブへ。`, "mild"); continue; }
+      break;
+    }
+    const nxt = pick(st.pro.years>=10 ? ["クラブのアカデミーで指導者になった。","解説の仕事と、サッカースクールの運営を始めた。","クラブのスタッフとして残った。"] : ["一般企業に就職し、営業職としてゼロから働き始めた。","地元に戻り、少年団のコーチをしながら会社員になった。","トレーナーの資格を取る勉強を始めた。","JFLのクラブで1年プレーしたあと、引退した。"]);
+    st.ending = st.pro.caps ? "日本代表に選出" : st.pro.abroad ? "海外クラブでプレー" : `${st.pro.best}でプロ${st.pro.years}年`;
+    yield log(`${st.age}歳で現役を引退。プロ${st.pro.years}年間の年俸合計は約${man(st.earn)}。`, "end", "Jリーガーの平均引退年齢 26.0歳");
+    st.endAge = st.age; yield {t:"end", st}; yield* afterLife(); yield {t:"end2", st}; return st;
+  }
+}
+
+// 自動プレイ（同期・投稿・検証用）
+function autoPlay(seed, opt){
+  const g = life(seed, opt); const R = rngFrom(seed ^ 0x9e3779b9);
+  const log = []; let birth=null; let res = g.next(); let st;
+  while(!res.done){
+    const v = res.value;
+    if (v.t==="birth") birth = v.st;
+    if (v.t==="log") log.push(v);
+    if (v.t==="end") st = v.st;
+    if (v.t==="choice"){
+      const w = v.opts.map(o=> /プロ契約/.test(o.label)?8: /推薦で大学/.test(o.label)?1.6: /挑戦/.test(o.label)?0.35: /就職・進学/.test(o.label)?1.4: /就職する/.test(o.label)?0.6: /やめる/.test(o.label)?0.5: /強豪校/.test(o.label)?0.35: /JFL/.test(o.label)?1: /U-18|U-15|街クラブJY|セレクション/.test(o.label)?1.1:1);
+      let s = w.reduce((a,b)=>a+b,0), r=R()*s, i=0; while(r>w[i]){ r-=w[i]; i++; }
+      log.push({t:"pick", age:v.age, q:v.q, a:v.opts[i].label});
+      res = g.next(i); continue; }
+    res = g.next();
+  }
+  return {birth, log, st};
+}
+function setRates(r){ RATES = r; }
+
+
+</script>
+<script>
+(() => {
+  const TOP = [null,100,94.99,73.97,16.5,1.5,0.39,0.31,0.18,0.05,0.02];
+  setRates({passJ12:2.89,passJ15:5.78,tr0:19.71,tr1:6.78,tr2:2.43,tr3:0.27,senshuken:1.38,bigInj:24.55});
+  const SURV = {5:1,6:1,7:1,8:1,9:1,10:1,11:1,12:0.95,13:0.95,14:0.95,15:0.617,16:0.617,17:0.617,18:0.169,19:0.169,20:0.168,21:0.168,22:0.0143,23:0.0133,24:0.0129,25:0.0127,26:0.0016,27:0.0014,28:0.0012,29:0.0011,30:0.001,31:0.0009,32:0.0006,33:0.0004,34:0.0004,35:0.0002,36:0.0001,37:0.0001,38:0};
+  const NAMES = ["ハルト","ソウタ","ユウト","リク","レン"];
+  const SITE_REGIONS = ["関東","関西"];
+  const ZUKAN = [["s1","小学校で卒業","小"],["s2","中学で卒業","中"],["s3","高校で卒業","高"],["s4","大学で卒業","大"],["jfl","JFL・地域リーグ","地"],["J3","J3でプロ","J3"],["J2","J2でプロ","J2"],["J1","J1でプロ","J1"],["abroad","海外クラブ","海"],["caps","日本代表","代"],["senshu","高校選手権に出場","杯"],["nat","ナショナルトレセン","◎"]];
+  const $ = id => document.getElementById(id);
+  const yen = n => n>=10000 ? (Math.round(n/1000)/10).toLocaleString("ja-JP")+"万円" : n.toLocaleString("ja-JP")+"円";
+  const grade = a => a<6?"年長": a<12?`小${a-5}`: a<15?`中${a-11}`: a<18?`高${a-14}`: a<22?`大${a-17}`: `${a}歳`;
+  const minute = a => a<=35 ? Math.max(0, Math.round((a-5)*3)) : Math.min(120, 90 + Math.round((a-35)*30/35));
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const store = { get(k){ try{ return JSON.parse(localStorage.getItem(k)||"null"); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} } };
+
+  let g, ref, birth, seed, opt, forced, picks, mates, queue, timer, curAge, shownMateAge, endSt, dotsState, ch2 = false;
+
+  // ── スタート画面 ──
+  (function initForm(){
+    $("kPref").innerHTML = PREFS.map((p,i)=>`<option value="${i}" ${p[0]==="東京都"?"selected":""}>${p[0]}</option>`).join("");
+    $("kMonth").innerHTML = [4,5,6,7,8,9,10,11,12,1,2,3].map(m=>`<option value="${m}">${m}月</option>`).join("");
+    $("kGrade").innerHTML = ["年長","小1","小2","小3","小4","小5","小6","中1","中2","中3"].map((x,i)=>`<option value="${i+5}" ${x==="小5"?"selected":""}>${x}</option>`).join("");
+  })();
+  $("goRandom").onclick = () => start(null, {}, []);
+  $("goKid").onclick = () => { $("starts").hidden = true; $("kidForm").hidden = false; $("kPref").focus(); };
+  $("kidBack").onclick = () => { $("starts").hidden = false; $("kidForm").hidden = true; };
+  $("kidForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const age = +$("kGrade").value, h = parseFloat($("kHeight").value);
+    const hz = isFinite(h) ? Math.max(-3, Math.min(3, (h - HEIGHT[Math.min(17,age)]) / HSD[Math.min(17,age)])) : null;
+    start(null, {prefIdx:+$("kPref").value, mIdx: MONTHS.indexOf(+$("kMonth").value), hz, kidAge:age, kid:true}, []);
+  });
+  const hm = location.hash.match(/^#s(\d+)$/);
+  if (hm) { $("goRandom").querySelector("b").textContent = "共有された人生を始める"; $("goRandom").onclick = () => start(+hm[1], {}, []); }
+
+  // ── 進行 ──
+  function start(s, o, f){
+    seed = s ?? Math.floor(Math.random()*1e9); opt = o || {}; forced = f || []; picks = [];
+    if (!opt.kid) { try{ history.replaceState(null,"","#s"+seed); }catch(e){} }
+    $("start").hidden = true; $("game").hidden = false;
+    $("log").innerHTML = ""; $("choice").innerHTML = ""; $("result").hidden = true; $("result").innerHTML = "";
+    queue = []; curAge = null; shownMateAge = {}; endSt = null; ch2 = false; clearTimeout(timer); $("cLeftL").textContent = "まだ続けている同学年";
+    g = life(seed, opt); mates = [];
+    initDots();
+    pump();
+    window.scrollTo({top:0});
+  }
+  function pump(val){
+    let r = g.next(val);
+    while (!r.done){
+      const v = r.value;
+      if (v.t==="birth"){ birth = v.st; ref = v.ref;
+        mates = NAMES.map((n,k)=>{ const m = autoPlay(seed*7+k*101+1, {prefIdx: ref.prefIdx}); return {name:n, st:m.st, ev: mateEvents(m.log), end:m.st.endAge}; });
+        queue.push({kind:"birth"}); }
+      else if (v.t==="log") queue.push({kind:"log", v});
+      else if (v.t==="end"){ endSt = v.st; queue.push({kind:"ch2", age:v.st.age}); }
+      else if (v.t==="choice"){
+        const fi = picks.length;
+        if (fi < forced.length){ const i = forced[fi]; picks.push({q:v.q, opts:v.opts, i, age:v.age}); queue.push({kind:"pick", age:v.age, q:v.q, a:v.opts[i].label}); r = g.next(i); continue; }
+        queue.push({kind:"choice", v}); break;
+      }
+      r = g.next();
+    }
+    if (r.done) queue.push({kind:"finish"});
+    drain();
+  }
+  function drain(){
+    clearTimeout(timer);
+    const step = () => {
+      const item = queue.shift(); if (!item) return;
+      render(item);
+      if (item.kind==="choice" || item.kind==="finish") return;
+      timer = setTimeout(step, reduce ? 0 : item.kind==="year" ? 160 : 420);
+    };
+    step();
+  }
+  $("skip").onclick = () => { clearTimeout(timer); while (queue.length && queue[0].kind!=="choice" && queue[0].kind!=="finish") render(queue.shift()); if (queue.length) render(queue.shift()); };
+
+  function mateEvents(log){
+    const re = /合格|昇格した|プロ契約|全国高校サッカー選手権に出場|地域トレセン|ナショナルトレセン|続けなかった|入らず|趣味|卒業した|社会人になった|現役を引退|ヨーロッパ|日本代表|JFL|O-40|コーチを始めた|審判の資格|お父さんチーム|またボールを蹴り始めた|ウォーキングフットボール|Jリーガーになった/;
+    return log.filter(l=>l.t==="log" && re.test(l.txt)).map(l=>({age:l.age, txt:l.txt.split("。")[0]+"。"}));
+  }
+  function yearHeader(age){
+    const li = document.createElement("li"); li.className = "yr";
+    li.innerHTML = `<b>${grade(age)}</b><span>${age}歳・${minute(age)}′</span>`; $("log").appendChild(li);
+    for (const m of mates){ for (const e of m.ev) if (e.age===age) addLine("mate", `<b>${m.name}</b>：${e.txt}`); }
+  }
+  function addLine(tone, html){
+    const li = document.createElement("li"); li.className = tone||"";
+    li.innerHTML = `<span class="ico ${tone||""}" aria-hidden="true"></span><span class="t">${html}</span>`;
+    $("log").appendChild(li);
+    if (!reduce) li.scrollIntoView({block:"nearest", behavior:"smooth"});
+  }
+  function render(item){
+    if (item.kind==="birth"){ showBirth(); return; }
+    if (item.kind==="ch2"){ ch2 = true; const li = document.createElement("li"); li.className = "yr ch2"; li.innerHTML = `<b>第2章　その後の人生</b><span>延長戦・90′〜</span>`; $("log").appendChild(li); addLine("", `${ref.ending}で、選手としての物語はひと区切り。でも、プロにならなくても、何歳になっても、サッカーは続けられる。`); $("cLeftL").textContent = "サッカー歴"; return; }
+    const age = item.v ? item.v.age : item.age;
+    if (age!=null && age!==curAge){ curAge = age; yearHeader(age); updateHud(age); }
+    if (item.kind==="log"){ const v = item.v; const tone = /戦力外/.test(v.txt) ? "bad" : v.tone; addLine(tone, v.txt + (v.tag?`<span class="tag">${v.tag}</span>`:"")); updateHud(curAge); }
+    else if (item.kind==="pick"){ addLine("pick", `${item.q} → <b>${item.a}</b>`); }
+    else if (item.kind==="choice"){ updateHud(curAge); showChoice(item.v); }
+    else if (item.kind==="finish"){ finish(); }
+  }
+  function showBirth(){
+    addLine("good", `<b>${birth.pref}</b>に、${birth.month}月生まれの男の子として生まれた。${[1,2,3].includes(birth.month)?"早生まれ。":""}家庭は${birth.wealth}、体は${birth.growth}タイプ。${opt.kid?`<span class="tag">うちの子モード</span>`:""}`);
+    addLine("", `同じチームで<b>${NAMES.join("・")}</b>の5人も一緒にボールを蹴り始めた。`);
+    updateHud(5);
+  }
+  function stars(){ if (ref.pro) return 5; return Math.max(1, Math.min(5, ref.trecen + 2)); }
+  function updateHud(age){
+    if (!ref) return;
+    $("cMin").textContent = minute(age)+"′";
+    $("cGr").innerHTML = `${ch2?`${age}歳`:grade(age)}<small>${ch2?"延長戦":age<6?"キックオフ":ref.pro?"プロのピッチ":`${age}歳`}</small>`;
+    $("cBar").style.width = (minute(age)/120*100)+"%";
+    if (ch2 && ref.after){ $("cLeft").textContent = ((ref.endAge-5) + ref.after.years)+"年"; }
+    else { const left = Math.max(1, Math.round(45000*(SURV[Math.min(38,age)]||0))); $("cLeft").textContent = left.toLocaleString("ja-JP"); }
+    const team = ref.pro ? `プロ・${ref.pro.best}` : ref.team ? TEAMS[ref.team].name : "—";
+    $("pcard").innerHTML = `<div><div class="team">${team}</div><div class="sub">${ref.pref}・${ref.month}月生まれ・${birth.growth}</div></div>
+      <div><div class="pos">${ref.pos||"—"}</div><div class="stars" aria-label="評価 5段階中${stars()}">${"★".repeat(stars())}${"☆".repeat(5-stars())}</div></div>
+      <div class="stats"><div><span>身長</span><b>${ref.height?ref.height.toFixed(0)+"cm":"—"}</b></div><div><span>親の費用</span><b>${yen(ref.cost)}</b></div><div><span>当番</span><b>${ref.toban}回</b></div><div><span>同期</span><b>${mates.filter(m=>m.end>age).length}/5人</b></div></div>`;
+    dotsTo(age);
+  }
+
+  // ── 点の海 ──
+  function initDots(){
+    const COLS = 45, ROWS = 20, N = COLS*ROWS;
+    const R = rngFrom(seed ^ 0x51ed);
+    const order = Array.from({length:N}, (_,i)=>i); for (let i=N-1;i>0;i--){ const j = Math.floor(R()*(i+1)); [order[i],order[j]] = [order[j],order[i]]; }
+    const you = 10*COLS + 22, mateIdx = [9*COLS+18, 11*COLS+26, 8*COLS+24, 12*COLS+19, 10*COLS+28];
+    const rank = new Array(N); let k = 0; for (const i of order){ if (i===you || mateIdx.includes(i)) continue; rank[i] = k++; }
+    dotsState = {COLS, ROWS, N, you, mateIdx, rank, rest:k, alpha:new Float32Array(N).fill(1), target:new Float32Array(N).fill(1), raf:0};
+    drawDots();
+  }
+  function dotsTo(age){
+    const d = dotsState; if (!d) return; const s = SURV[Math.min(38,age)] ?? 0;
+    for (let i=0;i<d.N;i++){
+      if (i===d.you) d.target[i] = 1;
+      else { const mi = d.mateIdx.indexOf(i); if (mi>=0) d.target[i] = mates[mi] && mates[mi].end>age ? 1 : 0.18;
+        else d.target[i] = d.rank[i] < s*d.rest ? 1 : 0; }
+    }
+    if (reduce){ d.alpha.set(d.target); drawDots(); return; }
+    cancelAnimationFrame(d.raf);
+    const tick = () => { let moving = false; for (let i=0;i<d.N;i++){ const dd = d.target[i]-d.alpha[i]; if (Math.abs(dd)>0.01){ d.alpha[i] += dd*0.12; moving = true; } else d.alpha[i] = d.target[i]; } drawDots(); if (moving) d.raf = requestAnimationFrame(tick); };
+    d.raf = requestAnimationFrame(tick);
+  }
+  function drawDots(){
+    const d = dotsState, c = $("dots"), x = c.getContext("2d");
+    const W = c.width, H = c.height, gx = W/d.COLS, gy = H/d.ROWS, r = Math.min(gx,gy)*0.32;
+    const cDot = css("--dot"), cOff = css("--dot-off"), cYou = css("--you"), cMate = css("--mate");
+    x.clearRect(0,0,W,H);
+    for (let i=0;i<d.N;i++){
+      const cx = (i % d.COLS + .5)*gx, cy = (Math.floor(i / d.COLS) + .5)*gy;
+      const isYou = i===d.you, mi = d.mateIdx.indexOf(i);
+      x.beginPath(); x.arc(cx, cy, isYou ? r*1.9 : mi>=0 ? r*1.45 : r, 0, Math.PI*2);
+      if (isYou) x.fillStyle = cYou; else if (mi>=0) { x.globalAlpha = Math.max(.25, d.alpha[i]); x.fillStyle = cMate; }
+      else { x.fillStyle = d.alpha[i] > .5 ? cDot : cOff; x.globalAlpha = .35 + .65*d.alpha[i]; }
+      x.fill(); x.globalAlpha = 1;
+    }
+  }
+
+  // ── 岐路 ──
+  function showChoice(v){
+    const box = $("choice");
+    box.innerHTML = `<div class="cross"><h3>${v.q}</h3>${v.opts.length>2?`<span class="hint">横にスワイプして見比べ、カードをタップして選ぶ</span>`:`<span class="hint">カードをタップして選ぶ</span>`}
+      <div class="deck">${v.opts.map((o,i)=>`<button class="opt" id="opt-${i}" data-i="${i}"><span class="k">道 ${i+1}/${v.opts.length}</span><span><b>${o.label}</b>${o.note?`<span>${o.note}</span>`:""}</span><span class="go">この道を選ぶ<svg width="14" height="14" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>`).join("")}</div></div>`;
+    box.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => {
+      const i = +b.dataset.i; picks.push({q:v.q, opts:v.opts, i, age:v.age});
+      box.innerHTML = ""; addLine("pick", `${v.q} → <b>${v.opts[i].label}</b>`); pump(i);
+    }));
+    if (!reduce) box.scrollIntoView({block:"nearest", behavior:"smooth"});
+  }
+
+  // ── 結末 ──
+  function zukanKeys(st){
+    const k = [];
+    if (st.pro){ k.push(st.pro.best==="海外" ? "abroad" : st.pro.best); if (st.pro.abroad) k.push("abroad"); if (st.pro.caps) k.push("caps"); }
+    else k.push({1:"s1",2:"s2",3:"s3",4:"s4",5:"jfl"}[st.level] || "s1");
+    if (st.f && st.f.senshuken) k.push("senshu"); if (st.trecen >= 3) k.push("nat");
+    return [...new Set(k)];
+  }
+  function stationOf(st){ if (st.pro) return 5; return Math.min(4, Math.max(1, st.level >= 5 ? 4 : st.level)); }
+  function routeSvg(st){
+    const people = [{name:"あなた", st, you:true}, ...mates.map(m=>({name:m.name, st:m.st}))];
+    const ST = ["年長","小学","中学","高校","大学","プロ"], x0 = 96, dx = 50, rh = 50, top = 34;
+    const H = top + people.length*rh + 6;
+    let s = `<svg class="route" viewBox="0 0 360 ${H}" role="img" aria-label="6人がどの年代まで続けたかの路線図">`;
+    ST.forEach((n,i)=>{ s += `<text x="${x0+i*dx}" y="16" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="Zen Kaku Gothic New, sans-serif">${n}</text><line x1="${x0+i*dx}" y1="24" x2="${x0+i*dx}" y2="${H-4}" stroke="var(--line)" stroke-dasharray="2 4"/>`; });
+    people.forEach((p,r)=>{
+      const y = top + r*rh + 16, reach = stationOf(p.st), col = p.you ? "var(--you)" : "var(--mate)";
+      s += `<text x="0" y="${y-2}" font-size="13" font-weight="700" fill="var(--fg)" font-family="Zen Kaku Gothic New, sans-serif">${p.name}</text>`;
+      s += `<text x="0" y="${y+14}" font-size="10" fill="var(--muted)" font-family="Zen Kaku Gothic New, sans-serif">${p.st.ending}</text>`;
+      if (p.st.after) s += `<text x="${x0+reach*dx+12}" y="${y+4}" font-size="10" fill="var(--muted)" font-family="Zen Kaku Gothic New, sans-serif">${reach<4?p.st.after.title.slice(0,14):""}</text>`;
+      s += `<line x1="${x0}" y1="${y}" x2="${x0+reach*dx}" y2="${y}" stroke="${col}" stroke-width="${p.you?6:4}" stroke-linecap="round"/>`;
+      for (let i=0;i<=reach;i++) s += `<circle cx="${x0+i*dx}" cy="${y}" r="${i===reach?7:4.5}" fill="${i===reach?col:"var(--surface)"}" stroke="${col}" stroke-width="2.5"/>`;
+    });
+    return s + `</svg>`;
+  }
+  function afterHtml(st){
+    const A = st.after; if (!A) return "";
+    const merits = [A.playing||A.back?"週末の試合が、仕事以外の居場所になった":null, A.friends?`一緒にボールを蹴った仲間は約${A.friends}人`:null, A.lic?`${A.kids}人の子どもにサッカーを教えた`:null, A.refs?`審判として${A.refs}試合以上を支えた`:null, A.child?"子どもと同じスポーツで、同じ話ができた":null, A.dream?"プロでなくても、全国を目指して戦えた":null, A.at70?"70歳でもボールを蹴る体と仲間が残った":null].filter(Boolean);
+    return `<div class="box"><h3>第2章：その後の人生</h3><b style="font-size:18px">「${A.title}」</b><div class="after"><div><span>仕事</span><b style="font-family:var(--f-body);font-size:15px">${A.job}</b></div><div><span>サッカー歴</span><b>${A.career}年</b></div><div><span>教えた子ども</span><b>${A.kids}人</b></div><div><span>審判した試合</span><b>${A.refs}試合</b></div></div><h3 style="margin-top:6px">サッカーが人生にくれたもの</h3><ul class="merit">${merits.map(m=>`<li>${m}</li>`).join("")}</ul><p class="fine">プロは毎年約180人。でもJFAにはシニア（40歳以上）が約5.1万人、指導者が約10.2万人、審判が約28.5万人登録している。サッカーの続け方は、選手だけじゃない。</p></div>`;
+  }
+  function ctaHtml(st){
+    const inSite = SITE_REGIONS.includes(st.region);
+    const head = opt.kid ? "このゲームで迷った岐路は、もうすぐ本物になります。" : "ゲームの岐路は、現実ではこう選ばれています。";
+    const q = "utm_source=life&utm_medium=game&utm_campaign=result";
+    if (inSite) return `<div class="cta"><b>${head}<br>${st.pref}のジュニアユース・ジュニアのセレクション情報を見る</b><p>セレクション・練習会の日程、会場、申込先を、情報元へのリンクつきでまとめています。</p><a class="btn btn-main" href="/selection?pref=${encodeURIComponent(st.pref)}&${q}">サッカーセレクションへ</a></div>`;
+    return `<div class="cta"><b>${head}<br>関東・関西のセレクション情報を見る</b><p>いまは関東・関西のチームを掲載しています。${st.pref}の情報は順次広げていきます。</p><a class="btn btn-main" href="/selection?${q}">サッカーセレクションへ</a></div>`;
+  }
+  function finish(){
+    const st = endSt || ref; updateHud(st.age);
+    const top = TOP[st.level]; const ppl = Math.max(1, Math.round(45000*top/100));
+    const keys = zukanKeys(st); const got = new Set(store.get("ss-life-zukan") || []); const fresh = keys.filter(k=>!got.has(k)); keys.forEach(k=>got.add(k)); store.set("ss-life-zukan", [...got]);
+    const res = $("result"); res.hidden = false;
+    const redo = picks.map((p,k)=>`<div class="q"><span>${grade(p.age)}：${p.q} → ${p.opts[p.i].label}</span><div class="alts">${p.opts.map((o,j)=> j===p.i?"":`<button data-k="${k}" data-j="${j}" type="button">${o.label}</button>`).join("")}</div></div>`).join("");
+    res.innerHTML = `
+      <div class="endhead"><span class="lab">${st.pref}・${st.month}月生まれ・${st.pos||""}の結末</span><h2>${st.ending}</h2>
+        ${fresh.length?`<span class="new">図鑑に新しい結末</span>`:""}
+        <span class="lab" style="margin-top:6px">一緒に始めた4.5万人のうち</span><span class="top">上位${top}%</span><span class="lab">ここまで来たのは約${ppl.toLocaleString("ja-JP")}人${st.earn?`・プロの年俸合計 約${st.earn>=10000?Math.floor(st.earn/10000)+"億"+(st.earn%10000?(st.earn%10000).toLocaleString("ja-JP")+"万":"")+"円":st.earn.toLocaleString("ja-JP")+"万円"}`:""}</span></div>
+      <div class="box"><h3>6人の路線図</h3>${routeSvg(st)}</div>
+      ${afterHtml(st)}
+      ${ctaHtml(st)}
+      <div class="box"><h3>あの分岐をやり直す</h3><p class="fine">同じ運命のまま、1つの選択だけ変えて生き直します。</p><div class="redo">${redo || '<span class="fine">選んだ岐路はありません。</span>'}</div></div>
+      <div class="box"><h3>結末図鑑 ${got.size}/${ZUKAN.length}</h3><div class="zukan">${ZUKAN.map(([k,n,ic])=>`<div class="${got.has(k)?"got":""} ${keys.includes(k)?"now":""}"><i aria-hidden="true">${got.has(k)?ic:"？"}</i>${got.has(k)?n:"まだ見ぬ結末"}</div>`).join("")}</div></div>
+      <canvas class="card" id="card" width="1080" height="1350" aria-label="結果カード"></canvas>
+      <div class="row"><button class="btn btn-you" id="copy" type="button">結果をコピーして共有</button><button class="btn btn-main" id="again" type="button">新しい人生を生きる</button>${opt.kid?`<button class="btn btn-ghost" id="againKid" type="button">同じ条件でもう一度</button>`:""}</div>
+      <div class="toast" id="toast" role="status"></div>`;
+    res.querySelectorAll(".alts button").forEach(b => b.onclick = () => { const k = +b.dataset.k, j = +b.dataset.j; start(seed, opt, picks.slice(0,k).map(p=>p.i).concat([j])); });
+    const text = `【4.5万分の1】${st.pref}・${st.month}月生まれの${st.pos||""}。結末は「${st.ending}」、第2章の称号は「${st.after?st.after.title:""}」。一緒に始めた4.5万人のうち上位${top}%。親の費用は${yen(st.cost)}・当番${st.toban}回。`;
+    $("copy").onclick = async () => { try{ await navigator.clipboard.writeText(text + " https://soccer-selection.jp/life"); $("toast").textContent = "コピーしました。LINEやSNSに貼り付けてください"; } catch(e){ $("toast").textContent = text; } };
+    $("again").onclick = () => start(null, {}, []);
+    if (opt.kid) $("againKid").onclick = () => start(null, opt, []);
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => drawCard(st, top, ppl)).catch(()=>drawCard(st, top, ppl));
+    res.scrollIntoView({behavior: reduce?"auto":"smooth", block:"start"});
+  }
+  function drawCard(st, top, ppl){
+    const c = $("card"); if (!c) return; const x = c.getContext("2d"), W = 1080, H = 1350;
+    x.fillStyle = "#14213a"; x.fillRect(0,0,W,H);
+    x.fillStyle = "rgba(255,255,255,.05)"; for (let i=0;i<54;i++) for (let j=0;j<68;j++){ x.beginPath(); x.arc(10+i*20, 10+j*20, 2, 0, Math.PI*2); x.fill(); }
+    x.strokeStyle = "rgba(255,255,255,.12)"; x.lineWidth = 4; x.strokeRect(60,60,W-120,H-120); x.beginPath(); x.moveTo(60,H/2); x.lineTo(W-60,H/2); x.stroke(); x.beginPath(); x.arc(W/2,H/2,150,0,Math.PI*2); x.stroke();
+    x.fillStyle = "#e8590c"; x.beginPath(); x.arc(W-160, 190, 22, 0, Math.PI*2); x.fill();
+    x.fillStyle = "#9aa7bc"; x.font = "700 30px 'Zen Kaku Gothic New', sans-serif"; x.fillText("サッカー人生シミュレーター", 110, 150);
+    x.fillStyle = "#eef2f8"; x.font = "64px 'Dela Gothic One', sans-serif"; x.fillText("4.5万分の1", 110, 232);
+    x.fillStyle = "#9aa7bc"; x.font = "700 34px 'Zen Kaku Gothic New', sans-serif"; x.fillText(`${st.pref}・${st.month}月生まれ・${st.pos||""}・${(st.height||0).toFixed(0)}cm`, 110, 318);
+    let fs = 92; x.fillStyle = "#8ab8f0"; x.font = `${fs}px 'Dela Gothic One', sans-serif`; while (x.measureText(st.ending).width > W-220 && fs > 50){ fs -= 4; x.font = `${fs}px 'Dela Gothic One', sans-serif`; } x.fillText(st.ending, 110, 450);
+    x.fillStyle = "#eef2f8"; x.font = "700 38px 'Zen Kaku Gothic New', sans-serif"; x.fillText("一緒に始めた4.5万人のうち", 110, 560);
+    x.font = "800 124px 'JetBrains Mono', monospace"; x.fillText(`上位${top}%`, 100, 690);
+    x.font = "700 34px 'Zen Kaku Gothic New', sans-serif"; x.fillStyle = "#9aa7bc"; x.fillText(`ここまで来たのは約${ppl.toLocaleString("ja-JP")}人`, 110, 752);
+    const still = mates.filter(m=>m.st.level>=st.level).length; x.fillText(`同じチームの5人中、ここまで来たのは${still}人`, 110, 810);
+    if (st.earn){ x.fillStyle = "#8ab8f0"; x.font = "700 34px 'Zen Kaku Gothic New', sans-serif"; x.fillText(`プロの年俸合計 約${st.earn>=10000?Math.floor(st.earn/10000)+"億"+(st.earn%10000?(st.earn%10000).toLocaleString("ja-JP")+"万":"")+"円":st.earn.toLocaleString("ja-JP")+"万円"}`, 110, 880); }
+    if (st.after){ x.fillStyle = "#e8590c"; x.font = "700 34px 'Zen Kaku Gothic New', sans-serif"; x.fillText(`第2章：「${st.after.title}」・サッカー歴${st.after.career}年`, 110, 950); }
+    x.fillStyle = "#9aa7bc"; x.font = "700 28px 'Zen Kaku Gothic New', sans-serif"; x.fillText("親が払ったもの（18歳まで）", 110, 1050);
+    x.fillStyle = "#eef2f8"; x.font = "800 56px 'JetBrains Mono', monospace"; x.fillText(yen(st.cost), 110, 1124);
+    x.font = "700 34px 'Zen Kaku Gothic New', sans-serif"; x.fillText(`当番 ${st.toban}回・送迎 ${st.drive.toLocaleString("ja-JP")}時間`, 110, 1180);
+    x.fillStyle = "#9aa7bc"; x.font = "500 24px 'Zen Kaku Gothic New', sans-serif"; x.fillText("統計：JFA登録者数ほか ／ soccer-selection.jp", 110, 1262);
+  }
+})();
+</script>
+
+</body>
+</html>
