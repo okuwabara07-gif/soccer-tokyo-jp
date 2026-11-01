@@ -43,3 +43,6 @@ next-env.d.ts
 page.tsx.oldbak*
 *.prebak
 *.bak
+
+# サッカー人生シミュレーターの投稿素材（scripts/life-post の出力）
+/life-posts/
