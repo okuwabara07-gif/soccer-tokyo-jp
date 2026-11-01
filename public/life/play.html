@@ -77,6 +77,20 @@ button{cursor:pointer}
 .field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px}
 .field select,.field input{width:100%;min-height:46px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--fg);padding:0 12px}
 .fine{font-size:12px;color:var(--muted);margin:0}
+.check{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;min-height:44px}
+.check input{width:20px;height:20px}
+.near{display:grid;gap:8px}
+.near a{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;text-decoration:none;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.near a b{font-size:15px}
+.near a span{font-size:12px;color:var(--muted)}
+.near a em{font-style:normal;font-size:12px;font-weight:700;color:var(--you-ink);grid-column:1/-1}
+.count{background:var(--navy);color:var(--navy-fg);border-radius:18px;padding:16px;display:grid;gap:4px}
+.count span{font-size:12px;color:var(--navy-dim)}
+.count b{font-family:var(--f-num);font-size:30px;line-height:1.1}
+.links{display:grid;gap:8px}
+.links a{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center;text-decoration:none;color:var(--fg);border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--surface)}
+.links a span{font-size:12px;color:var(--muted)}
+.links a i{font-style:normal;color:var(--blue);font-weight:700}
 
 /* 試合時計 */
 .clock{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--navy);color:var(--navy-fg);margin:0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:10px max(16px,env(safe-area-inset-left,0px)) 12px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 14px;align-items:center}
@@ -214,8 +228,13 @@ button{cursor:pointer}
         <div class="field"><label for="kMonth">生まれ月</label><select id="kMonth"></select></div>
         <div class="field"><label for="kGrade">いまの学年</label><select id="kGrade"></select></div>
         <div class="field"><label for="kHeight">いまの身長（cm）</label><input id="kHeight" type="number" inputmode="decimal" min="90" max="200" step="0.1" value="146.0"></div>
+        <div class="field"><label for="kName">名前（呼び名・任意）</label><input id="kName" type="text" maxlength="10" placeholder="例：ハルト" autocomplete="off"></div>
+        <div class="field"><label for="kCity">市区町村（任意）</label><input id="kCity" type="text" maxlength="20" placeholder="例：世田谷区" autocomplete="off"></div>
+        <div class="field"><label for="kDad">父のスポーツ経験</label><select id="kDad"><option value="soccer">サッカー</option><option value="other" selected>ほかの競技</option><option value="none">なし</option></select></div>
+        <div class="field"><label for="kMom">母のスポーツ経験</label><select id="kMom"><option value="soccer">サッカー</option><option value="other">ほかの競技</option><option value="none" selected>なし</option></select></div>
       </div>
-      <p class="fine">身長は同じ学年の全国平均と比べて体格の個性に変換します。入力内容は保存されません。</p>
+      <label class="check"><input id="kWork" type="checkbox" checked> 共働き</label>
+      <p class="fine">身長は同じ学年の全国平均と比べて体格の個性に変換します。市区町村は、結末で近くのクラブを探すのに使います（関東・関西）。入力内容は保存されず、共有リンクにも名前と市区町村は入りません。</p>
       <div class="row"><button class="btn btn-main" type="submit">この条件で年長から始める</button><button class="btn btn-ghost" type="button" id="kidBack">戻る</button></div>
     </form>
   </section>
@@ -572,7 +591,9 @@ function setRates(r){ RATES = r; }
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const store = { get(k){ try{ return JSON.parse(localStorage.getItem(k)||"null"); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} } };
 
-  let g, ref, birth, seed, opt, forced, picks, mates, queue, timer, curAge, shownMateAge, endSt, dotsState, ch2 = false;
+  let g, ref, birth, seed, opt, forced, picks, mates, queue, timer, curAge, shownMateAge, endSt, dotsState, ch2 = false, curParents = null;
+  const esc = t => String(t).replace(/[&<>"\']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+  const randomParents = () => { const R = rngFrom(seed ^ 0x7a11); const pick = (p) => { const r = R(); return r < p[0] ? "soccer" : r < p[0]+p[1] ? "other" : "none"; }; return {dad: pick([0.3,0.4]), mom: pick([0.08,0.5]), work: R() < 0.7}; };
 
   // ── スタート画面 ──
   (function initForm(){
@@ -587,7 +608,9 @@ function setRates(r){ RATES = r; }
     e.preventDefault();
     const age = +$("kGrade").value, h = parseFloat($("kHeight").value);
     const hz = isFinite(h) ? Math.max(-3, Math.min(3, (h - HEIGHT[Math.min(17,age)]) / HSD[Math.min(17,age)])) : null;
-    start(null, {prefIdx:+$("kPref").value, mIdx: MONTHS.indexOf(+$("kMonth").value), hz, kidAge:age, kid:true}, []);
+    start(null, {prefIdx:+$("kPref").value, mIdx: MONTHS.indexOf(+$("kMonth").value), hz, kidAge:age, kid:true,
+      name: $("kName").value.trim().slice(0,10), city: $("kCity").value.trim().slice(0,20),
+      parents: {dad: $("kDad").value, mom: $("kMom").value, work: $("kWork").checked}}, []);
   });
   // 共有リンク: #s<seed>（ランダム）または #k<県>-<誕生月>-<体格>-<学年>-<seed>（うちの子モード）
   const hashKey = () => opt.kid ? `k${opt.prefIdx}-${opt.mIdx}-${Math.round((opt.hz||0)*100)}-${opt.kidAge}-${seed}` : `s${seed}`;
@@ -668,7 +691,11 @@ function setRates(r){ RATES = r; }
     else if (item.kind==="finish"){ finish(); }
   }
   function showBirth(){
-    addLine("good", `<b>${birth.pref}</b>に、${birth.month}月生まれの男の子として生まれた。${[1,2,3].includes(birth.month)?"早生まれ。":""}家庭は${birth.wealth}、体は${birth.growth}タイプ。${opt.kid?`<span class="tag">うちの子モード</span>`:""}`);
+    addLine("good", `${opt.name?`<b>${esc(opt.name)}</b>は`:""}<b>${birth.pref}${opt.city?esc(opt.city):""}</b>に、${birth.month}月生まれの男の子として生まれた。${[1,2,3].includes(birth.month)?"早生まれ。":""}家庭は${birth.wealth}、体は${birth.growth}タイプ。${opt.kid?`<span class="tag">うちの子モード</span>`:""}`);
+    const pa = opt.parents || randomParents();
+    const SP = {soccer:"サッカー経験あり", other:"ほかの競技の経験あり", none:"スポーツ経験なし"};
+    addLine("", `父は${SP[pa.dad]}、母は${SP[pa.mom]}。${pa.work?"共働きで、週末の当番と送迎は夫婦で分け合う。":"送迎はおもに片方の親が担う。"}${pa.dad==="soccer"||pa.mom==="soccer"?"家の前でボールを蹴る時間が自然と増えた。":""}<span class="tag">保護者にスポーツ歴があると子のスポーツを重視する傾向（笹川スポーツ財団2017）</span>`);
+    curParents = pa;
     addLine("", `同じチームで<b>${NAMES.join("・")}</b>の5人も一緒にボールを蹴り始めた。`);
     updateHud(5);
   }
@@ -766,12 +793,40 @@ function setRates(r){ RATES = r; }
     const merits = [A.playing||A.back?"週末の試合が、仕事以外の居場所になった":null, A.friends?`一緒にボールを蹴った仲間は約${A.friends}人`:null, A.lic?`${A.kids}人の子どもにサッカーを教えた`:null, A.refs?`審判として${A.refs}試合以上を支えた`:null, A.child?"子どもと同じスポーツで、同じ話ができた":null, A.dream?"プロでなくても、全国を目指して戦えた":null, A.at70?"70歳でもボールを蹴る体と仲間が残った":null].filter(Boolean);
     return `<div class="box"><h3>第2章：その後の人生</h3><b style="font-size:18px">「${A.title}」</b><div class="after"><div><span>仕事</span><b style="font-family:var(--f-body);font-size:15px">${A.job}</b></div><div><span>サッカー歴</span><b>${A.career}年</b></div><div><span>教えた子ども</span><b>${A.kids}人</b></div><div><span>審判した試合</span><b>${A.refs}試合</b></div></div><h3 style="margin-top:6px">サッカーが人生にくれたもの</h3><ul class="merit">${merits.map(m=>`<li>${m}</li>`).join("")}</ul><p class="fine">プロは毎年約180人。でもJFAにはシニア（40歳以上）が約5.1万人、指導者が約10.2万人、審判が約28.5万人登録している。サッカーの続け方は、選手だけじゃない。</p></div>`;
   }
+  function nextStageInfo(){
+    if (opt.kidAge==null) return null;
+    const now = new Date(Date.now() + 9*3600e3), y = now.getUTCFullYear(), m = now.getUTCMonth()+1, sy = m>=4 ? y : y-1;
+    const plan = opt.kidAge <= 11 ? {age:11, label:"ジュニアユース（中学年代）", when:"小6の夏〜秋"} : opt.kidAge <= 14 ? {age:14, label:"高校年代・ユース", when:"中3の夏〜秋"} : null;
+    if (!plan) return null;
+    const ty = sy + (plan.age - opt.kidAge), months = (ty - y)*12 + (7 - m);
+    return {...plan, months};
+  }
   function ctaHtml(st){
-    const inSite = SITE_REGIONS.includes(st.region);
-    const head = opt.kid ? "このゲームで迷った岐路は、もうすぐ本物になります。" : "ゲームの岐路は、現実ではこう選ばれています。";
     const q = "utm_source=life&utm_medium=game&utm_campaign=result";
-    if (inSite) return `<div class="cta"><b>${head}<br>${st.pref}のジュニアユース・ジュニアのセレクション情報を見る</b><p>セレクション・練習会の日程、会場、申込先を、情報元へのリンクつきでまとめています。</p><a class="btn btn-main" href="/selection?pref=${encodeURIComponent(st.pref)}&${q}">サッカーセレクションへ</a></div>`;
-    return `<div class="cta"><b>${head}<br>関東・関西のセレクション情報を見る</b><p>いまは関東・関西のチームを掲載しています。${st.pref}の情報は順次広げていきます。</p><a class="btn btn-main" href="/selection?${q}">サッカーセレクションへ</a></div>`;
+    const who = opt.name ? `${esc(opt.name)}くん` : "あなた";
+    const ns = nextStageInfo();
+    const count = ns ? `<div class="count"><span>${who}の次の岐路：${ns.label}のセレクション（目安：${ns.when}）</span><b>${ns.months>0?`あと約${ns.months}か月`:"いまがその時期"}</b><span>ゲームで迷った分かれ道は、現実ではもうすぐやってきます。</span></div>` : "";
+    const area = opt.city ? `${st.pref}${esc(opt.city)}` : st.pref;
+    const inSite = SITE_REGIONS.includes(st.region);
+    const near = inSite ? `<div class="box"><h3>${area}から探せるクラブ</h3><div class="near" id="nearClubs"><span class="fine">読み込んでいます…</span></div><a class="btn btn-ghost" href="/selection?pref=${encodeURIComponent(st.pref)}&${q}">${st.pref}のセレクション情報をすべて見る</a></div>`
+      : `<div class="box"><h3>セレクション情報</h3><p class="fine">いまは関東・関西のクラブを掲載しています。${st.pref}の情報は順次広げていきます。</p><a class="btn btn-ghost" href="/selection?${q}">関東・関西のセレクション情報を見る</a></div>`;
+    const member = `<div class="cta"><b>気になるクラブのセレクション締切を、LINEでお知らせします</b><p>会員になると、締切リマインド、お気に入りクラブの登録、足型・体格・栄養のAI診断が使えます。スタンダードは月500円から。</p><a class="btn btn-main" href="/member?${q}&from=life">会員プランを見る</a></div>`;
+    const h = ref.height ? Math.round(ref.height) : null;
+    const links = `<div class="links">
+      <a href="/body-check?${q}"><b>体格に合うポジションをAIで診断</b><i>›</i><span>${opt.kid&&h?`身長${h}cmの体格から、向いているポジションを提案`:"身長と体重から、向いているポジションを提案"}</span></a>
+      <a href="/books/okane-toban-shinro?${q}"><b>本『入る前に知りたかった 少年サッカーのお金と当番と進路』</b><i>›</i><span>ゲームの親の負担は${yen(st.cost)}・当番${st.toban}回。実際の費用と当番の目安を1冊に</span></a>
+    </div>`;
+    return count + near + member + links;
+  }
+  async function loadClubs(st){
+    const box = $("nearClubs"); if (!box) return;
+    try {
+      const r = await fetch(`/api/life/clubs?pref=${encodeURIComponent(st.pref)}&city=${encodeURIComponent(opt.city||"")}`);
+      const d = await r.json();
+      if (!d.clubs || !d.clubs.length){ box.innerHTML = `<span class="fine">まだ掲載クラブがありません。</span>`; return; }
+      const head = d.scope==="city" ? "" : `<span class="fine">${opt.city?`${esc(opt.city)}の掲載クラブが見つからないため、`:""}${esc(st.pref)}の主なクラブを表示しています。</span>`;
+      box.innerHTML = head + d.clubs.map(c => `<a href="/clubs/${encodeURIComponent(c.slug)}?utm_source=life&utm_medium=game&utm_campaign=near"><b>${esc(c.name)}</b><i aria-hidden="true">›</i><span>${esc(c.city||st.pref)}${c.jleague?"・Jクラブ下部":""}</span>${c.next?`<em>次のセレクション ${esc((c.next.date||"").slice(5).replace("-","/"))}${c.next.deadline?`（締切 ${esc(c.next.deadline.slice(5).replace("-","/"))}）`:""}</em>`:""}</a>`).join("");
+    } catch(e){ box.innerHTML = `<span class="fine">クラブ情報を読み込めませんでした。</span>`; }
   }
   function finish(){
     const st = endSt || ref; updateHud(st.age);
@@ -780,7 +835,7 @@ function setRates(r){ RATES = r; }
     const res = $("result"); res.hidden = false;
     const redo = picks.map((p,k)=>`<div class="q"><span>${grade(p.age)}：${p.q} → ${p.opts[p.i].label}</span><div class="alts">${p.opts.map((o,j)=> j===p.i?"":`<button data-k="${k}" data-j="${j}" type="button">${o.label}</button>`).join("")}</div></div>`).join("");
     res.innerHTML = `
-      <div class="endhead"><span class="lab">${st.pref}・${st.month}月生まれ・${st.pos||""}の結末</span><h2>${st.ending}</h2>
+      <div class="endhead"><span class="lab">${opt.name?esc(opt.name)+"くん・":""}${st.pref}・${st.month}月生まれ・${st.pos||""}の結末</span><h2>${st.ending}</h2>
         ${fresh.length?`<span class="new">図鑑に新しい結末</span>`:""}
         <span class="lab" style="margin-top:6px">一緒に始めた4.5万人のうち</span><span class="top">上位${top}%</span><span class="lab">ここまで来たのは約${ppl.toLocaleString("ja-JP")}人${st.earn?`・プロの年俸合計 約${st.earn>=10000?Math.floor(st.earn/10000)+"億"+(st.earn%10000?(st.earn%10000).toLocaleString("ja-JP")+"万":"")+"円":st.earn.toLocaleString("ja-JP")+"万円"}`:""}</span></div>
       <div class="box"><h3>6人の路線図</h3>${routeSvg(st)}</div>
@@ -792,6 +847,7 @@ function setRates(r){ RATES = r; }
       <div class="share"><b>この人生を友だちに渡す</b><span>同じ運命で、相手はどの道を選ぶか。チームの保護者LINEで比べてみてください。</span><div class="row"><a class="btn btn-main" id="shLine" href="#" target="_blank" rel="noopener">LINEで送る</a><a class="btn btn-ghost" id="shX" href="#" target="_blank" rel="noopener">Xに投稿</a><button class="btn btn-ghost" id="copy" type="button">リンクをコピー</button></div></div>
       <div class="row"><button class="btn btn-you" id="again" type="button">新しい人生を生きる</button>${opt.kid?`<button class="btn btn-ghost" id="againKid" type="button">同じ条件でもう一度</button>`:""}</div>
       <div class="toast" id="toast" role="status"></div>`;
+    loadClubs(st);
     res.querySelectorAll(".alts button").forEach(b => b.onclick = () => { const k = +b.dataset.k, j = +b.dataset.j; start(seed, opt, picks.slice(0,k).map(p=>p.i).concat([j])); });
     const text = `【4.5万分の1】${st.pref}・${st.month}月生まれの${st.pos||""}。結末は「${st.ending}」、第2章の称号は「${st.after?st.after.title:""}」。一緒に始めた4.5万人のうち上位${top}%。親の費用は${yen(st.cost)}・当番${st.toban}回。`;
     const link = src => `https://soccer-selection.jp/life/play?utm_source=${src}&utm_medium=share&utm_campaign=result#${hashKey()}`;
