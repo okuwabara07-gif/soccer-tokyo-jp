@@ -171,6 +171,11 @@ button{cursor:pointer}
 .result canvas.card{width:100%;max-width:100%;height:auto;border-radius:16px;border:1px solid var(--line)}
 .row{display:flex;gap:10px;flex-wrap:wrap}
 .toast{font-size:13px;color:var(--blue);min-height:1.4em}
+.share{background:var(--surface);border:2px solid var(--you);border-radius:20px;padding:18px;display:grid;gap:10px}
+.share b{font-size:17px}
+.share > span{font-size:13px;color:var(--muted)}
+.share a{text-decoration:none}
+.shared{margin:0;background:var(--blue-soft);border-radius:14px;padding:12px 14px;font-size:14px;font-weight:700;color:var(--fg)}
 .redo{display:grid;gap:8px}
 .redo .q{display:grid;gap:6px;border-top:1px dashed var(--line);padding-top:8px}
 .redo .q:first-child{border-top:0;padding-top:0}
@@ -584,13 +589,20 @@ function setRates(r){ RATES = r; }
     const hz = isFinite(h) ? Math.max(-3, Math.min(3, (h - HEIGHT[Math.min(17,age)]) / HSD[Math.min(17,age)])) : null;
     start(null, {prefIdx:+$("kPref").value, mIdx: MONTHS.indexOf(+$("kMonth").value), hz, kidAge:age, kid:true}, []);
   });
-  const hm = location.hash.match(/^#s(\d+)$/);
-  if (hm) { $("goRandom").querySelector("b").textContent = "共有された人生を始める"; $("goRandom").onclick = () => start(+hm[1], {}, []); }
+  // 共有リンク: #s<seed>（ランダム）または #k<県>-<誕生月>-<体格>-<学年>-<seed>（うちの子モード）
+  const hashKey = () => opt.kid ? `k${opt.prefIdx}-${opt.mIdx}-${Math.round((opt.hz||0)*100)}-${opt.kidAge}-${seed}` : `s${seed}`;
+  const hs = location.hash.match(/^#s(\d+)$/), hk = location.hash.match(/^#k(\d+)-(\d+)-(-?\d+)-(\d+)-(\d+)$/);
+  if (hs || hk) {
+    const b = document.createElement("p"); b.className = "shared"; b.textContent = "友だちが生きた人生と同じ運命で始まります。あなたなら、どの道を選ぶ？"; $("starts").before(b);
+    $("goRandom").querySelector("b").textContent = "共有された人生を始める";
+    $("goRandom").querySelector("b + span").textContent = "県・誕生月・家庭・体格は友だちと同じ";
+    $("goRandom").onclick = hk ? () => start(+hk[5], {prefIdx:+hk[1], mIdx:+hk[2], hz:+hk[3]/100, kidAge:+hk[4], kid:true}, []) : () => start(+hs[1], {}, []);
+  }
 
   // ── 進行 ──
   function start(s, o, f){
     seed = s ?? Math.floor(Math.random()*1e9); opt = o || {}; forced = f || []; picks = [];
-    if (!opt.kid) { try{ history.replaceState(null,"","#s"+seed); }catch(e){} }
+    try{ history.replaceState(null,"","#"+hashKey()); }catch(e){}
     $("start").hidden = true; $("game").hidden = false;
     $("log").innerHTML = ""; $("choice").innerHTML = ""; $("result").hidden = true; $("result").innerHTML = "";
     queue = []; curAge = null; shownMateAge = {}; endSt = null; ch2 = false; clearTimeout(timer); $("cLeftL").textContent = "まだ続けている同学年";
@@ -777,11 +789,16 @@ function setRates(r){ RATES = r; }
       <div class="box"><h3>あの分岐をやり直す</h3><p class="fine">同じ運命のまま、1つの選択だけ変えて生き直します。</p><div class="redo">${redo || '<span class="fine">選んだ岐路はありません。</span>'}</div></div>
       <div class="box"><h3>結末図鑑 ${got.size}/${ZUKAN.length}</h3><div class="zukan">${ZUKAN.map(([k,n,ic])=>`<div class="${got.has(k)?"got":""} ${keys.includes(k)?"now":""}"><i aria-hidden="true">${got.has(k)?ic:"？"}</i>${got.has(k)?n:"まだ見ぬ結末"}</div>`).join("")}</div></div>
       <canvas class="card" id="card" width="1080" height="1350" aria-label="結果カード"></canvas>
-      <div class="row"><button class="btn btn-you" id="copy" type="button">結果をコピーして共有</button><button class="btn btn-main" id="again" type="button">新しい人生を生きる</button>${opt.kid?`<button class="btn btn-ghost" id="againKid" type="button">同じ条件でもう一度</button>`:""}</div>
+      <div class="share"><b>この人生を友だちに渡す</b><span>同じ運命で、相手はどの道を選ぶか。チームの保護者LINEで比べてみてください。</span><div class="row"><a class="btn btn-main" id="shLine" href="#" target="_blank" rel="noopener">LINEで送る</a><a class="btn btn-ghost" id="shX" href="#" target="_blank" rel="noopener">Xに投稿</a><button class="btn btn-ghost" id="copy" type="button">リンクをコピー</button></div></div>
+      <div class="row"><button class="btn btn-you" id="again" type="button">新しい人生を生きる</button>${opt.kid?`<button class="btn btn-ghost" id="againKid" type="button">同じ条件でもう一度</button>`:""}</div>
       <div class="toast" id="toast" role="status"></div>`;
     res.querySelectorAll(".alts button").forEach(b => b.onclick = () => { const k = +b.dataset.k, j = +b.dataset.j; start(seed, opt, picks.slice(0,k).map(p=>p.i).concat([j])); });
     const text = `【4.5万分の1】${st.pref}・${st.month}月生まれの${st.pos||""}。結末は「${st.ending}」、第2章の称号は「${st.after?st.after.title:""}」。一緒に始めた4.5万人のうち上位${top}%。親の費用は${yen(st.cost)}・当番${st.toban}回。`;
-    $("copy").onclick = async () => { try{ await navigator.clipboard.writeText(text + " https://soccer-selection.jp/life"); $("toast").textContent = "コピーしました。LINEやSNSに貼り付けてください"; } catch(e){ $("toast").textContent = text; } };
+    const link = src => `https://soccer-selection.jp/life/play?utm_source=${src}&utm_medium=share&utm_campaign=result#${hashKey()}`;
+    const msg = text + " 同じ運命で、あなたならどう生きる？";
+    $("shLine").href = `https://line.me/R/share?text=${encodeURIComponent(msg + "\n" + link("line"))}`;
+    $("shX").href = `https://x.com/intent/post?text=${encodeURIComponent(msg)}&url=${encodeURIComponent(link("x"))}`;
+    $("copy").onclick = async () => { const s = msg + " " + link("copy"); try{ await navigator.clipboard.writeText(s); $("toast").textContent = "コピーしました。LINEやSNSに貼り付けてください"; } catch(e){ $("toast").textContent = s; } };
     $("again").onclick = () => start(null, {}, []);
     if (opt.kid) $("againKid").onclick = () => start(null, opt, []);
     (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => drawCard(st, top, ppl)).catch(()=>drawCard(st, top, ppl));

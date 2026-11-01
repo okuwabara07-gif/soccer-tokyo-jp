@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
+import LifeBanner from "@/components/LifeBanner";
 import ReactMarkdown from "react-markdown";
 
 export const revalidate = 3600;
@@ -59,6 +60,9 @@ export default async function ColumnArticlePage({ params }: { params: Promise<{ 
             <Link href="/clubs" className="kf-btn kf-btn--ghost" style={{ padding: "10px 18px" }}>チームを探す</Link>
             <Link href="/selection" className="kf-btn kf-btn--ghost" style={{ padding: "10px 18px" }}>セレクション情報</Link>
           </div>
+        </div>
+        <div style={{ marginTop: 20 }}>
+          <LifeBanner compact />
         </div>
         {related && related.length > 0 && (
           <div style={{ marginTop: 28 }}>

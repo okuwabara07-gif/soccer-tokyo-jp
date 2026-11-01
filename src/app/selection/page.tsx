@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
+import LifeBanner from "@/components/LifeBanner";
 import SelectionClient from "@/components/SelectionClient";
 import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
@@ -71,6 +72,10 @@ export default async function SelectionPage() {
           関東・関西のジュニアユース・ジュニアのセレクション開催情報。日程・会場・申込先をまとめています。合否の傾向や合格率は扱いません。
         </p>
         <SelectionClient selections={current} />
+
+        <div style={{ marginTop: 24 }}>
+          <LifeBanner compact />
+        </div>
 
         {past.length > 0 && (
           <section style={{ marginTop: 32 }}>

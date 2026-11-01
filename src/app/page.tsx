@@ -7,6 +7,7 @@ import BottomNav from "@/components/BottomNav";
 import StatBar from "@/components/StatBar";
 import SectionHeader from "@/components/SectionHeader";
 import SiteFooter from "@/components/SiteFooter";
+import LifeBanner from "@/components/LifeBanner";
 import { createClient } from "@supabase/supabase-js";
 import { pageMeta } from "@/lib/seo";
 
@@ -32,6 +33,7 @@ const SUPPORT = [
   { label: "体格診断", href: "/body-check", img: "/images/kf/panels/p_body.jpg", desc: "体格に合ったポジションを提案" },
 ];
 const FUN = [
+  { label: "サッカー人生シミュレーター", href: "/life", img: "/life/og.png", desc: "年長から70歳までを5分で" },
   { label: "ゴールパフォーマンス図鑑", href: "/performance", img: "/images/kf/panels/p_performance.jpg", desc: "決め技を動画でチェック" },
   { label: "サッカー漫画", href: "/manga", img: "/images/kf/panels/p_manga.jpg", desc: "人気漫画をチェック" },
   { label: "ポジション別資料", href: "/position", img: "/images/kf/panels/p_position.jpg", desc: "役割や動きを学ぶ" },
@@ -163,6 +165,10 @@ export default async function HomePage() {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:16 }}>
           {BIG.map(p=><PanelCard key={p.label} p={p} big />)}
         </div>
+      </section>
+
+      <section className="kf-container" style={{ padding:"24px 16px 0" }}>
+        <LifeBanner />
       </section>
 
       {selections && selections.length > 0 && (
