@@ -20,13 +20,16 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const pref = (url.searchParams.get("pref") || "").slice(0, 10);
   const city = base(url.searchParams.get("city")).slice(0, 20);
+  // 女子版のゲームからは gender=girls が来る。女子チーム（team_gender=girls）だけを返し、リーグ登録のみのクラブ（男子）は出さない
+  const girls = url.searchParams.get("gender") === "girls";
   if (!pref) return NextResponse.json({ clubs: [], scope: "none" });
 
   const { data, error } = await supabase
     .from("clubs")
     .select("id,slug,name,city,city_norm,city_norm_source,club_type,strength_rank_pref")
     .eq("is_published", true)
-    .eq("prefecture", pref);
+    .eq("prefecture", pref)
+    .eq("team_gender", girls ? "girls" : "boys");
   if (error || !data) return NextResponse.json({ clubs: [], scope: "error" });
 
   const rows = data as ClubRow[];
@@ -42,7 +45,7 @@ export async function GET(req: Request) {
   picked = picked.slice(0, 6);
 
   type LC = { n: string; p: string; c?: string; e?: boolean; l?: string };
-  const leagueOnly = city
+  const leagueOnly = city && !girls
     ? (LEAGUE_CLUBS as LC[]).filter((x) => x.p === pref && x.c && hit(x.c)).slice(0, 6)
     : [];
 
