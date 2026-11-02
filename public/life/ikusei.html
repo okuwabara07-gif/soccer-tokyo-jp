@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>4.5万分の1 育成モード｜サッカー人生を育てて挑むゲーム | サッカーセレクション</title>
-<meta name="description" content="小1から高3までの9シーズン、練習を選んで能力を育て、ポジションと進路を自分で決める。セレクション・昇格試験・選手権のPKは自分の指で。最後に未来の自分と、向いているサッカーの仕事が見える無料ゲーム。">
+<meta name="description" content="年長から高3までの10シーズン（途中の学年からも）、両親の身長も入れて、練習を選んで能力を育て、ポジションと進路を自分で決める。セレクション・昇格試験・選手権のPKは自分の指で。最後に未来の自分と、向いているサッカーの仕事が見える無料ゲーム。">
 <link rel="canonical" href="https://soccer-selection.jp/life/ikusei">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="サッカーセレクション">
@@ -73,7 +73,7 @@ h1,h2,h3{text-wrap:balance;margin:0}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 .hud .gr{font-family:var(--f-display);font-size:24px;line-height:1}
 .hud .gr small{display:block;font-family:var(--f-body);font-size:11px;color:var(--navy-dim);margin-top:4px;font-weight:700}
-.track{display:grid;grid-template-columns:repeat(9,1fr);gap:3px}
+.track{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
 .track i{height:6px;border-radius:3px;background:rgba(255,255,255,.14)}
 .track i.done{background:var(--navy-dim)} .track i.now{background:var(--accent)}
 .track i.big{box-shadow:0 0 0 2px rgba(255,138,76,.55) inset}
@@ -177,6 +177,10 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .job > span{font-size:13px;color:var(--muted)}
 .job .door{color:var(--blue);font-weight:700}
 
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.field{display:grid;gap:4px;min-width:0}
+.field label{font-size:12px;font-weight:700;color:var(--muted)}
+.field input,.field select{min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:0 12px;font:inherit;width:100%}
 .back{font-size:13px;font-weight:700;color:var(--blue);text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
 .cta{background:var(--blue-soft);border:2px solid var(--blue);border-radius:20px;padding:18px;display:grid;gap:10px}
 .cta b{font-size:17px;line-height:1.45} .cta p{margin:0;font-size:13px;color:var(--muted)} .cta a{justify-self:start}
@@ -201,7 +205,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 (() => {
 // ── 設定 ──────────────────────────────────────────────
 const SEASONS = [
-  {g:"小1・2", age:6, k:"es"}, {g:"小3・4", age:8, k:"es", pos:true}, {g:"小5・6", age:10, k:"es", big:"sel"},
+  {g:"年長", age:5, k:"es"}, {g:"小1・2", age:6, k:"es"}, {g:"小3・4", age:8, k:"es", pos:true}, {g:"小5・6", age:10, k:"es", big:"sel"},
   {g:"中1", age:12, k:"jh"}, {g:"中2", age:13, k:"jh"}, {g:"中3", age:14, k:"jh", big:"u18"},
   {g:"高1", age:15, k:"hs"}, {g:"高2", age:16, k:"hs"}, {g:"高3", age:17, k:"hs", big:"pk"}];
 const ST = [["spd","スピード"],["tec","テクニック"],["iq","判断"],["phy","フィジカル"],["men","メンタル"]];
@@ -278,14 +282,28 @@ const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const esc = t => String(t).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 const addTr = tr => { for (const [k,v] of Object.entries(tr||{})) S.tr[k] = (S.tr[k]||0) + v; };
 
-function newRun(seed){
+// 親の身長から大人になったときの身長の目安（男子：（父＋母＋13）÷2、幅はおよそ±9cm）
+const midParent = (d, m) => (d && m) ? Math.round((d + m + 13) / 2) : null;
+const bodyType = (pr) => { const b = []; if (pr.dh && pr.dw) b.push(pr.dw / (pr.dh/100) ** 2); if (pr.mh && pr.mw) b.push(pr.mw / (pr.mh/100) ** 2); if (!b.length) return null; const v = b.reduce((a,c)=>a+c,0)/b.length; return v >= 25 ? "がっしり" : v < 20 ? "細身" : "ふつう"; };
+function newRun(seed, pr){
+  pr = pr || {};
   const s = {spd:18+Math.round(R()*8), tec:18+Math.round(R()*8), iq:16+Math.round(R()*8), phy:16+Math.round(R()*8), men:18+Math.round(R()*8)};
   if (seed==="left") s.tec += 8; if (seed==="fast") s.spd += 8; if (seed==="brain") s.iq += 8; if (seed==="heart") s.men += 8;
-  const month = [4,5,6,7,8,9,10,11,12,1,2,3][Math.floor(R()*12)];
-  S = { seed, s, prev:{...s}, i:0, fat:20, team:"地元の少年団", pos:"", rank:"", skills:[], log:[], rival:{name:"ハヤト", ovr:ovr(s)+3}, flags:{}, month, injuries:0, highFat:0, tr:{}, quotes:[], route:[] };
+  const month = pr.month || [4,5,6,7,8,9,10,11,12,1,2,3][Math.floor(R()*12)];
+  const start = clamp(pr.start|0, 0, 4);
+  // 途中から始めるときは、それまでの年代のぶん能力を伸ばしておく
+  for (let k = 0; k < start; k++){ const g = GROW[SEASONS[k].k]; for (const [st] of ST) s[st] = clamp(Math.round(s[st] + 4.5*g[st]*(0.8+R()*0.4)), 1, 99); }
+  const mph = midParent(pr.dh, pr.mh), bt = bodyType(pr);
+  if (mph) { const d = clamp((mph - 171) * 0.6, -6, 6); s.phy = clamp(Math.round(s.phy + d), 1, 99); if (d < -2) s.spd = clamp(s.spd + 2, 1, 99); }
+  if (bt === "がっしり"){ s.phy += 2; s.spd -= 1; } if (bt === "細身"){ s.spd += 2; s.phy -= 1; }
+  if ([1,2,3].includes(month) && start <= 3){ s.phy -= 2; s.men += 1; }
+  const team = start >= 4 ? "街クラブJY" : "地元の少年団";
+  S = { seed, s, prev:{...s}, i:start, start, fat:20, team, pos:"", rank:"", skills:[], log:[], rival:{name:"ハヤト", ovr:ovr(s)+3}, flags:{}, month, injuries:0, highFat:0, tr:{}, quotes:[], route:[], mph, bt, name:(pr.name||"").slice(0,10) };
   S.rank = rankOf(); plan = []; evPending = null; evDone = false;
-  addLog("good", `${month}月生まれ。${S.team}でボールを蹴り始めた。ライバルは同じチームの${S.rival.name}。`);
-  if ([1,2,3].includes(month)) addLog(null, "早生まれ。小学生のうちは体の大きさで不利になりやすい。");
+  addLog("good", `${S.name?S.name+"は":""}${month}月生まれ。${SEASONS[start].g}から、${S.team}でボールを蹴る。ライバルは同じチームの${S.rival.name}。`);
+  if (mph) addLog(null, `両親の身長から、大人になったときの身長の目安は約${mph}cm（±9cmほど）。`);
+  if (bt) addLog(null, `両親の体型は「${bt}」。体の使い方の傾向の目安にしている。`);
+  if ([1,2,3].includes(month)) addLog(null, "早生まれ。小学生のうちは体の大きさで不利になりやすいが、考える力で補える。");
   quote("start");
   render();
 }
@@ -294,7 +312,7 @@ function rankOf(){
   const d = ovr(S.s) - (lv + S.i*2.2);
   return d > 6 ? "エース" : d > 0 ? "スタメン" : d > -7 ? "途中出場" : "ベンチ外";
 }
-function addLog(tone, txt){ S.log.unshift({g:SEASONS[Math.min(S.i,8)].g, tone, txt}); }
+function addLog(tone, txt){ S.log.unshift({g:SEASONS[Math.min(S.i,SEASONS.length-1)].g, tone, txt}); }
 function quote(k){ if (!QUOTES[k] || S.quotes.includes(k)) return; S.quotes.push(k); if (!SAVE.quotes.includes(k)){ SAVE.quotes.push(k); store.set("ikusei-save", SAVE); setTimeout(()=>toast("語録を手に入れた：" + QUOTES[k]), 400); } }
 
 // ── 画面：スタート ─────────────────────────────────────
@@ -306,16 +324,35 @@ function startScreen(){
     <section class="hero">
       <span class="eyebrow">4.5万分の1・育成モード</span>
       <h1>育てて、挑んで、<em>次の人生へ。</em></h1>
-      <p>小1から高3までの9シーズン。練習を選んで能力を育て、ポジションと進路を自分で決める。小6のセレクション、中3の進路の試験、高3の選手権PKは、あなたの指で決まる。最後に、サッカーに関わる仕事のどれが向いているかと、未来の自分が見える。</p>
+      <p>年長から高3までの10シーズン（途中の学年からも始められる）。練習を選んで能力を育て、ポジションと進路を自分で決める。小6のセレクション、中3の進路の試験、高3の選手権PKは、あなたの指で決まる。最後に、サッカーに関わる仕事のどれが向いているかと、未来の自分が見える。</p>
     </section>
     <div class="card"><h2 style="font-size:16px">才能の種を1つ持って生まれる</h2>
       <p class="note">前の人生で取ったバッジで、新しい種が増えます。</p>
       <div class="seeds" id="seeds">${SEEDS.map(x => { const ok = x.base || got.has(x.need); return `<button class="seed" data-id="${x.id}" ${ok?"":"disabled"} aria-pressed="${x.id===pick}"><i>${ok?x.i:"？"}</i><span><b>${ok?x.n:"まだ持っていない種"}</b><span>${ok?x.d:"バッジ「"+BADGES.find(b=>b[0]===x.need)[1]+"」で手に入る"}</span></span></button>`; }).join("")}</div>
     </div>
-    <div class="row"><button class="btn main" id="go">小1の春から始める</button><a class="btn ghost" href="/life/play" style="display:inline-flex;align-items:center;text-decoration:none">統計で生きる通常モード</a>${SAVE.runs?`<span class="note">これまで${SAVE.runs}回の人生・見た結末 ${SAVE.ends.length}種類・語録 ${SAVE.quotes.length}/${Object.keys(QUOTES).length}</span>`:""}</div>
+    <div class="card"><h2 style="font-size:16px">あなた（お子さん）の条件</h2>
+      <p class="note">すべて任意です。入れた条件で始まります。入力内容はこの端末の中だけに残り、送信はされません。</p>
+      <div class="form">
+        <div class="field"><label for="fStart">始める時期</label><select id="fStart"><option value="0">年長から</option><option value="1">小1から</option><option value="2">小3から</option><option value="3">小5から</option><option value="4">中1から</option></select></div>
+        <div class="field"><label for="fMonth">生まれ月</label><select id="fMonth"><option value="">おまかせ</option>${[4,5,6,7,8,9,10,11,12,1,2,3].map(m=>`<option value="${m}">${m}月</option>`).join("")}</select></div>
+        <div class="field"><label for="fName">呼び名</label><input id="fName" type="text" maxlength="10" placeholder="例：ハルト" autocomplete="off"></div>
+        <div class="field"><label for="fDh">父の身長（cm）</label><input id="fDh" type="number" inputmode="decimal" min="140" max="210" placeholder="例：172"></div>
+        <div class="field"><label for="fMh">母の身長（cm）</label><input id="fMh" type="number" inputmode="decimal" min="130" max="200" placeholder="例：158"></div>
+        <div class="field"><label for="fDw">父の体重（kg）</label><input id="fDw" type="number" inputmode="decimal" min="35" max="180" placeholder="任意"></div>
+        <div class="field"><label for="fMw">母の体重（kg）</label><input id="fMw" type="number" inputmode="decimal" min="30" max="150" placeholder="任意"></div>
+      </div>
+      <p class="note">両親の身長から、大人になったときの身長の目安（男子：（父＋母＋13）÷2）を出して、体の強さに反映します。体重は体型の傾向として軽く反映するだけです。</p>
+    </div>
+    <div class="row"><button class="btn main" id="go">この条件で始める</button><a class="btn ghost" href="/life/play" style="display:inline-flex;align-items:center;text-decoration:none">統計で生きる通常モード</a>${SAVE.runs?`<span class="note">これまで${SAVE.runs}回の人生・見た結末 ${SAVE.ends.length}種類・語録 ${SAVE.quotes.length}/${Object.keys(QUOTES).length}</span>`:""}</div>
     ${SAVE.quotes.length?`<div class="card"><h3 style="font-size:15px">語録帳 ${SAVE.quotes.length}/${Object.keys(QUOTES).length}</h3><ul class="quotes">${SAVE.quotes.map(k=>`<li>${QUOTES[k]}</li>`).join("")}</ul></div>`:""}`;
   app.querySelectorAll(".seed").forEach(b => b.onclick = () => { pick = b.dataset.id; app.querySelectorAll(".seed").forEach(x => x.setAttribute("aria-pressed", String(x===b))); });
-  $("go").onclick = () => newRun(pick);
+  const P = store.get("ikusei-profile", {});
+  for (const [id,k] of [["fStart","start"],["fMonth","month"],["fName","name"],["fDh","dh"],["fMh","mh"],["fDw","dw"],["fMw","mw"]]) if (P[k]!=null && P[k]!=="") $(id).value = P[k];
+  $("go").onclick = () => {
+    const n = id => { const v = parseFloat($(id).value); return isFinite(v) ? v : null; };
+    const pr = {start:+$("fStart").value, month: $("fMonth").value ? +$("fMonth").value : null, name:$("fName").value.trim(), dh:n("fDh"), mh:n("fMh"), dw:n("fDw"), mw:n("fMw")};
+    store.set("ikusei-profile", pr); newRun(pick, pr);
+  };
 }
 
 // ── 画面：シーズン ────────────────────────────────────
@@ -323,10 +360,10 @@ function render(){
   const se = SEASONS[S.i];
   const drills = DRILLS.filter(d => (!d.only || d.only===se.k) && (!d.from || se.k!=="es"));
   const risk = injRisk();
-  const needPos = se.pos && !S.pos;
+  const needPos = (se.pos || S.i>=3) && !S.pos;
   app.innerHTML = `
     <div class="hud" role="group" aria-label="進み具合">
-      <div class="gr">${se.g}<small>${se.big?"大一番のシーズン":"シーズン "+(S.i+1)+"/9"}</small></div>
+      <div class="gr">${se.g}<small>${se.big?"大一番のシーズン":"シーズン "+(S.i+1-S.start)+"/"+(SEASONS.length-S.start)}</small></div>
       <div class="track" aria-hidden="true">${SEASONS.map((x,k)=>`<i class="${k<S.i?"done":k===S.i?"now":""} ${x.big?"big":""}"></i>`).join("")}</div>
       <div class="ovr"><b class="num" id="ovr">${ovr(S.s)}</b><span>総合力</span></div>
     </div>
@@ -572,7 +609,7 @@ function pkResult(win, word, loseLine){
 }
 function verdict(ok, word, quiet){
   const inn = $("bigIn");
-  inn.insertAdjacentHTML("beforeend", `<div class="verdict ${ok?"ok":"ng"}">${word}</div><button class="btn main" id="bigNext">${S.i>=8?"進路を決める":"次のシーズンへ"}</button>`);
+  inn.insertAdjacentHTML("beforeend", `<div class="verdict ${ok?"ok":"ng"}">${word}</div><button class="btn main" id="bigNext">${S.i>=SEASONS.length-1?"進路を決める":"次のシーズンへ"}</button>`);
   if (ok && !quiet) confetti();
   $("bigNext").onclick = () => { closeBig(); nextSeason(); };
   $("bigNext").focus();
@@ -631,8 +668,9 @@ function finish(path, sc){
   const jobs = (S.flags.pro ? [["pro",99], ...top.slice(0,2)] : top);
   const fut = future(path, tier, top[0][0]);
   app.innerHTML = `
-    <div class="card end"><span class="eyebrow" style="color:var(--navy-dim)">高3の冬・結末${newEnd?"（新しい結末）":""}</span><h2>${end}</h2>
+    <div class="card end"><span class="eyebrow" style="color:var(--navy-dim)">${S.name?esc(S.name)+"・":""}高3の冬・結末${newEnd?"（新しい結末）":""}</span><h2>${end}</h2>
       <div class="row" style="gap:18px"><span><span class="eyebrow" style="color:var(--navy-dim)">総合力</span><br><b class="num" style="font-size:34px">${o}</b></span><span><span class="eyebrow" style="color:var(--navy-dim)">${S.pos||"ポジション"}・特技</span><br><b style="font-size:16px">${sk?S.skills.map(x=>x.n).join("・"):"なし"}</b></span></div>
+      ${S.mph?`<p style="margin:0;color:var(--navy-dim);font-size:14px">大人になったときの身長の目安：約${S.mph}cm（両親の身長から）</p>`:""}
       <p style="margin:0;color:var(--navy-dim);font-size:14px">ライバルのハヤトは総合力${S.rival.ovr}。${o>=S.rival.ovr?"最後は、あなたが上だった。":"最後まで、背中を追いかけた。"}</p></div>
     <div class="card"><h3 style="font-size:15px">未来のあなた（想像）</h3><ol class="future">${fut.map(f=>`<li><b>${f[0]}</b><span>${f[1]}</span></li>`).join("")}</ol><p class="note">ここまでの選び方から想像した未来です。本当の未来は、これからの選び方で何度でも変わります。</p></div>
     <div class="card"><h3 style="font-size:15px">サッカーに関わる仕事、向いているのは</h3><div class="jobs">${jobs.map(([k,v],i)=>`<div class="job"><div class="jh"><b>${i+1}. ${JOBS[k].n}</b><span class="num">${v}%</span></div><span class="jt"><i style="width:${v}%"></i></span><span>${JOBS[k].d}</span><span class="door">入口：${JOBS[k].door}</span></div>`).join("")}</div>
@@ -653,7 +691,7 @@ function finish(path, sc){
     <div class="share"><b>この人生を友だちに見せる</b><div class="row"><a class="btn main" id="shLine" href="#" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none">LINEで送る</a><a class="btn ghost" id="shX" href="#" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none">Xに投稿</a><button class="btn ghost" id="copy" type="button">リンクをコピー</button></div><span class="note" id="copied" role="status"></span></div>
     <div class="row"><button class="btn main" id="again">次の人生へ</button></div>
     <p class="note">能力の伸び、ケガのしやすさ、PK、仕事の向き不向きはゲームとしての判定です。プロ入りの人数（1学年約180人）や1年目の年俸上限（1,200万円）、資格の入口は実際の制度に合わせています。語録はこのゲームのオリジナルです。</p>`;
-  const msg = `【4.5万分の1 育成モード】${S.pos||""}で9シーズン。結末は「${end}」。向いている仕事は「${JOBS[jobs[0][0]].n}」だった。あなたなら、どう育てる？`;
+  const msg = `【4.5万分の1 育成モード】${SEASONS[S.start].g}から${S.pos||""}で${SEASONS.length-S.start}シーズン。結末は「${end}」。向いている仕事は「${JOBS[jobs[0][0]].n}」だった。あなたなら、どう育てる？`;
   const link = src => `https://soccer-selection.jp/life/ikusei?utm_source=${src}&utm_medium=share&utm_campaign=ikusei`;
   $("shLine").href = `https://line.me/R/share?text=${encodeURIComponent(msg + "\n" + link("line"))}`;
   $("shX").href = `https://x.com/intent/post?text=${encodeURIComponent(msg)}&url=${encodeURIComponent(link("x"))}`;
