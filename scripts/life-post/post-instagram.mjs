@@ -13,8 +13,10 @@ const { INSTAGRAM_ACCOUNT_ID: IG, META_ACCESS_TOKEN: TOKEN, SUPABASE_URL, SUPABA
 const DRY = process.env.DRY_RUN === "true", FORCE = process.env.FORCE === "true";
 const summary = (s) => { console.log(s); if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, s + "\n"); };
 
-const missing = Object.entries({ INSTAGRAM_ACCOUNT_ID: IG, META_ACCESS_TOKEN: TOKEN, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY: SRK }).filter(([, v]) => !v).map(([k]) => k);
-if (missing.length && !DRY) { summary(`❌ GitHubのシークレットが未設定: ${missing.join(", ")}`); process.exit(1); }
+// 画像は Instagram の設定がなくても公開バケットに置く（TikTok 用に Higgsfield から取り込むため）
+const missingStore = [["SUPABASE_URL", SUPABASE_URL], ["SUPABASE_SERVICE_ROLE_KEY", SRK]].filter(([, v]) => !v).map(([k]) => k);
+const missingIG = [["INSTAGRAM_ACCOUNT_ID", IG], ["META_ACCESS_TOKEN", TOKEN]].filter(([, v]) => !v).map(([k]) => k);
+if (missingStore.length && !DRY) { summary(`❌ GitHubのシークレットが未設定: ${missingStore.join(", ")}`); process.exit(1); }
 
 const jpg = fs.readFileSync(path.join(dir, `${date}.jpg`));
 const caption = fs.readFileSync(path.join(dir, `${date}.ig.txt`), "utf8").slice(0, 2200);
@@ -33,7 +35,10 @@ if (!FORCE) {
 }
 
 await put(`${date}.jpg`, jpg, "image/jpeg");
+await put(`${date}.ig.txt`, caption, "text/plain");
 const imageUrl = pub(`${date}.jpg`);
+summary(`🖼 画像を置きました: ${imageUrl}`);
+if (missingIG.length) { summary(`⏭ Instagramは未設定のため投稿しません（${missingIG.join(", ")}）`); process.exit(0); }
 
 // Instagramログインのトークン（IGAA…）は graph.instagram.com、Facebookログインのトークンは graph.facebook.com
 const API = process.env.GRAPH_API || (TOKEN.startsWith("IGAA") ? "https://graph.instagram.com/v21.0" : "https://graph.facebook.com/v21.0");
