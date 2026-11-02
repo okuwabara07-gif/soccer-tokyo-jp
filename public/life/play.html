@@ -271,8 +271,10 @@ button{cursor:pointer}
       <li>文部科学省 学校保健統計調査 令和6年度：年齢別の平均身長</li>
       <li><a href="https://web.gekisaka.jp/news/jleague/detail/?415650-415650-fl" target="_blank" rel="noopener">Jリーグ選手契約制度の改定</a>：1年目の年俸上限、年俸下限</li>
       <li>日本プロサッカー選手会：Jリーガーの平均引退年齢26歳</li>
+      <li><a href="/books/okane-toban-shinro">『入る前に知りたかった 少年サッカーのお金と当番と進路』Q15</a>：少年団・街クラブの1年目の費用（少年団 年4.2万〜14万円、クラブ 年15万〜33万円の中間値）</li>
+      <li>サッカーセレクション掲載クラブ：街クラブジュニアユースの月謝（掲載23クラブの中央値 月13,500円）</li>
     </ul>
-    <p>16万回の自動プレイで照合：プロ入り1学年約177人（実績約180人）、経路 大学55%・ユース28%・高校16%（実績52・31・13%）、プロの4〜6月生まれ35%・1〜3月生まれ15%（実績33%・15%）、平均引退26.7歳（実績26.0歳）。親の負担、ケガ、トレセン選出率、年俸の中央値は想定値です。</p>
+    <p>16万回の自動プレイで照合：プロ入り1学年約177人（実績約180人）、経路 大学55%・ユース28%・高校16%（実績52・31・13%）、プロの4〜6月生まれ35%・1〜3月生まれ15%（実績33%・15%）、平均引退26.7歳（実績26.0歳）。中学年代以降の遠征費・当番、ケガ、トレセン選出率、年俸の中央値は想定値です。</p>
   </details>
 </div>
 
@@ -296,11 +298,11 @@ const TEAMS = {
   kinder:   {name:"幼稚園のサッカー教室", env:0.8, fee:4000, extra:10000, toban:0, drive:1},
   kids:     {name:"キッズスクール", env:1.0, fee:6000, extra:15000, toban:0, drive:2},
   park:     {name:"公園でボール遊び", env:0.5, fee:0, extra:0, toban:0, drive:0},
-  shonen:   {name:"少年団", env:0.6, fee:3000, extra:50000, toban:2, drive:3},
-  machi12:  {name:"街クラブ", env:1.0, fee:8000, extra:100000, toban:1, drive:4},
+  shonen:   {name:"少年団", env:0.6, fee:2500, extra:61000, toban:2, drive:3},
+  machi12:  {name:"街クラブ", env:1.0, fee:9500, extra:126000, toban:1, drive:4},
   jac12:    {name:"JクラブU-12", env:1.6, fee:10000, extra:120000, toban:0, drive:6},
   bukatsu15:{name:"中学部活", env:0.6, fee:0, extra:60000, toban:0, drive:1},
-  machi15:  {name:"街クラブJY", env:1.0, fee:15000, extra:200000, toban:1, drive:5},
+  machi15:  {name:"街クラブJY", env:1.0, fee:13500, extra:200000, toban:1, drive:5},
   jac15:    {name:"JクラブU-15", env:1.6, fee:15000, extra:180000, toban:0, drive:6},
   koritsu:  {name:"高校部活", env:0.6, fee:7000, extra:150000, toban:0, drive:1},
   kyogo:    {name:"強豪校", env:1.3, fee:60000, extra:300000, toban:0, drive:0},
@@ -395,7 +397,7 @@ function* life(seed, opt){
   if (R() < 0.05) return yield* quit("中学では別の部活を選び、サッカーは小学校で卒業した。", 1, "小学校で卒業");
   st.level = 2;
   const inJ = st.team==="jac12";
-  let c3 = yield* choose("中学年代はどこでプレーする？", [["jac15", inJ?"JクラブU-15へ昇格を目指す":"JクラブU-15のセレクションを受ける", inJ?"内部昇格の判定":"倍率は数十倍"],["machi15","街クラブJYのセレクションを受ける","月15,000円・遠征多め"],["bukatsu15","中学の部活に入る","費用は少ない"]]);
+  let c3 = yield* choose("中学年代はどこでプレーする？", [["jac15", inJ?"JクラブU-15へ昇格を目指す":"JクラブU-15のセレクションを受ける", inJ?"内部昇格の判定":"倍率は数十倍"],["machi15","街クラブJYのセレクションを受ける","月1.35万円前後・遠征多め"],["bukatsu15","中学の部活に入る","費用は少ない"]]);
   const pre = [];
   if (c3==="jac15"){ st.f.tryJ15=1; if (z() > (inJ?T.jac15in:T.jac15)) { st.f.passJ15=1; setTeam("jac15"); pre.push(log(inJ?"JクラブU-15に昇格した。":"JクラブU-15のセレクションに合格。", "good", !inJ && pctTag("passJ15") && `受験者の合格率 約${pctTag("passJ15")}%`)); }
     else { pre.push(log(inJ?"JクラブU-15への昇格は見送られた。":"JクラブU-15のセレクションは不合格。", "mild", !inJ && pctTag("passJ15") && `受験者の合格率 約${pctTag("passJ15")}%`)); c3 = z() > T.machi15 ? "machi15":"bukatsu15"; } }
