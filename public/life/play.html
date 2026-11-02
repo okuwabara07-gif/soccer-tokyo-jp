@@ -212,6 +212,11 @@ button{cursor:pointer}
 .sex button small{font-size:11px;font-weight:700;color:var(--you)}
 .sex button[aria-pressed="true"]{background:var(--navy);color:var(--navy-fg)}
 .sex button[aria-pressed="true"] small{color:#ffb38a}
+.habits{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.habits li{display:grid;gap:2px;padding:10px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
+.habits li.ok{border-color:var(--blue);background:var(--blue-soft)}
+.habits li b{font-size:15px}
+.habits li span{font-size:13px;color:var(--muted)}
 .src{margin-top:30px;font-size:12px;color:var(--muted)}
 .src summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}
 .src ul{padding-left:1.2em}
@@ -277,6 +282,7 @@ button{cursor:pointer}
       <li>文部科学省 学校保健統計調査 令和6年度：年齢別の平均身長</li>
       <li><a href="https://web.gekisaka.jp/news/jleague/detail/?415650-415650-fl" target="_blank" rel="noopener">Jリーグ選手契約制度の改定</a>：1年目の年俸上限、年俸下限</li>
       <li>日本プロサッカー選手会：Jリーガーの平均引退年齢26歳</li>
+      <li>行動：<a href="https://research.brighton.ac.uk/en/publications/the-role-of-deliberate-practice-and-play-in-career-progression-in/" target="_blank" rel="noopener">Ford ほか 2009（遊びのサッカーとプロ入り）</a>、<a href="https://research.hanze.nl/en/publications/self-regulation-and-performance-level-of-elite-and-non-elite-yout/" target="_blank" rel="noopener">Toering ほか 2009（振り返る力・努力と選抜）</a>、Milewski ほか 2014（睡眠とケガ）、米国小児科学会 2016（早期の専門化と燃え尽き）</li>
       <li>女子版：JFA 種別区分別男女区分別登録数（女子の小学生20,528人・中学生11,225人・高校生11,489人、2023年度）、文部科学省 学校保健統計調査 令和6年度（女子の平均身長）</li>
       <li>女子版：<a href="https://www5.targma.jp/js/2026/02/17/post22025/" target="_blank" rel="noopener">JFA女子部「12歳の壁」</a>（女子の約5人に1人が13歳でやめる）、<a href="https://weleague.jp/files/upload/202602/25_160652.pdf" target="_blank" rel="noopener">WEリーグ ベンチマーク調査 2026</a>（最低年俸270万円・A契約460万円）、2025-26シーズンのWEリーグ新人の出身（昇格・高卒・大卒）</li>
       <li><a href="/books/okane-toban-shinro">『入る前に知りたかった 少年サッカーのお金と当番と進路』Q15</a>：少年団・街クラブの1年目の費用（少年団 年4.2万〜14万円、クラブ 年15万〜33万円の中間値）</li>
@@ -358,7 +364,7 @@ function* life(seed, opt){
     mIdx: Math.floor(R()*12), wealth: R()<0.3?0:(R()<0.75?1:2), growth: pick(["早熟","普通","普通","晩熟"]),
     hz: norm(), talent: 50 + 10*norm(), dev: 0, effort: 0.5, team:null, teamFit:0, injuredYear:false,
     age:5, cost:0, toban:0, drive:0, level:0, career:[], pro:null, ending:"", pos:null, trecen:-1, height:0,
-    earn:0, f:{}, girl:G
+    earn:0, f:{}, girl:G, hab:{}
   };
   st.month = MONTHS[st.mIdx];
   if (opt.mIdx!=null) { st.mIdx = opt.mIdx; st.month = MONTHS[st.mIdx]; }
@@ -376,11 +382,11 @@ function* life(seed, opt){
     st.injuredYear = false; st.height = heightAt(st.age);
     const tm = TEAMS[st.team];
     if (st.age < 18 && tm){ st.cost += tm.fee*12 + tm.extra; st.toban += tm.toban*12; st.drive += tm.drive*48; }
-    const injP = 0.05 + st.effort*0.05;
+    const injP = (0.05 + st.effort*0.05) * (st.age<18 && st.hab.daily==="sleep" && st.age>=12 ? 0.6 : 1) * (st.age<18 && st.hab.early==="multi" ? 0.9 : 1);
     if (R() < injP){ const bad = R()<0.3; if(bad){ st.injuredYear=true; st.dev -= 1.2; st.f.bigInj=(st.f.bigInj||0)+1;
         yield log(pick(["右膝の靭帯を痛め、半年以上ボールを蹴れなかった。","疲労骨折で長期離脱。試合をスタンドから見る1年になった。","足首の大ケガ。復帰しても、元の感覚が戻るまで時間がかかった。"]), "bad", pctTag("bigInj") && `長期離脱は1人あたり一生で${pctTag("bigInj")}%`); }
       else yield log(pick(["捻挫で1か月離脱。","打撲で大会を1つ欠場した。", st.age>=10&&st.age<=14?"オスグッドで練習を控えた時期があった。":"太ももの肉離れで3週間離脱。"]), "mild"); }
-    if (!st.injuredYear) st.dev += tm.env*0.9 + st.effort*0.8 + st.teamFit + norm()*0.9 - 1.17;
+    if (!st.injuredYear) st.dev += tm.env*0.9 + st.effort*0.8 + st.teamFit + norm()*0.9 - 1.17 + (st.hab.daily==="note" && st.age>=12 && st.age<18 ? 0.12 : 0);
     for (const l of (lines||[])) if (l) yield (typeof l === "string" ? log(l) : l);
     st.age++;
   };
@@ -390,6 +396,23 @@ function* life(seed, opt){
     const zz = z(0.4); let got = -1; for (let i=0;i<TRC.length;i++) if (zz > TRC[i][1]) got = i;
     if (got > st.trecen){ st.trecen = got; const name = TRC[got][0]; st.f["tr"+got]=1;
       yield log(`${name}に選ばれた。`, got>=2?"good":null, pctTag("tr"+got) && `同学年の約${pctTag("tr"+got)}%`); }
+  };
+
+  // 求められる行動（研究で差が出たもの）を選ぶ岐路
+  const earlyHabit = function*(){
+    const h = yield* choose("小2。練習のない日、どう過ごす？", [["play","友だちと公園でボール遊び","決まりのない遊びのサッカー"],["multi","水泳や体操など、ほかのスポーツも","いろいろな動きを覚える"],["drill","スクールを増やしてサッカーの練習","月+6,000円"]]);
+    st.hab.early = h;
+    if (h==="play"){ st.dev += 0.3; return log("放課後は友だちとボールを追いかけた。遊びの中で、ボールの扱いが自然とうまくなった。", null, "プロになった選手は6〜12歳の「遊びのサッカー」の時間が長い（Ford ほか 2009）"); }
+    if (h==="multi"){ return log("水泳と体操にも通った。体の使い方の引き出しが増えた。", null, "早い時期の専門化は使いすぎのケガと燃え尽きを増やす（米国小児科学会 2016）"); }
+    st.dev += 0.2; st.cost += 6000*12*4; st.drive += 2*48*4; st.f.burn = 1;
+    return log("スクールを増やし、週5日ボールを蹴るようになった。", null, "練習量は大事。ただし早い専門化は燃え尽きの一因（米国小児科学会 2016）");
+  };
+  const dailyHabit = function*(){
+    const h = yield* choose("中学から、毎日続ける習慣をひとつ決めるなら？", [["note","サッカーノートで1日を振り返る","できたこと・課題・次にやること"],["sleep","毎日8時間以上寝る","夜のスマホを控える"],["free","特に決めない",""]]);
+    st.hab.daily = h;
+    return h==="note" ? log("寝る前に、サッカーノートを書くようになった。", null, "選抜された選手ほど「振り返る力」と「努力を続ける力」が高い（Toering ほか 2009）")
+      : h==="sleep" ? log("夜10時にはスマホを置いて寝るようにした。", null, "睡眠8時間未満の中高生アスリートはケガが1.7倍（Milewski ほか 2014）")
+      : null;
   };
   const heightLine = () => { const h = heightAt(st.age), a = Math.min(17,st.age), d = h - H[a];
     return log(`身長${h.toFixed(1)}cm。${G?"女子の":""}全国平均（${H[a]}cm）より${Math.abs(d).toFixed(1)}cm${d>=0?"高い":"低い"}。`, null, "学校保健統計 2024"); };
@@ -405,7 +428,8 @@ function* life(seed, opt){
   const c1 = yield* choose("小1の春。どこでボールを蹴る？", [["shonen","地元の少年団","月3,000円・当番あり"],["machi12","街クラブ", st.wealth===0?"月8,000円・家計はきつい":"月8,000円・送迎は週4時間"]]);
   setTeam(c1);
   yield* year([log(`${TEAMS[c1].name}に入った。同じ学年でボールを蹴り始めた子は全国に約4.5万人。`, null, "JFA第4種 270,188人÷6"), log(`${st.pref}には1チームあたり約${st.perTeam}人の登録選手がいる。`, null, "JFA都道府県別 2025")]);
-  yield* year([pick(["初めての公式戦。ボールに全員で群がる“団子サッカー”だった。","リフティングが10回を超えた。","コーチに名前を覚えてもらえた。"])]);
+  const eh = yield* earlyHabit();
+  yield* year([eh, pick(["初めての公式戦。ボールに全員で群がる“団子サッカー”だった。","リフティングが10回を超えた。","コーチに名前を覚えてもらえた。"])]);
   yield* year([abil()>55?"学年のなかで目立つ存在になってきた。":pick(["ベンチの時間が長い試合もあった。","練習には休まず通った。"]), heightLine()]);
   // 小4：ポジション
   { const hz = (heightAt(9)-H[9])/HS[9]; const w = [hz>0.8?0.25:0.05, 0.3+Math.max(0,hz)*0.1, 0.35, 0.3];
@@ -432,10 +456,11 @@ function* life(seed, opt){
     st.growth==="早熟"?"体が一気に大きくなり、当たり負けしなくなった。":st.growth==="晩熟"?"周りの子が急に大きくなり、体格差に苦しんだ。":""]);
   const c4 = yield* choose("中学の3年間、練習量はどうする？", [["mid","チームの練習をしっかり",""],["high","毎朝の自主練も追加","伸びるがケガも増える"],["low","勉強と両立して控えめに",""]]);
   st.effort = c4==="high"?1:c4==="low"?0.1:0.5;
-  yield* year([heightLine(), pick(["夏の大会で初めてスタメンに入った。","U-13リーグで1年戦い抜いた。","監督が代わり、ポジションの役割が変わった。"])]);
+  const dh = yield* dailyHabit();
+  yield* year([dh, heightLine(), pick(["夏の大会で初めてスタメンに入った。","U-13リーグで1年戦い抜いた。","監督が代わり、ポジションの役割が変わった。"])]);
   yield* year([...[...trecen()], abil()>62?"高校のスカウトが練習を見に来るようになった。":pick(["高校をどこにするか、親と話す夜が増えた。","3年最後の大会は地区予選で敗退した。"])]);
   // ── 高校 ──
-  if (R() < 0.32 && abil() < 55) return yield* quit("高校ではサッカーを続けなかった。中学で区切りをつけた。", 2, "中学で卒業");
+  if (R() < 0.32 + (st.f.burn?0.06:0) && abil() < 55) return yield* quit(st.f.burn && R()<0.5 ? "小さい頃から練習漬けで、中学の終わりに気持ちが切れた。高校ではサッカーを続けなかった。" : "高校ではサッカーを続けなかった。中学で区切りをつけた。", 2, "中学で卒業");
   st.level = 3;
   const inJ15 = st.team==="jac15";
   let c5 = yield* choose("中3の秋。高校年代の進路は？", [["jac18", inJ15?"JクラブU-18への昇格を目指す":"JクラブU-18のセレクションを受ける", inJ15?"昇格は半数以下":"狭き門"],["kyogo","全国常連の強豪校へ","寮生活・月6万円前後"],["koritsu","地元の高校のサッカー部","通学も費用も軽い"],["quit","高校ではサッカーをやめる",""]]);
@@ -488,7 +513,8 @@ function* life(seed, opt){
     setTeam(c1);
     yield* year([log(`${TEAMS[c1].name}に入った。同じ学年でボールを蹴っている女の子は全国に約3,400人。`, null, "JFA 女子の小学生登録 20,528人÷6（2023年度）"),
       c1==="girls12" ? "女の子だけのチームで、すぐに友だちができた。" : "チームの女の子は自分ひとり。着替えの場所を探すところから始まった。"]);
-    yield* year([pick(["初めての公式戦。男の子に当たり負けしないよう、必死で走った。","リフティングが10回を超えた。","コーチに名前を覚えてもらえた。"])]);
+    const eh = yield* earlyHabit();
+    yield* year([eh, pick(["初めての公式戦。男の子に当たり負けしないよう、必死で走った。","リフティングが10回を超えた。","コーチに名前を覚えてもらえた。"])]);
     yield* year([abil()>55?"学年のなかで目立つ存在になってきた。男の子にも負けていない。":pick(["ベンチの時間が長い試合もあった。","練習には休まず通った。"]), heightLine()]);
     { const hz = (heightAt(9)-H[9])/HS[9]; const w = [hz>0.8?0.25:0.05, 0.3+Math.max(0,hz)*0.1, 0.35, 0.3];
       let s=w.reduce((a,b)=>a+b), x=R()*s, k=0; while(x>w[k]){x-=w[k];k++;} st.pos = ["GK","DF","MF","FW"][k]; }
@@ -511,10 +537,11 @@ function* life(seed, opt){
       st.team==="boys15" ? "体格で男子に差をつけられ始めた。それでも、ボールを持てば負けなかった。" : ""]);
     const c4 = yield* choose("中学の3年間、練習量はどうする？", [["mid","チームの練習をしっかり",""],["high","毎朝の自主練も追加","伸びるがケガも増える"],["low","勉強と両立して控えめに",""]]);
     st.effort = c4==="high"?1:c4==="low"?0.1:0.5;
-    yield* year([heightLine(), st.team==="boys15" ? pick(["男子の公式戦に、交代で出場した。","練習試合で男子相手にゴールを決めた。"]) : pick(["全日本U-15女子サッカー選手権の予選に出た。","女子のU-15リーグで1年戦い抜いた。","監督が代わり、ポジションの役割が変わった。"])]);
+    const dh = yield* dailyHabit();
+    yield* year([dh, heightLine(), st.team==="boys15" ? pick(["男子の公式戦に、交代で出場した。","練習試合で男子相手にゴールを決めた。"]) : pick(["全日本U-15女子サッカー選手権の予選に出た。","女子のU-15リーグで1年戦い抜いた。","監督が代わり、ポジションの役割が変わった。"])]);
     yield* year([...[...trecen()], abil()>62?"高校の女子サッカー部の監督が、試合を見に来るようになった。":pick(["高校をどこにするか、親と話す夜が増えた。","3年最後の大会は地区予選で敗退した。"])]);
     // ── 高校 ──
-    if (R() < TG.quit15 && abil() < 55) return yield* quit("高校ではサッカーを続けなかった。中学で区切りをつけた。", 2, "中学で卒業");
+    if (R() < TG.quit15 + (st.f.burn?0.06:0) && abil() < 55) return yield* quit(st.f.burn && R()<0.5 ? "小さい頃から練習漬けで、中学の終わりに気持ちが切れた。高校ではサッカーを続けなかった。" : "高校ではサッカーを続けなかった。中学で区切りをつけた。", 2, "中学で卒業");
     st.level = 3;
     const inW = st.team==="wea15";
     let c5 = yield* choose("中3の秋。高校年代の進路は？", [["wea18", inW?"アカデミーU-18への昇格を目指す":"WEクラブのアカデミー（U-18）のセレクションを受ける", inW?"昇格は狭き門":"全国で数少ない"],["kyogoG","全国大会常連の女子サッカー部へ","寮生活・月6万円前後"],["koritsuG","地元の高校の女子サッカー部","通学も費用も軽い"],["quit","高校ではサッカーをやめる",""]]);
@@ -731,14 +758,14 @@ function setRates(r){ RATES = r; }
 <script>
 (() => {
   // 男子と女子で別々に16万回の自動プレイで測った値
-  const RATES_B = {passJ12:2.89,passJ15:5.78,tr0:19.71,tr1:6.78,tr2:2.43,tr3:0.27,senshuken:1.38,bigInj:24.55};
-  const RATES_GL = {"passW15":9.77,"tr0":19.63,"tr1":6.55,"tr2":2.2,"tr3":0.2,"senshuken":8.17,"bigInj":23.57};
-  const TOP_B = [null,100,94.99,73.97,16.5,1.5,0.39,0.31,0.18,0.05,0.02];
-  const TOP_GL = [null,100,78.76,72.37,17.9,4.14,1.65,1.65,0.33,0.33,0.12];
-  const SURV_GL = {"5":1,"6":1,"7":1,"8":1,"9":1,"10":1,"11":1,"12":0.7876,"13":0.7876,"14":0.7876,"15":0.6013,"16":0.6013,"17":0.6013,"18":0.179,"19":0.178,"20":0.1774,"21":0.1761,"22":0.0378,"23":0.0359,"24":0.0352,"25":0.033,"26":0.0073,"27":0.0069,"28":0.0066,"29":0.0063,"30":0.006,"31":0.0058,"32":0.0049,"33":0.0041,"34":0.0029,"35":0.0017,"36":0.001,"37":0.0003,"38":0.0001};
+  const RATES_B = {"passJ12":3,"passJ15":5.89,"tr0":20.02,"tr1":7.06,"tr2":2.55,"tr3":0.31,"senshuken":1.47,"bigInj":23.3};
+  const RATES_GL = {"passW15":9.86,"tr0":20.08,"tr1":6.87,"tr2":2.32,"tr3":0.22,"senshuken":8.6,"bigInj":22.25};
+  const TOP_B = [null,100,95,72.83,16.41,1.55,0.39,0.31,0.2,0.06,0.02];
+  const TOP_GL = [null,100,78.77,71.47,17.99,4.28,1.76,1.76,0.35,0.35,0.14];
+  const SURV_GL = {"5":1,"6":1,"7":1,"8":1,"9":1,"10":1,"11":1,"12":0.7877,"13":0.7877,"14":0.7877,"15":0.5951,"16":0.5951,"17":0.5951,"18":0.1799,"19":0.1788,"20":0.1782,"21":0.1766,"22":0.0387,"23":0.0365,"24":0.0357,"25":0.0336,"26":0.0076,"27":0.0071,"28":0.0068,"29":0.0066,"30":0.0064,"31":0.0062,"32":0.0052,"33":0.0044,"34":0.003,"35":0.0018,"36":0.0011,"37":0.0004,"38":0.0001};
   let TOP = TOP_B, SURV, COH = 45000, COHL = "4.5万人", girl = false;
   setRates(RATES_B);
-  const SURV_B = {5:1,6:1,7:1,8:1,9:1,10:1,11:1,12:0.95,13:0.95,14:0.95,15:0.617,16:0.617,17:0.617,18:0.169,19:0.169,20:0.168,21:0.168,22:0.0143,23:0.0133,24:0.0129,25:0.0127,26:0.0016,27:0.0014,28:0.0012,29:0.0011,30:0.001,31:0.0009,32:0.0006,33:0.0004,34:0.0004,35:0.0002,36:0.0001,37:0.0001,38:0};
+  const SURV_B = {"5":1,"6":1,"7":1,"8":1,"9":1,"10":1,"11":1,"12":0.95,"13":0.95,"14":0.95,"15":0.606,"16":0.606,"17":0.606,"18":0.1641,"19":0.1638,"20":0.1635,"21":0.1634,"22":0.0146,"23":0.014,"24":0.0137,"25":0.0135,"26":0.0017,"27":0.0016,"28":0.0015,"29":0.0014,"30":0.0013,"31":0.0012,"32":0.0008,"33":0.0007,"34":0.0005,"35":0.0003,"36":0.0001,"37":0.0001,"38":0.0001};
   SURV = SURV_B;
   const setSex = gl => { girl = !!gl; TOP = girl ? TOP_GL : TOP_B; SURV = girl ? SURV_GL : SURV_B; COH = girl ? 3400 : 45000; COHL = girl ? "約3,400人" : "4.5万人"; setRates(girl ? RATES_GL : RATES_B); };
   // 同期の名前：今の年長〜小学生世代（2014〜2021年生まれ）の男の子に多い名前から毎回選ぶ（2020年生まれの1位は「蒼」：明治安田生命）
@@ -980,6 +1007,20 @@ function setRates(r){ RATES = r; }
     });
     return s + `</svg>`;
   }
+  // 求められる資質・行動：研究で、上のレベルに進んだ選手とそうでない選手の差が出た行動
+  function habitsHtml(st){
+    const h = st.hab || {};
+    const q = "utm_source=life&utm_medium=game&utm_campaign=habit";
+    const items = [
+      [h.early==="play", "遊びの中で覚える", "6〜12歳に「遊びのサッカー」の時間が長い選手ほど、プロに進んでいた。", "Ford ほか 2009"],
+      [h.daily==="note", "振り返る力", "自分の強みと課題を振り返り、次の行動に移せる選手ほど選抜されていた。", "Toering ほか 2009"],
+      [picks.some(p => /練習量/.test(p.q) && !/控えめ/.test(p.opts[p.i].label)), "努力を続ける力", "練習や試合に力を注ぎ続ける姿勢も、選抜された選手で高かった。", "Toering ほか 2009"],
+      [h.daily==="sleep", "休む力", "睡眠が8時間未満の中高生アスリートは、ケガが1.7倍だった。", "Milewski ほか 2014"],
+    ];
+    const got = items.filter(i => i[0]).length;
+    const note = h.daily!=="note" ? `<a class="btn btn-ghost" href="/books/oyako-soccer-note?${q}">振り返りを親子で：『9歳から始める 親子サッカーノート』</a>` : `<a class="btn btn-ghost" href="/books/oyako-soccer-note?${q}">ノートの書き方を親子で：『9歳から始める 親子サッカーノート』</a>`;
+    return `<div class="box"><h3>上に進む選手に共通する行動 ${got}/${items.length}</h3><ul class="habits">${items.map(([ok,t,d,src]) => `<li class="${ok?"ok":""}"><b>${ok?"✓":"・"} ${t}</b><span>${d}<span class="tag">${src}</span></span></li>`).join("")}</ul><p class="fine">素質や生まれ月は選べませんが、行動は選べます。ゲームの中の効果の大きさは、研究の方向に合わせた想定値です。</p>${note}</div>`;
+  }
   function afterHtml(st){
     const A = st.after; if (!A) return "";
     const merits = [A.playing||A.back?"週末の試合が、仕事以外の居場所になった":null, A.friends?`一緒にボールを蹴った仲間は約${A.friends}人`:null, A.lic?`${A.kids}人の子どもにサッカーを教えた`:null, A.refs?`審判として${A.refs}試合以上を支えた`:null, A.child?"子どもと同じスポーツで、同じ話ができた":null, A.dream?"プロでなくても、全国を目指して戦えた":null, A.at70?"70歳でもボールを蹴る体と仲間が残った":null].filter(Boolean);
@@ -1033,6 +1074,7 @@ function setRates(r){ RATES = r; }
         ${fresh.length?`<span class="new">図鑑に新しい結末</span>`:""}
         <span class="lab" style="margin-top:6px">一緒に始めた${COHL}のうち</span><span class="top">上位${top}%</span><span class="lab">ここまで来たのは約${ppl.toLocaleString("ja-JP")}人${st.earn?`・プロの年俸合計 約${st.earn>=10000?Math.floor(st.earn/10000)+"億"+(st.earn%10000?(st.earn%10000).toLocaleString("ja-JP")+"万":"")+"円":st.earn.toLocaleString("ja-JP")+"万円"}`:""}</span></div>
       ${(() => { const P = personality(st); st.persona = P.t; return `<div class="box"><h3>選択から見えた性格</h3><b style="font-size:20px">「${P.t}」</b><p class="fine" style="font-size:14px;color:var(--fg)">${P.d}</p>${P.early?`<p class="fine">${P.early}<span class="tag">山口・伊藤・中室 2023</span></p>`:""}<p class="fine">あなたが選んだ道から判定しています。名前や誕生日から性格を決めることはしていません。</p></div>`; })()}
+      ${habitsHtml(st)}
       <div class="box"><h3>6人の路線図</h3>${routeSvg(st)}</div>
       ${afterHtml(st)}
       ${ctaHtml(st)}
