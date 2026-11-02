@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>4.5万分の1 育成モード｜サッカー人生を育てて挑むゲーム | サッカーセレクション</title>
+<meta name="description" content="小1から高3までの9シーズン、練習を選んで能力を育て、ポジションと進路を自分で決める。セレクション・昇格試験・選手権のPKは自分の指で。最後に未来の自分と、向いているサッカーの仕事が見える無料ゲーム。">
+<link rel="canonical" href="https://soccer-selection.jp/life/ikusei">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="サッカーセレクション">
+<meta property="og:title" content="4.5万分の1 育成モード">
+<meta property="og:description" content="練習で育て、セレクションとPKに挑み、未来の自分と向いているサッカーの仕事を知る。">
+<meta property="og:url" content="https://soccer-selection.jp/life/ikusei">
+<meta property="og:image" content="https://soccer-selection.jp/life/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#14213a">
+<style>html,body{margin:0}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=JetBrains+Mono:wght@700;800&display=swap">
+<style>
+/* Layout: スマホ縦1カラム。上に年代の時計と能力の5角形、下に「今季の練習」と岐路。大一番だけ全面のミニゲーム */
+:root{
+  --bg:#f4f6fa; --surface:#ffffff; --fg:#14213a; --muted:#5a6576; --line:#dde3ec;
+  --navy:#14213a; --navy-fg:#eef2f8; --navy-dim:#9aa7bc;
+  --accent:#e8590c; --accent-soft:#fde9dd; --blue:#1d5fa8; --blue-soft:#e6eef8;
+  --warn:#c98a00; --warn-soft:#fbf1d6; --bad:#c2352b; --bad-soft:#f9e1de;
+  --f-display:'Dela Gothic One','Zen Kaku Gothic New',sans-serif;
+  --f-body:'Zen Kaku Gothic New','Hiragino Sans','Noto Sans JP',sans-serif;
+  --f-num:'JetBrains Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1424; --surface:#151f36; --fg:#eef2f8; --muted:#9aa7bc; --line:#26324d;
+  --navy:#0a1020; --navy-fg:#eef2f8; --navy-dim:#8b97ad;
+  --accent:#ff8a4c; --accent-soft:#3a2418; --blue:#8ab8f0; --blue-soft:#1b2a47;
+  --warn:#f0c04a; --warn-soft:#3a3016; --bad:#ff7a6e; --bad-soft:#3d1e1c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1424; --surface:#151f36; --fg:#eef2f8; --muted:#9aa7bc; --line:#26324d;
+  --navy:#0a1020; --navy-fg:#eef2f8; --navy-dim:#8b97ad;
+  --accent:#ff8a4c; --accent-soft:#3a2418; --blue:#8ab8f0; --blue-soft:#1b2a47;
+  --warn:#f0c04a; --warn-soft:#3a3016; --bad:#ff7a6e; --bad-soft:#3d1e1c; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px}
+.wrap{max-width:520px;margin:0 auto;display:grid;gap:14px}
+button{font:inherit;cursor:pointer;color:inherit}
+button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+h1,h2,h3{text-wrap:balance;margin:0}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--muted)}
+
+/* スタート */
+.hero{display:grid;gap:12px;padding-block:10px 4px}
+.hero h1{font-family:var(--f-display);font-weight:400;font-size:clamp(30px,9vw,44px);line-height:1.15}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p{margin:0;color:var(--muted)}
+.seeds{display:grid;gap:10px}
+.seed{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:center;text-align:left;padding:14px;border-radius:16px;border:2px solid var(--line);background:var(--surface)}
+.seed[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.seed[disabled]{opacity:.45;cursor:not-allowed}
+.seed i{font-style:normal;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--blue-soft);color:var(--blue);font-family:var(--f-display);font-size:18px}
+.seed b{display:block}
+.seed span{font-size:13px;color:var(--muted)}
+.btn{min-height:52px;border-radius:999px;border:0;padding:0 26px;font-weight:900;font-size:17px;background:var(--navy);color:var(--navy-fg)}
+.btn.main{background:var(--accent);color:#fff}
+.btn.ghost{background:transparent;border:2px solid var(--line);color:var(--fg)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* HUD */
+.hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--navy);color:var(--navy-fg);border-radius:18px;padding:12px 16px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.hud .gr{font-family:var(--f-display);font-size:24px;line-height:1}
+.hud .gr small{display:block;font-family:var(--f-body);font-size:11px;color:var(--navy-dim);margin-top:4px;font-weight:700}
+.track{display:grid;grid-template-columns:repeat(9,1fr);gap:3px}
+.track i{height:6px;border-radius:3px;background:rgba(255,255,255,.14)}
+.track i.done{background:var(--navy-dim)} .track i.now{background:var(--accent)}
+.track i.big{box-shadow:0 0 0 2px rgba(255,138,76,.55) inset}
+.hud .ovr{text-align:right;line-height:1.1}
+.hud .ovr b{font-family:var(--f-num);font-size:26px}
+.hud .ovr span{display:block;font-size:11px;color:var(--navy-dim);font-weight:700}
+
+/* 能力カード */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;display:grid;gap:12px}
+.stats{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;align-items:center}
+@media (max-width:380px){.stats{grid-template-columns:1fr}.stats canvas{justify-self:center}}
+.bars{display:grid;gap:7px}
+.bar{display:grid;grid-template-columns:5.4em minmax(0,1fr) 2.4em;gap:8px;align-items:center;font-size:13px;font-weight:700}
+.bar .t{height:9px;border-radius:5px;background:var(--line);overflow:hidden}
+.bar .t i{display:block;height:100%;width:0;background:var(--blue);border-radius:5px;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.bar .v{text-align:right}
+.bar .up{color:var(--accent);font-size:11px;margin-left:2px}
+.meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.meta div{background:var(--bg);border-radius:12px;padding:8px 10px;display:grid;line-height:1.25}
+.meta span{font-size:11px;color:var(--muted);font-weight:700}
+.meta b{font-size:15px}
+.fat .t{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:4px}
+.fat .t i{display:block;height:100%;transition:width .5s ease}
+.skills{display:flex;flex-wrap:wrap;gap:6px}
+.skill{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.skill.new{animation:pop .6s ease}
+@keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+/* 練習 */
+.plan h2{font-size:17px}
+.slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.slot{min-height:58px;border-radius:14px;border:2px dashed var(--line);display:grid;place-items:center;text-align:center;font-size:12px;font-weight:700;color:var(--muted);padding:4px;background:transparent}
+.slot.on{border-style:solid;border-color:var(--blue);background:var(--blue-soft);color:var(--fg)}
+.drills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.drill{text-align:left;border-radius:14px;border:1px solid var(--line);background:var(--surface);padding:10px 12px;display:grid;gap:2px;min-height:76px}
+.drill:hover{border-color:var(--blue)}
+.drill b{font-size:14px}
+.drill span{font-size:12px;color:var(--muted)}
+.drill .fx{font-family:var(--f-num);font-size:11px;color:var(--blue)}
+.drill[disabled]{opacity:.4}
+.risk{font-size:13px;font-weight:700;padding:8px 12px;border-radius:12px}
+.risk.lo{background:var(--blue-soft);color:var(--blue)} .risk.mid{background:var(--warn-soft);color:var(--warn)} .risk.hi{background:var(--bad-soft);color:var(--bad)}
+
+/* 出来事 */
+.ev{background:var(--navy);color:var(--navy-fg);border:0}
+.ev .who{display:flex;gap:10px;align-items:center}
+.ev .face{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-size:18px;background:rgba(255,255,255,.1)}
+.ev .who b{display:block} .ev .who span{font-size:12px;color:var(--navy-dim)}
+.ev p{margin:0;font-size:16px;font-weight:700;line-height:1.6}
+.ev .opts{display:grid;gap:8px}
+.ev .opt{text-align:left;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);padding:12px 14px;display:grid;gap:2px;color:var(--navy-fg)}
+.ev .opt:hover{border-color:var(--accent)}
+.ev .opt span{font-size:12px;color:var(--navy-dim)}
+.ev .res{font-size:14px;color:var(--navy-dim)}
+
+/* 記録 */
+.log{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:14px}
+.log li{display:grid;grid-template-columns:3.6em minmax(0,1fr);gap:8px}
+.log li b{font-family:var(--f-num);font-size:12px;color:var(--muted);padding-top:2px}
+.log li.good span{color:var(--blue);font-weight:700} .log li.bad span{color:var(--bad);font-weight:700}
+
+/* 大一番 */
+.big{position:fixed;inset:0;z-index:20;background:var(--navy);color:var(--navy-fg);display:grid;place-items:center;
+  padding:calc(env(safe-area-inset-top,0px) + 16px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 16px) max(16px,env(safe-area-inset-left,0px))}
+.big .in{width:100%;max-width:520px;display:grid;gap:14px;justify-items:center;text-align:center}
+.big h2{font-family:var(--f-display);font-weight:400;font-size:clamp(24px,7vw,34px);line-height:1.25}
+.big p{margin:0;color:var(--navy-dim)}
+.big canvas{width:100%;max-width:460px;height:auto;border-radius:16px;touch-action:manipulation;cursor:pointer}
+.big .hint{font-size:13px;color:var(--navy-dim)}
+.big .score{font-family:var(--f-num);font-size:20px}
+.big .verdict{font-family:var(--f-display);font-size:30px}
+.big .verdict.ok{color:#8ab8f0} .big .verdict.ng{color:#ff8a4c}
+
+/* 結末 */
+.end{background:var(--navy);color:var(--navy-fg);border:0}
+.end h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,8vw,40px);color:#8ab8f0;line-height:1.2}
+.badges{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.badge{border:1px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center;font-size:11px;line-height:1.35;min-height:70px;display:grid;place-content:center;gap:2px;color:var(--muted);background:var(--bg)}
+.badge i{font-style:normal;font-family:var(--f-display);font-size:16px}
+.badge.got{background:var(--blue-soft);border-color:var(--blue);color:var(--fg);font-weight:700}
+.badge.now{box-shadow:0 0 0 2px var(--accent) inset}
+.note{font-size:12px;color:var(--muted);margin:0}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%) translateY(20px);opacity:0;z-index:30;background:var(--accent);color:#fff;font-weight:900;padding:10px 18px;border-radius:999px;transition:.3s;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.routes{display:grid;gap:10px;width:100%}
+.route{text-align:left;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);padding:14px 16px;display:grid;gap:2px;color:var(--navy-fg)}
+.route:hover,.route:focus-visible{border-color:#ff8a4c}
+.route b{font-size:16px} .route span{font-size:13px;color:var(--navy-dim)}
+.quotes{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.quotes li{font-weight:700;font-size:15px;padding:10px 14px;border-left:4px solid var(--accent);background:var(--bg);border-radius:0 12px 12px 0}
+.future{margin:0;padding:0;list-style:none;display:grid;gap:0;position:relative}
+.future li{display:grid;grid-template-columns:4em minmax(0,1fr);gap:10px;padding:10px 0;border-top:1px dashed var(--line)}
+.future li:first-child{border-top:0}
+.future b{font-family:var(--f-num);color:var(--accent)}
+.jobs{display:grid;gap:12px}
+.job{display:grid;gap:4px}
+.job .jh{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.job .jh b{font-size:15px}
+.job .jt{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.job .jt i{display:block;height:100%;background:var(--accent);border-radius:4px}
+.job > span{font-size:13px;color:var(--muted)}
+.job .door{color:var(--blue);font-weight:700}
+
+.back{font-size:13px;font-weight:700;color:var(--blue);text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
+.cta{background:var(--blue-soft);border:2px solid var(--blue);border-radius:20px;padding:18px;display:grid;gap:10px}
+.cta b{font-size:17px;line-height:1.45} .cta p{margin:0;font-size:13px;color:var(--muted)} .cta a{justify-self:start}
+.links{display:grid;gap:8px}
+.links a{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--fg);text-decoration:none}
+.links a b{font-size:15px} .links a i{font-style:normal;grid-row:span 2;align-self:center;color:var(--muted);font-size:20px} .links a span{font-size:12px;color:var(--muted)}
+.links a:hover{border-color:var(--blue)}
+.share{background:var(--surface);border:2px solid var(--accent);border-radius:20px;padding:16px;display:grid;gap:10px}
+.share b{font-size:16px}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:40;width:100%;height:100%}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="wrap" id="app"></div>
+<div class="big" id="big" hidden><div class="in" id="bigIn"></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+// ── 設定 ──────────────────────────────────────────────
+const SEASONS = [
+  {g:"小1・2", age:6, k:"es"}, {g:"小3・4", age:8, k:"es", pos:true}, {g:"小5・6", age:10, k:"es", big:"sel"},
+  {g:"中1", age:12, k:"jh"}, {g:"中2", age:13, k:"jh"}, {g:"中3", age:14, k:"jh", big:"u18"},
+  {g:"高1", age:15, k:"hs"}, {g:"高2", age:16, k:"hs"}, {g:"高3", age:17, k:"hs", big:"pk"}];
+const ST = [["spd","スピード"],["tec","テクニック"],["iq","判断"],["phy","フィジカル"],["men","メンタル"]];
+// 年代ごとの伸びやすさ（技術は小学校高学年、体は中学〜高校で伸びやすい：想定値）
+const GROW = { es:{spd:1,tec:1.35,iq:1.05,phy:.6,men:1}, jh:{spd:1.15,tec:1,iq:1.1,phy:1.25,men:1}, hs:{spd:.9,tec:.8,iq:1.2,phy:1.3,men:1.1} };
+const DRILLS = [
+  {id:"drib", n:"ドリブル練習", d:"ボールを体の一部に", fx:{tec:4}, fat:12, tr:{gear:1}},
+  {id:"dash", n:"ダッシュ・鬼ごっこ", d:"一歩目を速く", fx:{spd:4,phy:1}, fat:15, tr:{trainer:1}},
+  {id:"game", n:"ミニゲーム", d:"考えながらプレー", fx:{iq:4,tec:1}, fat:11, tr:{coach:1,analyst:1}},
+  {id:"play", n:"公園で遊びのサッカー", d:"決まりのない自由な時間", fx:{tec:2,iq:2,men:1}, fat:6, only:"es", tr:{coach:1}},
+  {id:"body", n:"体幹・筋トレ", d:"当たり負けしない体", fx:{phy:4}, fat:13, from:"jh", tr:{trainer:1,nutri:1}},
+  {id:"video", n:"試合の映像を見る", d:"うまい選手の動きを研究", fx:{iq:3}, fat:3, from:"jh", tr:{analyst:2,media:1}},
+  {id:"note", n:"サッカーノート", d:"できたこと・課題・次", fx:{men:2,iq:2}, fat:2, tr:{media:2,coach:1}},
+  {id:"rest", n:"休む・8時間寝る", d:"疲れを抜く", fx:{}, fat:-28, tr:{trainer:1,nutri:1}},
+];
+const POSITIONS = [
+  ["FW","FW（点を取る）","スピード+3", {spd:3}, {media:1}],
+  ["MF","MF（試合を組み立てる）","判断+3", {iq:3}, {coach:1,analyst:1}],
+  ["DF","DF（ゴールを守る）","フィジカル+3", {phy:3}, {front:1,ref:1}],
+  ["GK","GK（最後の砦）","メンタル+3・PKは止める側に", {men:3}, {ref:1,trainer:1}],
+];
+const SEEDS = [
+  {id:"left", n:"魔法の左足", d:"テクニック +8 から始まる", i:"左", base:true},
+  {id:"fast", n:"快足", d:"スピード +8 から始まる", i:"速", base:true},
+  {id:"brain", n:"サッカー脳", d:"判断 +8 から始まる", i:"脳", base:true},
+  {id:"heart", n:"鉄の心臓", d:"メンタル +8。大一番に強い", i:"心", need:"pk"},
+  {id:"late", n:"晩熟の大器", d:"小学生は伸びにくいが高校で一気に伸びる", i:"晩", need:"selfail"},
+  {id:"bug", n:"ボールの虫", d:"練習の伸びが1.15倍", i:"虫", need:"allsix"},
+];
+const SKILLS = [
+  {n:"足裏の魔術師", t:s=>s.tec>=55}, {n:"一瞬の加速", t:s=>s.spd>=55}, {n:"司令塔の目", t:s=>s.iq>=55},
+  {n:"空中戦に強い", t:s=>s.phy>=60}, {n:"大舞台に強い", t:s=>s.men>=60}, {n:"万能型", t:s=>ST.every(([k])=>s[k]>=50)},
+];
+const BADGES = [
+  ["first","初めての合格","合"],["pk","大一番のPKで勝った","PK"],["noinj","ケガなしで高3まで","守"],["selfail","不合格でも続けた","再"],
+  ["rival","ライバルに勝った","勝"],["allsix","全能力60以上","極"],["pro","プロ契約","P"],["rest","疲れを溜めずに3年","眠"],
+  ["abroad","海外に挑戦した","海"],["captain","キャプテンを務めた","C"],["gk","GKで勝った","手"],["quotes","語録を10個集めた","録"]];
+// サッカー語録（このゲームのオリジナル）。出来事や節目で手に入る
+const QUOTES = {
+  start:"ボールを蹴った日から、サッカーは始まっている。", play:"遊びの中で覚えたことは、一生忘れない。", note:"負けた試合のノートが、いちばん分厚い。",
+  rest:"休むのも練習のうち。", rival:"ライバルは、いちばん近くにいるコーチ。", selfail:"選ばれなかった日から、本当の練習が始まる。",
+  pass:"合格はゴールじゃない。新しいスタートラインだ。", grow:"うまい人より、うまくなり続ける人に。", iq:"ボールを持っていない時間に、試合は決まる。",
+  miss:"PKを外せるのは、蹴る勇気があった人だけ。", goal:"緊張は、本気で準備してきた証拠。", late:"体が大きくなるのが遅い子は、考える時間を長くもらった子。",
+  captain:"声を出すのも、プレーのひとつ。", team:"どのチームに入るかより、そこで何をするか。", inj:"ケガをした時間は、体と話す時間。",
+  gk:"止めたシュートの数だけ、仲間は前に出られる。", end:"プロにならなくても、サッカーは一生の友だち。", old:"70歳でも、ボールは蹴れる。",
+  parent:"帰りの車で話したことが、次の日の練習になる。", abroad:"言葉が通じなくても、パスは通じる。"};
+// サッカーに関わる仕事（向き・不向きの判定に使う）
+const JOBS = {
+  pro:{n:"プロサッカー選手", d:"毎年プロになるのは1学年で約180人。", door:"高校・ユースで結果を出し、スカウトの目に留まる"},
+  coach:{n:"指導者（コーチ・監督）", d:"子どもやチームを伸ばす仕事。", door:"JFAの指導者ライセンスはD級から始められる"},
+  analyst:{n:"アナリスト（分析担当）", d:"試合の映像とデータで勝ち筋を探す。", door:"大学でスポーツ科学やデータ分析を学ぶ"},
+  trainer:{n:"トレーナー・理学療法士", d:"ケガを防ぎ、復帰を支える。", door:"理学療法士は国家資格。養成校で3〜4年学ぶ"},
+  ref:{n:"審判", d:"試合を正しく、安全に進める。", door:"JFAの4級審判から始められる"},
+  media:{n:"スポーツ記者・実況", d:"試合の面白さを言葉で伝える。", door:"書く・話す練習。サッカーノートが第一歩"},
+  gear:{n:"用品の開発（スパイク・ボール）", d:"選手の足元を道具で支える。", door:"スポーツ用品メーカーで企画・開発"},
+  front:{n:"クラブの運営・広報", d:"スタジアムに人を集め、クラブを続ける。", door:"クラブやスポーツ団体で運営・営業・広報"},
+  nutri:{n:"管理栄養士", d:"食事で選手の体をつくる。", door:"国家資格。食と体の専門を学ぶ"},
+};
+
+// ── 保存（この端末のブラウザだけ） ─────────────────────
+const store = { get(k,d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} } };
+let SAVE = store.get("ikusei-save", {badges:[], runs:0, best:"", quotes:[], ends:[]});
+SAVE.quotes = SAVE.quotes || []; SAVE.ends = SAVE.ends || [];
+
+// ── 状態 ─────────────────────────────────────────────
+let S, plan = [], evDone = false, evPending = null, posPending = false;
+const $ = id => document.getElementById(id);
+const app = $("app");
+const R = () => Math.random();
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const Q = "utm_source=life&utm_medium=game&utm_campaign=ikusei";
+const ovr = s => Math.round((s.spd + s.tec + s.iq + s.phy + s.men) / 5);
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const esc = t => String(t).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const addTr = tr => { for (const [k,v] of Object.entries(tr||{})) S.tr[k] = (S.tr[k]||0) + v; };
+
+function newRun(seed){
+  const s = {spd:18+Math.round(R()*8), tec:18+Math.round(R()*8), iq:16+Math.round(R()*8), phy:16+Math.round(R()*8), men:18+Math.round(R()*8)};
+  if (seed==="left") s.tec += 8; if (seed==="fast") s.spd += 8; if (seed==="brain") s.iq += 8; if (seed==="heart") s.men += 8;
+  const month = [4,5,6,7,8,9,10,11,12,1,2,3][Math.floor(R()*12)];
+  S = { seed, s, prev:{...s}, i:0, fat:20, team:"地元の少年団", pos:"", rank:"", skills:[], log:[], rival:{name:"ハヤト", ovr:ovr(s)+3}, flags:{}, month, injuries:0, highFat:0, tr:{}, quotes:[], route:[] };
+  S.rank = rankOf(); plan = []; evPending = null; evDone = false;
+  addLog("good", `${month}月生まれ。${S.team}でボールを蹴り始めた。ライバルは同じチームの${S.rival.name}。`);
+  if ([1,2,3].includes(month)) addLog(null, "早生まれ。小学生のうちは体の大きさで不利になりやすい。");
+  quote("start");
+  render();
+}
+function rankOf(){
+  const lv = {"地元の少年団":28,"街クラブJY":36,"中学の部活":32,"JクラブU-15":46,"JクラブU-18":58,"強豪校":52,"高校のサッカー部":44,"海外のアカデミー":56}[S.team] || 30;
+  const d = ovr(S.s) - (lv + S.i*2.2);
+  return d > 6 ? "エース" : d > 0 ? "スタメン" : d > -7 ? "途中出場" : "ベンチ外";
+}
+function addLog(tone, txt){ S.log.unshift({g:SEASONS[Math.min(S.i,8)].g, tone, txt}); }
+function quote(k){ if (!QUOTES[k] || S.quotes.includes(k)) return; S.quotes.push(k); if (!SAVE.quotes.includes(k)){ SAVE.quotes.push(k); store.set("ikusei-save", SAVE); setTimeout(()=>toast("語録を手に入れた：" + QUOTES[k]), 400); } }
+
+// ── 画面：スタート ─────────────────────────────────────
+function startScreen(){
+  const got = new Set(SAVE.badges);
+  let pick = "left";
+  app.innerHTML = `
+    <a class="back" href="/life">4.5万分の1 トップへ</a>
+    <section class="hero">
+      <span class="eyebrow">4.5万分の1・育成モード</span>
+      <h1>育てて、挑んで、<em>次の人生へ。</em></h1>
+      <p>小1から高3までの9シーズン。練習を選んで能力を育て、ポジションと進路を自分で決める。小6のセレクション、中3の進路の試験、高3の選手権PKは、あなたの指で決まる。最後に、サッカーに関わる仕事のどれが向いているかと、未来の自分が見える。</p>
+    </section>
+    <div class="card"><h2 style="font-size:16px">才能の種を1つ持って生まれる</h2>
+      <p class="note">前の人生で取ったバッジで、新しい種が増えます。</p>
+      <div class="seeds" id="seeds">${SEEDS.map(x => { const ok = x.base || got.has(x.need); return `<button class="seed" data-id="${x.id}" ${ok?"":"disabled"} aria-pressed="${x.id===pick}"><i>${ok?x.i:"？"}</i><span><b>${ok?x.n:"まだ持っていない種"}</b><span>${ok?x.d:"バッジ「"+BADGES.find(b=>b[0]===x.need)[1]+"」で手に入る"}</span></span></button>`; }).join("")}</div>
+    </div>
+    <div class="row"><button class="btn main" id="go">小1の春から始める</button><a class="btn ghost" href="/life/play" style="display:inline-flex;align-items:center;text-decoration:none">統計で生きる通常モード</a>${SAVE.runs?`<span class="note">これまで${SAVE.runs}回の人生・見た結末 ${SAVE.ends.length}種類・語録 ${SAVE.quotes.length}/${Object.keys(QUOTES).length}</span>`:""}</div>
+    ${SAVE.quotes.length?`<div class="card"><h3 style="font-size:15px">語録帳 ${SAVE.quotes.length}/${Object.keys(QUOTES).length}</h3><ul class="quotes">${SAVE.quotes.map(k=>`<li>${QUOTES[k]}</li>`).join("")}</ul></div>`:""}`;
+  app.querySelectorAll(".seed").forEach(b => b.onclick = () => { pick = b.dataset.id; app.querySelectorAll(".seed").forEach(x => x.setAttribute("aria-pressed", String(x===b))); });
+  $("go").onclick = () => newRun(pick);
+}
+
+// ── 画面：シーズン ────────────────────────────────────
+function render(){
+  const se = SEASONS[S.i];
+  const drills = DRILLS.filter(d => (!d.only || d.only===se.k) && (!d.from || se.k!=="es"));
+  const risk = injRisk();
+  const needPos = se.pos && !S.pos;
+  app.innerHTML = `
+    <div class="hud" role="group" aria-label="進み具合">
+      <div class="gr">${se.g}<small>${se.big?"大一番のシーズン":"シーズン "+(S.i+1)+"/9"}</small></div>
+      <div class="track" aria-hidden="true">${SEASONS.map((x,k)=>`<i class="${k<S.i?"done":k===S.i?"now":""} ${x.big?"big":""}"></i>`).join("")}</div>
+      <div class="ovr"><b class="num" id="ovr">${ovr(S.s)}</b><span>総合力</span></div>
+    </div>
+    <div class="card">
+      <div class="stats"><canvas id="radar" width="300" height="300" style="width:150px;height:150px" aria-label="能力の5角形"></canvas>
+        <div class="bars">${ST.map(([k,n])=>`<div class="bar"><span>${n}</span><span class="t"><i data-k="${k}"></i></span><span class="v num">${S.s[k]}${S.s[k]>S.prev[k]?`<span class="up">+${S.s[k]-S.prev[k]}</span>`:""}</span></div>`).join("")}</div></div>
+      <div class="meta">
+        <div><span>チーム</span><b>${S.team}</b></div>
+        <div><span>${S.pos?S.pos+"・":""}チーム内</span><b>${S.rank}</b></div>
+        <div class="fat"><span>疲れ <span class="num">${S.fat}</span></span><span class="t"><i style="width:${S.fat}%;background:${S.fat>70?"var(--bad)":S.fat>50?"var(--warn)":"var(--blue)"}"></i></span></div>
+      </div>
+      ${S.skills.length?`<div class="skills">${S.skills.map(x=>`<span class="skill ${x.fresh?"new":""}">${x.n}</span>`).join("")}</div>`:""}
+    </div>
+    ${needPos ? posHtml() : eventHtml()}
+    <div class="card plan" ${evDone && !needPos?"":"hidden"} id="plan">
+      <h2>今シーズンの練習を3つ選ぶ</h2>
+      <div class="slots">${[0,1,2].map(k=>`<button class="slot ${plan[k]?"on":""}" data-k="${k}" aria-label="枠${k+1}">${plan[k]?DRILLS.find(d=>d.id===plan[k]).n+"<br><span style='font-size:11px;color:var(--muted)'>タップで外す</span>":"空き"}</button>`).join("")}</div>
+      <div class="drills">${drills.map(d=>`<button class="drill" data-id="${d.id}" ${plan.length>=3?"disabled":""}><b>${d.n}</b><span>${d.d}</span><span class="fx">${Object.entries(d.fx).map(([k,v])=>ST.find(x=>x[0]===k)[1]+"+"+v).join(" ")}${d.fat<0?" 疲れ"+d.fat:" 疲れ+"+d.fat}</span></button>`).join("")}</div>
+      <div class="risk ${risk<10?"lo":risk<25?"mid":"hi"}">このまま進んだときのケガのしやすさ：<b>${risk<10?"低い":risk<25?"ふつう":"高い"}</b>（<span class="num">${risk}%</span>）${risk>=25?"　休みを入れよう":""}</div>
+      <button class="btn main" id="next" ${plan.length<3?"disabled":""}>${se.big?"この練習で大一番へ":"このシーズンを過ごす"}</button>
+    </div>
+    <div class="card"><h3 style="font-size:15px">記録</h3><ul class="log">${S.log.slice(0,8).map(l=>`<li class="${l.tone||""}"><b>${l.g}</b><span>${l.txt}</span></li>`).join("")}</ul></div>`;
+  drawRadar();
+  requestAnimationFrame(()=>app.querySelectorAll(".bar .t i").forEach(i=>i.style.width = S.s[i.dataset.k]+"%"));
+  app.querySelectorAll(".drill").forEach(b => b.onclick = () => { if (plan.length<3){ plan.push(b.dataset.id); render(); } });
+  app.querySelectorAll(".slot").forEach(b => b.onclick = () => { const k = +b.dataset.k; if (plan[k]){ plan.splice(k,1); render(); } });
+  const nx = $("next"); if (nx) nx.onclick = runSeason;
+  app.querySelectorAll(".ev .opt[data-i]").forEach(b => b.onclick = () => resolveEvent(+b.dataset.i));
+  app.querySelectorAll(".ev .opt[data-pos]").forEach(b => b.onclick = () => choosePos(b.dataset.pos));
+  S.skills.forEach(x=>x.fresh=false);
+}
+function posHtml(){
+  return `<div class="card ev"><div class="who"><span class="face">監</span><span><b>監督</b><span>小3・4・ポジションを決める</span></span></div><p>「そろそろ、どこでやりたいか決めよう」</p><div class="opts">${POSITIONS.map(p=>`<button class="opt" data-pos="${p[0]}"><b>${p[1]}</b><span>${p[2]}</span></button>`).join("")}</div></div>`;
+}
+function choosePos(k){
+  const p = POSITIONS.find(x=>x[0]===k); S.prev = {...S.s}; S.pos = k; applyFx(p[3]); addTr(p[4]);
+  addLog("good", `ポジションは${p[1].split("（")[0]}に決まった。`); if (k==="GK") quote("gk"); if (k==="MF") quote("iq");
+  render();
+}
+function projFat(){ let f = S.fat; for (const id of plan) f += DRILLS.find(d=>d.id===id).fat; return clamp(f,0,100); }
+function injRisk(){ const f = projFat(); return Math.round(clamp((f-45)*0.9, 2, 60)); }
+
+// ── 出来事（ライバル・コーチ・親・友だち） ───────────────
+// o: [ラベル, 補足, 能力, 特別処理, 疲れ, 向き（仕事の傾向）, 語録]
+const EVENTS = [
+  {who:"コーチ", face:"コ", k:"es", t:"「明日の試合、点を取りたい？それとも守りたい？」", o:[["点を取りたい","点を取る楽しさ",{spd:2,men:1},null,0,{media:1}],["コーチに任せる","いろいろな役割を経験",{iq:3},null,0,{coach:1}]]},
+  {who:"お母さん", face:"母", k:"es", t:"帰りの車。「今日のミス、なんでだと思う？」と聞かれた。", o:[["黙ってしまう","",{men:-2}],["自分で理由を話す","振り返る練習になる",{iq:2,men:2},null,0,{coach:1,media:1},"parent"]], res:["次の日、少し元気がなかった。","話しているうちに、次にやることが見えた。"]},
+  {who:"ライバル", face:"ハ", k:"es", t:"ハヤトが「1対1で練習しよう」と言ってきた。", o:[["1対1をやる","勝てば自信、負けても学びがある",null,"duel"],["パス練習を一緒にやろうと誘う","仲間として伸びる",{tec:2,iq:1},null,0,{coach:1}]]},
+  {who:"お父さん", face:"父", k:"es", t:"テレビでW杯をやっている。夜遅くまで起きていたい。", o:[["最後まで見る","疲れ+8",{iq:2},null,8,{media:1,analyst:1}],["録画して明日見る","",{men:1},null,-5,{}]]},
+  {who:"友だち", face:"友", k:"es", t:"チームの子が試合に出られず泣いている。", o:[["声をかけて一緒に練習する","",{men:2},null,0,{coach:2},"team"],["自分の練習に集中する","",{tec:2}]]},
+  {who:"コーチ", face:"コ", k:"jh", t:"「試合に出たいなら、まず走れ」と言われた。", o:[["毎朝ランニングを始める","疲れ+10",{spd:2,phy:3},null,10,{trainer:1}],["自分の得意なプレーを磨くと決める","",{tec:3,men:1},null,0,{gear:1}]]},
+  {who:"友だち", face:"友", k:"jh", t:"週末に遊園地に誘われた。練習試合と重なっている。", o:[["練習試合に行く","",{iq:2,tec:1}],["遊園地に行く","疲れ-15",{men:2},null,-15,{front:1}]]},
+  {who:"ライバル", face:"ハ", k:"jh", t:"ハヤトがトレセンに選ばれた。自分は落ちた。", o:[["ハヤトの練習を観察する","",{iq:3},null,0,{analyst:2,coach:1}],["悔しさを自主練にぶつける","疲れ+8",{tec:2,spd:2},null,8,{},"selfail"]]},
+  {who:"スマホ", face:"夜", k:"jh", t:"夜11時。動画を見続けてしまいそう。", o:[["スマホを置いて寝る","疲れ-10",{},null,-10,{trainer:1,nutri:1},"rest"],["あと1本だけ","",{men:-1},null,5]]},
+  {who:"審判", face:"審", k:"jh", t:"試合で、相手のファウルが見逃された。", o:[["審判に抗議する","",{men:-2}],["切りかえて次のプレーへ","",{men:3},null,0,{ref:2}]]},
+  {who:"監督", face:"監", k:"hs", t:"「キャプテンをやってみないか」", o:[["引き受ける","大変だが成長できる",{men:4,iq:2},"captain",6,{front:2,coach:2},"captain"],["プレーに集中したいと断る","",{tec:2}]]},
+  {who:"スカウト", face:"ス", k:"hs", t:"練習試合のスタンドに、Jクラブのスカウトがいる。", o:[["いつも通りのプレー","",{iq:2},"scout0"],["思い切ったプレーで目立つ","うまくいけば評価が上がる",null,"scout1",0,{media:1}]]},
+  {who:"ライバル", face:"ハ", k:"hs", t:"ハヤトが大ケガで、最後の大会に出られないと言う。", o:[["ハヤトの分まで戦うと決める","",{men:4},null,0,{},"rival"],["お見舞いに行き、リハビリの話を聞く","",{men:2,iq:2},null,0,{trainer:3}]]},
+  {who:"先生", face:"先", k:"hs", t:"進路面談。「サッカー以外の得意なことは？」", o:[["文章を書くこと","",{iq:1},null,0,{media:3}],["人に教えること","",{men:1},null,0,{coach:3}],["体の仕組みを調べること","",{phy:1},null,0,{trainer:2,nutri:2}]]},
+];
+function pickEvent(){
+  const k = SEASONS[S.i].k; const pool = EVENTS.filter(e => e.k===k && !S.flags["ev"+EVENTS.indexOf(e)]);
+  const e = pool[Math.floor(R()*pool.length)] || EVENTS.filter(e=>e.k===k)[0];
+  S.flags["ev"+EVENTS.indexOf(e)] = 1; return e;
+}
+function eventHtml(){
+  if (!evPending){ evPending = pickEvent(); evDone = false; }
+  const e = evPending;
+  if (evDone) return `<div class="card ev"><div class="who"><span class="face">${e.face}</span><span><b>${e.who}</b><span>${SEASONS[S.i].g}の出来事</span></span></div><p class="res">${e._res||""}</p></div>`;
+  return `<div class="card ev"><div class="who"><span class="face">${e.face}</span><span><b>${e.who}</b><span>${SEASONS[S.i].g}の出来事・1つ選ぶ</span></span></div><p>${e.t}</p><div class="opts">${e.o.map((o,i)=>`<button class="opt" data-i="${i}"><b>${o[0]}</b>${o[1]?`<span>${o[1]}</span>`:""}</button>`).join("")}</div></div>`;
+}
+function resolveEvent(i){
+  const e = evPending, o = e.o[i]; let res = e.res ? e.res[i] : "";
+  S.prev = {...S.s};
+  if (o[2]) applyFx(o[2]);
+  if (o[4]) S.fat = clamp(S.fat + o[4], 0, 100);
+  addTr(o[5]); if (o[6]) quote(o[6]);
+  if (o[3]==="duel"){ const win = ovr(S.s) + R()*12 > S.rival.ovr + R()*12; if (win){ S.flags.rival = 1; applyFx({men:3,tec:1}); res = "1対1で勝った。ハヤトが本気で悔しがっていた。"; toast("ライバルに勝った"); quote("rival"); } else { applyFx({tec:2}); res = "負けた。でも、何が足りないかが分かった。"; } }
+  if (o[3]==="scout1"){ if (R() < 0.35 + S.s.tec/250){ S.flags.scout = 2; res = "ヒールリフトが決まり、スカウトがメモを取った。"; toast("スカウトの評価が上がった"); } else { S.flags.scout = -1; res = "ボールを奪われて失点。監督に交代させられた。"; } }
+  if (o[3]==="scout0"){ S.flags.scout = 1; res = "堅実なプレーで、スカウトの印象に残った。"; }
+  if (o[3]==="captain"){ S.flags.captain = 1; }
+  e._res = res || `「${o[0]}」を選んだ。`;
+  addLog(null, `${e.who}：${o[0]}`);
+  evDone = true; render();
+}
+function applyFx(fx, mult=1){ for (const [k,v] of Object.entries(fx)) S.s[k] = clamp(Math.round(S.s[k] + v*mult), 1, 99); }
+
+// ── シーズンを過ごす ──────────────────────────────────
+function runSeason(){
+  const se = SEASONS[S.i]; S.prev = {...S.s};
+  let fat = S.fat; const g = GROW[se.k];
+  const lateM = S.seed==="late" ? (se.k==="es"?0.7: se.k==="hs"?1.6:1) : 1, bugM = S.seed==="bug" ? 1.15 : 1;
+  const injured = R()*100 < injRisk();
+  for (const id of plan){ const d = DRILLS.find(x=>x.id===id); const fx = {}; for (const [k,v] of Object.entries(d.fx)) fx[k] = v * g[k] * lateM * bugM * (injured?0.4:1) * (1.1 + R()*0.5); applyFx(fx); fat += d.fat; addTr(d.tr); if (id==="play") quote("play"); if (id==="note") quote("note"); if (id==="rest") quote("rest"); }
+  const env = {"JクラブU-15":1.5,"JクラブU-18":1.5,"海外のアカデミー":1.5,"強豪校":1.3,"街クラブJY":1.1}[S.team] || 0.9;
+  for (const [k] of ST) S.s[k] = clamp(Math.round(S.s[k] + env*g[k]*lateM*(0.6+R()*0.6)), 1, 99);
+  S.fat = clamp(fat - 8, 0, 100);
+  if (S.fat > 70) S.highFat++;
+  if (injured){ S.injuries++; S.fat = 30; addTr({trainer:2}); addLog("bad", "疲れが溜まり、ひざを痛めた。伸びは半分以下に。"); toast("ケガをした"); quote("inj"); }
+  S.rival.ovr += 4 + Math.round(R()*4);
+  for (const sk of SKILLS) if (sk.t(S.s) && !S.skills.some(x=>x.n===sk.n)){ S.skills.push({n:sk.n, fresh:true}); addLog("good", `特技「${sk.n}」を覚えた。`); toast(`特技「${sk.n}」を覚えた`); }
+  if (ovr(S.s) - ovr(S.prev) >= 7) quote("grow");
+  if (S.seed==="late" && se.k==="hs") quote("late");
+  addLog(null, `練習：${plan.map(id=>DRILLS.find(d=>d.id===id).n).join("・")}。総合力 ${ovr(S.prev)} → ${ovr(S.s)}`);
+  plan = []; evPending = null; evDone = false;
+  if (se.big) return routeChoice(se.big);
+  nextSeason();
+}
+function nextSeason(){
+  S.i++;
+  if (S.i >= SEASONS.length) return finalChoice();
+  S.rank = rankOf(); render(); window.scrollTo({top:0, behavior: reduce?"auto":"smooth"});
+}
+
+// ── 進路の岐路（大一番の前に、どこに挑むか選ぶ） ─────────
+function routeChoice(kind){
+  const big = $("big"), inn = $("bigIn"); big.hidden = false;
+  let q, opts;
+  if (kind==="sel"){ q = "小6の秋。中学年代はどこでプレーする？";
+    opts = [["jac","JクラブU-15のセレクション","とても難しい・合格すれば環境は最高"],["machi","街クラブJYのセレクション","ふつうの難しさ・遠征が多い"],["bukatsu","中学のサッカー部","試験なし・勉強と両立しやすい"]]; }
+  if (kind==="u18"){ q = "中3の秋。高校年代はどこでプレーする？";
+    opts = [S.team==="JクラブU-15" ? ["u18","U-18への昇格テスト","とても難しい・プロへの近道"] : ["kyogo","全国大会常連の強豪校のセレクション","難しい・部員は100人以上"],
+            ["abroad","海外のアカデミーに挑戦","とても難しい・言葉の壁がある"],
+            ["koko","地元の高校のサッカー部","試験なし・試合に出やすい"]]; }
+  if (kind==="pk"){ return pkIntro(); }
+  inn.innerHTML = `<span class="eyebrow" style="color:var(--navy-dim)">進路の岐路</span><h2>${q}</h2><div class="routes">${opts.map(o=>`<button class="route" data-r="${o[0]}"><b>${o[1]}</b><span>${o[2]}</span></button>`).join("")}</div>`;
+  inn.querySelectorAll(".route").forEach(b => b.onclick = () => startTrial(kind, b.dataset.r));
+}
+function startTrial(kind, r){
+  S.route.push(r);
+  const setT = (team, line, tone) => { S.team = team; addLog(tone||"good", line); };
+  if (r==="bukatsu"){ setT("中学のサッカー部", "中学のサッカー部に入った。勉強とサッカーを両立する3年間。"); quote("team"); return verdict(true, "入部", true); }
+  if (r==="koko"){ setT("高校のサッカー部", "地元の高校のサッカー部に入った。1年からBチームの試合に出た。"); quote("team"); return verdict(true, "入部", true); }
+  const T = {
+    jac:{title:"JクラブU-15のセレクション", zone: 4 + S.s.tec*0.18, speed: 1.05 - S.s.spd/260, ok:["JクラブU-15","JクラブU-15のセレクションに合格した。"], ng:["街クラブJY","JクラブU-15は不合格。街クラブJYで続けると決めた。"]},
+    machi:{title:"街クラブJYのセレクション", zone: 9 + S.s.tec*0.22, speed: 1.2 - S.s.spd/240, ok:["街クラブJY","街クラブJYのセレクションに合格した。"], ng:["中学のサッカー部","街クラブJYは不合格。中学のサッカー部で続けると決めた。"]},
+    u18:{title:"U-18への昇格テスト", zone: 5 + S.s.tec*0.16 + S.s.iq*0.06, speed: 1.0 - S.s.spd/260, ok:["JクラブU-18","U-18への昇格が決まった。"], ng:["高校のサッカー部","昇格は見送られた。地元の高校のサッカー部へ。"]},
+    kyogo:{title:"強豪校のセレクション", zone: 6 + S.s.tec*0.18 + S.s.iq*0.05, speed: 1.05 - S.s.spd/260, ok:["強豪校","強豪校にスポーツ推薦で合格した。"], ng:["高校のサッカー部","強豪校は不合格。地元の高校のサッカー部へ。"]},
+    abroad:{title:"海外のアカデミーの入団テスト", zone: 3 + S.s.tec*0.15 + S.s.men*0.08, speed: 0.95 - S.s.spd/270, ok:["海外のアカデミー","海外のアカデミーの入団テストに合格した。寮生活が始まる。"], ng:["高校のサッカー部","海外のテストは届かなかった。経験を持ち帰り、地元の高校へ。"]},
+  }[r];
+  if (r==="abroad") { S.flags.abroad = 1; quote("abroad"); }
+  timingGame({title:T.title, sub:"ボールが来たら、オレンジの枠でタップしてトラップ。3回中2回成功で合格。", zone:T.zone, speed:T.speed, tries:3, need:2,
+    done: ok => { if (ok){ setT(T.ok[0], T.ok[1]); S.flags.first = 1; quote("pass"); } else { setT(T.ng[0], T.ng[1], "bad"); S.flags.selfail = 1; quote("selfail"); } } });
+}
+function closeBig(){ $("big").hidden = true; }
+
+// タイミングゲーム（ファーストタッチ）
+function timingGame(o){
+  const inn = $("bigIn");
+  inn.innerHTML = `<span class="eyebrow" style="color:var(--navy-dim)">大一番</span><h2>${o.title}</h2><p>${o.sub}</p>
+    <canvas id="tg" width="900" height="300" aria-label="ボールが来たらタップ"></canvas>
+    <div class="score num" id="tgS">成功 0 / ${o.tries}</div><p class="hint">枠の広さはテクニック、ボールの速さはスピードで変わります。画面をタップ（スペースキーでも可）。</p>`;
+  const c = $("tg"), x = c.getContext("2d"); let t = 0, dir = 1, hits = 0, tries = 0, lock = false, raf;
+  const zw = clamp(o.zone, 5, 40), zc = 50 + (R()-0.5)*30;
+  const draw = () => {
+    x.clearRect(0,0,900,300);
+    x.fillStyle = "rgba(255,255,255,.06)"; x.fillRect(0,0,900,300);
+    x.strokeStyle = "rgba(255,255,255,.18)"; x.lineWidth = 4; x.beginPath(); x.moveTo(0,150); x.lineTo(900,150); x.stroke();
+    x.fillStyle = "rgba(255,138,76,.28)"; x.fillRect((zc-zw/2)*9, 40, zw*9, 220);
+    x.strokeStyle = "#ff8a4c"; x.lineWidth = 4; x.strokeRect((zc-zw/2)*9, 40, zw*9, 220);
+    const bx = t*9; x.fillStyle = "#eef2f8"; x.beginPath(); x.arc(bx, 150, 26, 0, Math.PI*2); x.fill();
+    x.strokeStyle = "#14213a"; x.lineWidth = 3; x.beginPath(); x.arc(bx, 150, 12, 0, Math.PI*2); x.stroke();
+  };
+  const loop = () => { if (!lock){ t += dir * (1.6 / Math.max(0.45, o.speed)); if (t>100){t=100;dir=-1;} if (t<0){t=0;dir=1;} } draw(); raf = requestAnimationFrame(loop); };
+  const hit = () => {
+    if (lock || tries>=o.tries) return; lock = true; tries++;
+    const ok = Math.abs(t - zc) <= zw/2; if (ok) hits++;
+    beep(ok); $("tgS").textContent = `成功 ${hits} / ${o.tries}`;
+    setTimeout(() => { lock = false; t = R()<.5?0:100; dir = t===0?1:-1;
+      if (tries>=o.tries || hits>=o.need || o.tries-tries < o.need-hits){ cancelAnimationFrame(raf); window.removeEventListener("keydown", key); const pass = hits>=o.need; o.done(pass); verdict(pass, pass?"合格":"不合格"); } }, 650);
+  };
+  const key = e => { if (e.code==="Space"){ e.preventDefault(); hit(); } };
+  c.onpointerdown = hit; window.addEventListener("keydown", key); loop();
+}
+// PK（選手権予選の決勝）。GKは止める側
+function pkIntro(){ return S.pos==="GK" ? gkGame() : pkGame(); }
+function drawGoal(x, G, kx, ball, keeperColor){
+  x.clearRect(0,0,900,560);
+  x.fillStyle = "rgba(255,255,255,.05)"; x.fillRect(0,0,900,560);
+  x.strokeStyle = "rgba(255,255,255,.2)"; x.lineWidth = 2;
+  for (let i=1;i<6;i++){ x.beginPath(); x.moveTo(G.x+i*G.w/6, G.y); x.lineTo(G.x+i*G.w/6, G.y+G.h); x.stroke(); }
+  for (let j=1;j<4;j++){ x.beginPath(); x.moveTo(G.x, G.y+j*G.h/4); x.lineTo(G.x+G.w, G.y+j*G.h/4); x.stroke(); }
+  x.strokeStyle = "#eef2f8"; x.lineWidth = 10; x.strokeRect(G.x, G.y, G.w, G.h);
+  x.fillStyle = "rgba(255,255,255,.08)"; x.fillRect(0, G.y+G.h, 900, 190);
+  x.fillStyle = keeperColor; x.beginPath(); x.ellipse(kx, G.y+G.h-70, 34, 70, 0, 0, Math.PI*2); x.fill();
+  x.fillStyle = "#14213a"; x.beginPath(); x.arc(kx, G.y+G.h-150, 24, 0, Math.PI*2); x.fill();
+  x.fillStyle = "#eef2f8"; x.beginPath(); x.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); x.fill();
+}
+function pkGame(){
+  const inn = $("bigIn");
+  inn.innerHTML = `<span class="eyebrow" style="color:var(--navy-dim)">大一番</span><h2>高3・選手権予選の決勝。<br>PK戦、5人目はあなた。</h2><p>ゴールのどこに蹴るかタップ。隅ほど決まりやすいが、外れやすい。</p>
+    <canvas id="pk" width="900" height="560" aria-label="ゴールの狙う場所をタップ"></canvas>
+    <p class="hint">外れやすさはテクニックとメンタル、GKに読まれやすさは判断で変わります。</p>`;
+  const c = $("pk"), x = c.getContext("2d"); let done = false, kx = 450;
+  const G = {x:150, y:110, w:600, h:260};
+  drawGoal(x, G, kx, {x:450,y:500,r:18}, "#ff8a4c");
+  c.onpointerdown = ev => {
+    if (done) return; done = true;
+    const r = c.getBoundingClientRect(), px = (ev.clientX - r.left) * 900 / r.width, py = (ev.clientY - r.top) * 560 / r.height;
+    const tx = clamp(px, G.x-40, G.x+G.w+40), ty = clamp(py, G.y-40, G.y+G.h);
+    const edge = Math.max(Math.abs(tx-450)/(G.w/2), 1 - (ty-G.y)/G.h);
+    const skill = (S.s.tec*0.6 + S.s.men*0.4 + (S.seed==="heart"?10:0)) / 100;
+    const miss = R() < clamp(0.04 + edge*0.32 - skill*0.28, 0.02, 0.45);
+    const aim = miss ? {x: tx + (tx>450?1:-1)*(70+R()*60), y: ty - 60 - R()*40} : {x:tx, y:ty};
+    const gkGuess = R() < clamp(0.42 - S.s.iq/400 + (1-edge)*0.25, 0.12, 0.6) ? aim.x : (R()<.5 ? G.x+90 : G.x+G.w-90);
+    const inGoal = aim.x>G.x && aim.x<G.x+G.w && aim.y>G.y;
+    const saved = !miss && Math.abs(gkGuess - aim.x) < (150 - edge*80) && R() < 0.85;
+    const goal = inGoal && !saved;
+    const t0 = performance.now();
+    const go = now => { const p = Math.min(1,(now - t0)/450); kx = 450 + (gkGuess-450)*Math.min(1, p*1.2);
+      drawGoal(x, G, kx, {x:450+(aim.x-450)*p, y:500+(aim.y-500)*p, r:18-6*p}, "#ff8a4c"); if (p < 1) return requestAnimationFrame(go);
+      beep(goal); pkResult(goal, goal?"ゴール！":saved?"止められた":"外れた", saved?"GKに読まれた。全国まであと1本だった。":"枠を外した。ボールはスタンドへ消えた。"); };
+    requestAnimationFrame(go);
+  };
+}
+function gkGame(){
+  const inn = $("bigIn");
+  inn.innerHTML = `<span class="eyebrow" style="color:var(--navy-dim)">大一番</span><h2>高3・選手権予選の決勝。<br>PK戦、相手の5人目。</h2><p>止めれば全国。どこに飛ぶか、ゴールのどこかをタップ。</p>
+    <canvas id="pk" width="900" height="560" aria-label="飛ぶ場所をタップ"></canvas>
+    <p class="hint">蹴る直前の動きが見えるのは判断、届く範囲はフィジカルとスピードで変わります。</p>`;
+  const c = $("pk"), x = c.getContext("2d"); let done = false;
+  const G = {x:150, y:110, w:600, h:260};
+  const shotX = G.x + 60 + R()*(G.w-120), shotY = G.y + 30 + R()*(G.h-60);
+  const hintSide = R() < 0.35 + S.s.iq/200 ? (shotX<450?"左":"右") : null;
+  drawGoal(x, G, 450, {x:450,y:500,r:18}, "#8ab8f0");
+  if (hintSide){ x.fillStyle = "#ff8a4c"; x.font = "700 30px 'Zen Kaku Gothic New',sans-serif"; x.textAlign = "center"; x.fillText(`キッカーの目線が${hintSide}を見た`, 450, 70); }
+  c.onpointerdown = ev => {
+    if (done) return; done = true;
+    const r = c.getBoundingClientRect(), px = (ev.clientX - r.left) * 900 / r.width;
+    const reach = 120 + (S.s.phy + S.s.spd) * 0.9;
+    const save = Math.abs(px - shotX) < reach && R() < 0.8;
+    const t0 = performance.now();
+    const go = now => { const p = Math.min(1,(now - t0)/450); const kx = 450 + (clamp(px,G.x,G.x+G.w)-450)*Math.min(1,p*1.3);
+      drawGoal(x, G, kx, {x:450+(shotX-450)*p, y:500+(shotY-500)*p, r:18-6*p}, "#8ab8f0"); if (p < 1) return requestAnimationFrame(go);
+      beep(save); if (save) S.flags.gk = 1; pkResult(save, save?"止めた！":"決められた", "逆を突かれた。全国まであと1本だった。"); };
+    requestAnimationFrame(go);
+  };
+}
+function pkResult(win, word, loseLine){
+  if (win){ S.flags.pk = 1; S.flags.senshu = 1; addLog("good", "PK戦に勝ち、全国高校サッカー選手権への出場が決まった。"); quote("goal"); }
+  else { addLog("bad", loseLine); quote("miss"); }
+  setTimeout(() => verdict(win, word), 300);
+}
+function verdict(ok, word, quiet){
+  const inn = $("bigIn");
+  inn.insertAdjacentHTML("beforeend", `<div class="verdict ${ok?"ok":"ng"}">${word}</div><button class="btn main" id="bigNext">${S.i>=8?"進路を決める":"次のシーズンへ"}</button>`);
+  if (ok && !quiet) confetti();
+  $("bigNext").onclick = () => { closeBig(); nextSeason(); };
+  $("bigNext").focus();
+}
+
+// ── 高3の冬：最後の進路 ───────────────────────────────
+function score(){ return ovr(S.s) + (S.flags.scout||0)*3 + S.skills.length*1.5 + (S.flags.pk?3:0) + ({"JクラブU-18":6,"海外のアカデミー":6,"強豪校":4}[S.team]||0); }
+function finalChoice(){
+  const sc = score(), big = $("big"), inn = $("bigIn"); big.hidden = false;
+  const opts = [];
+  if (sc >= 84) opts.push(["pro", S.team==="JクラブU-18" ? "トップチームとプロ契約" : "Jクラブからのオファーを受ける", "1年目の年俸は上限1,200万円"]);
+  if (sc >= 78 || S.flags.abroad) opts.push(["abroad", "海外のクラブのトライアウトを受ける", "合格すれば海外でプロ。言葉と生活の壁がある"]);
+  opts.push(["uni", sc >= 72 ? "推薦で大学の強豪サッカー部へ" : "大学に入りサッカー部に挑戦", "4年後のプロを目指す道"]);
+  opts.push(["senmon", "専門学校で学ぶ（トレーナー・栄養など）", "サッカーを支える側の資格を取る"]);
+  opts.push(["work", "就職して社会人チームで続ける", "仕事とサッカーを両立する"]);
+  inn.innerHTML = `<span class="eyebrow" style="color:var(--navy-dim)">高3の冬・最後の岐路</span><h2>次の4年を、どう生きる？</h2><p>総合力 ${ovr(S.s)}・特技 ${S.skills.length}個${S.flags.pk?"・選手権出場":""}</p><div class="routes">${opts.map(o=>`<button class="route" data-r="${o[0]}"><b>${o[1]}</b><span>${o[2]}</span></button>`).join("")}</div>`;
+  inn.querySelectorAll(".route").forEach(b => b.onclick = () => { closeBig(); finish(b.dataset.r, sc); });
+}
+
+// ── 結末 ─────────────────────────────────────────────
+function aptitude(){
+  const s = S.s, t = S.tr, A = {};
+  A.coach = (t.coach||0)*6 + s.iq*0.5 + s.men*0.4 + (S.flags.captain?8:0);
+  A.analyst = (t.analyst||0)*7 + s.iq*0.8;
+  A.trainer = (t.trainer||0)*6 + s.phy*0.4 + S.injuries*6;
+  A.ref = (t.ref||0)*8 + s.men*0.5 + s.iq*0.3;
+  A.media = (t.media||0)*6 + s.iq*0.3 + S.quotes.length*1.5;
+  A.gear = (t.gear||0)*7 + s.tec*0.6;
+  A.front = (t.front||0)*7 + s.men*0.3 + (S.flags.captain?10:0);
+  A.nutri = (t.nutri||0)*7 + s.phy*0.3;
+  const max = Math.max(...Object.values(A));
+  const min = Math.min(...Object.values(A));
+  return Object.entries(A).map(([k,v]) => [k, Math.round(40 + 56*(v-min)/Math.max(1,max-min))]).sort((a,b)=>b[1]-a[1]);
+}
+function finish(path, sc){
+  const o = ovr(S.s), sk = S.skills.length;
+  let end, tier = 0;
+  const tryOK = (need) => sc + (R()-0.5)*8 >= need;
+  if (path==="pro"){ end = S.team==="JクラブU-18" ? "ユースからJ1のクラブとプロ契約" : sc >= 88 ? "高卒でJ1のクラブとプロ契約" : "高卒でJ2のクラブとプロ契約"; tier = 4; S.flags.pro = 1; }
+  else if (path==="abroad"){ if (tryOK(82)){ end = "海外のクラブとプロ契約。言葉の壁を越えて"; tier = 4; S.flags.pro = 1; } else { end = "海外のトライアウトは不合格。帰国して大学でもう一度"; tier = 2; } S.flags.abroad = 1; quote("abroad"); }
+  else if (path==="uni"){ end = sc >= 78 ? "大学の強豪で4年。卒業後にJクラブ入りを狙う" : sc >= 70 ? "大学サッカー部でレギュラーをつかむ" : "大学サッカー部で4年間、仲間と戦い抜く"; tier = sc >= 78 ? 3 : 2; }
+  else if (path==="senmon"){ end = "専門学校でトレーナーを学び、選手を支える側へ"; tier = 2; addTr({trainer:4, nutri:2}); }
+  else { end = sc >= 70 ? "社会人リーグで夢を追い続ける" : "仕事をしながら、週末はフットサルで"; tier = 1; addTr({front:1}); }
+  quote("end");
+  if (S.injuries===0) S.flags.noinj = 1;
+  if (S.highFat===0) S.flags.rest = 1;
+  if (ST.every(([k])=>S.s[k]>=60)) S.flags.allsix = 1;
+  if (SAVE.quotes.length >= 10) S.flags.quotes = 1;
+  const keys = BADGES.map(b=>b[0]).filter(k=>S.flags[k]);
+  const got = new Set(SAVE.badges); const fresh = keys.filter(k=>!got.has(k)); keys.forEach(k=>got.add(k));
+  const newSeeds = SEEDS.filter(x => x.need && fresh.includes(x.need));
+  const endsSet = new Set(SAVE.ends); const newEnd = !endsSet.has(end); endsSet.add(end);
+  SAVE = {...SAVE, badges:[...got], runs:(SAVE.runs||0)+1, ends:[...endsSet]};
+  store.set("ikusei-save", SAVE);
+  const apt = aptitude(); const top = apt.slice(0,3);
+  const jobs = (S.flags.pro ? [["pro",99], ...top.slice(0,2)] : top);
+  const fut = future(path, tier, top[0][0]);
+  app.innerHTML = `
+    <div class="card end"><span class="eyebrow" style="color:var(--navy-dim)">高3の冬・結末${newEnd?"（新しい結末）":""}</span><h2>${end}</h2>
+      <div class="row" style="gap:18px"><span><span class="eyebrow" style="color:var(--navy-dim)">総合力</span><br><b class="num" style="font-size:34px">${o}</b></span><span><span class="eyebrow" style="color:var(--navy-dim)">${S.pos||"ポジション"}・特技</span><br><b style="font-size:16px">${sk?S.skills.map(x=>x.n).join("・"):"なし"}</b></span></div>
+      <p style="margin:0;color:var(--navy-dim);font-size:14px">ライバルのハヤトは総合力${S.rival.ovr}。${o>=S.rival.ovr?"最後は、あなたが上だった。":"最後まで、背中を追いかけた。"}</p></div>
+    <div class="card"><h3 style="font-size:15px">未来のあなた（想像）</h3><ol class="future">${fut.map(f=>`<li><b>${f[0]}</b><span>${f[1]}</span></li>`).join("")}</ol><p class="note">ここまでの選び方から想像した未来です。本当の未来は、これからの選び方で何度でも変わります。</p></div>
+    <div class="card"><h3 style="font-size:15px">サッカーに関わる仕事、向いているのは</h3><div class="jobs">${jobs.map(([k,v],i)=>`<div class="job"><div class="jh"><b>${i+1}. ${JOBS[k].n}</b><span class="num">${v}%</span></div><span class="jt"><i style="width:${v}%"></i></span><span>${JOBS[k].d}</span><span class="door">入口：${JOBS[k].door}</span></div>`).join("")}</div>
+      <p class="note">練習・出来事での選び方と能力から判定しています（試作の判定です）。プロにならなくても、サッカーの仕事はたくさんあります。</p></div>
+    <div class="card"><h3 style="font-size:15px">この人生で手に入れた語録</h3><ul class="quotes">${S.quotes.map(k=>`<li>${QUOTES[k]}</li>`).join("")}</ul><p class="note">語録帳 ${SAVE.quotes.length}/${Object.keys(QUOTES).length}・まだ見ていない言葉は、違う道を選ぶと出てきます。</p></div>
+    <div class="card"><h3 style="font-size:15px">能力の到達点</h3><div class="stats"><canvas id="radar" width="300" height="300" style="width:150px;height:150px" aria-label="能力の5角形"></canvas>
+      <div class="bars">${ST.map(([k,n])=>`<div class="bar"><span>${n}</span><span class="t"><i data-k="${k}"></i></span><span class="v num">${S.s[k]}</span></div>`).join("")}</div></div></div>
+    <div class="card"><h3 style="font-size:15px">バッジ ${got.size}/${BADGES.length}・見た結末 ${SAVE.ends.length}種類</h3>
+      <div class="badges">${BADGES.map(([k,n,ic])=>`<div class="badge ${got.has(k)?"got":""} ${fresh.includes(k)?"now":""}"><i>${got.has(k)?ic:"？"}</i>${got.has(k)?n:"まだ取っていない"}</div>`).join("")}</div>
+      ${newSeeds.length?`<p style="margin:0;font-weight:700;color:var(--accent)">新しい才能の種：${newSeeds.map(x=>x.n).join("・")}。次の人生で持っていけます。</p>`:`<p class="note">バッジを取ると、次の人生に持っていける「才能の種」が増えます。</p>`}</div>
+    <div class="card"><h3 style="font-size:15px">この人生の記録</h3><ul class="log">${S.log.slice().reverse().map(l=>`<li class="${l.tone||""}"><b>${l.g}</b><span>${l.txt}</span></li>`).join("")}</ul></div>
+    <div class="cta"><b>現実の分かれ道は、セレクションです</b><p>ゲームで迷った進路は、現実では小6の夏〜秋にやってきます。関東・関西のジュニアユースのセレクション日程と締切を、まとめて確認できます。</p><a class="btn main" href="/selection?${Q}" style="display:inline-flex;align-items:center;text-decoration:none">セレクション情報を見る</a></div>
+    <div class="links">
+      <a href="/member?${Q}&from=ikusei"><b>締切をLINEでお知らせ（会員）</b><i aria-hidden="true">›</i><span>お気に入りクラブの締切リマインド、体格・足型のAI診断。月500円から</span></a>
+      <a href="/books/oyako-soccer-note?${Q}"><b>本『9歳から始める 親子サッカーノート』</b><i aria-hidden="true">›</i><span>ゲームの「サッカーノート」を、親子で現実に</span></a>
+      <a href="/life/play?${Q}"><b>統計で生きる通常モード（年長〜70歳）</b><i aria-hidden="true">›</i><span>県・誕生月・家庭が統計の確率で決まる「4.5万分の1」</span></a>
+    </div>
+    <div class="share"><b>この人生を友だちに見せる</b><div class="row"><a class="btn main" id="shLine" href="#" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none">LINEで送る</a><a class="btn ghost" id="shX" href="#" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none">Xに投稿</a><button class="btn ghost" id="copy" type="button">リンクをコピー</button></div><span class="note" id="copied" role="status"></span></div>
+    <div class="row"><button class="btn main" id="again">次の人生へ</button></div>
+    <p class="note">能力の伸び、ケガのしやすさ、PK、仕事の向き不向きはゲームとしての判定です。プロ入りの人数（1学年約180人）や1年目の年俸上限（1,200万円）、資格の入口は実際の制度に合わせています。語録はこのゲームのオリジナルです。</p>`;
+  const msg = `【4.5万分の1 育成モード】${S.pos||""}で9シーズン。結末は「${end}」。向いている仕事は「${JOBS[jobs[0][0]].n}」だった。あなたなら、どう育てる？`;
+  const link = src => `https://soccer-selection.jp/life/ikusei?utm_source=${src}&utm_medium=share&utm_campaign=ikusei`;
+  $("shLine").href = `https://line.me/R/share?text=${encodeURIComponent(msg + "\n" + link("line"))}`;
+  $("shX").href = `https://x.com/intent/post?text=${encodeURIComponent(msg)}&url=${encodeURIComponent(link("x"))}`;
+  $("copy").onclick = async () => { const t = msg + " " + link("copy"); try { await navigator.clipboard.writeText(t); $("copied").textContent = "コピーしました。LINEやSNSに貼り付けてください"; } catch(e){ $("copied").textContent = t; } };
+  drawRadar(); requestAnimationFrame(()=>{ app.querySelectorAll(".bar .t i").forEach(i=>i.style.width = S.s[i.dataset.k]+"%"); });
+  $("again").onclick = startScreen; window.scrollTo({top:0});
+  if (tier>=4) confetti();
+}
+function future(path, tier, job){
+  const J = JOBS[job].n;
+  const at22 = {pro:"プロ4年目。リーグ戦に出場を重ねている。", abroad: tier>=4 ? "海外2クラブ目。現地の言葉で取材に答えるようになった。" : "大学4年。海外での経験を武器に、チームの中心になった。", uni:"大学4年。卒業後の道を、サッカーの経験から考え始めた。", senmon:"トレーナーとして、地元のクラブで選手のケガを見ている。", work:"社会人2年目。平日は仕事、土日は社会人リーグ。"}[path];
+  const at30 = tier>=4 ? `30歳。キャリアの後半。引退後は「${J}」の道も考えている。` : `30歳。「${J}」として働きながら、週末はボールを蹴っている。`;
+  const at45 = `45歳。${{coach:"教え子がJクラブのアカデミーに合格した。",analyst:"プロクラブの分析チームを率いている。",trainer:"代表チームに帯同するトレーナーになった。",ref:"1級審判として、大きな試合の笛を吹いた。",media:"W杯の試合を、実況席から伝えた。",gear:"自分が開発したスパイクを、子どもたちが履いている。",front:"地元クラブのスタジアムを、満員にした。",nutri:"ユース年代の選手の食事を、家族と一緒に考えている。"}[job]}`;
+  const at70 = "70歳。孫とボールを蹴っている。サッカーは、一生の友だちだった。";
+  quote("old");
+  return [["22歳", at22], ["30歳", at30.replace(/^30歳。/,"")], ["45歳", at45.replace(/^45歳。/,"")], ["70歳", at70.replace(/^70歳。/,"")]];
+}
+
+// ── 描画の小物 ───────────────────────────────────────
+function cssv(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function drawRadar(){
+  const c = $("radar"); if (!c) return; const x = c.getContext("2d"), W = 300, cx = 150, cy = 154, r = 100;
+  const pt = (k, v) => { const a = -Math.PI/2 + k*2*Math.PI/5; return [cx + Math.cos(a)*r*v, cy + Math.sin(a)*r*v]; };
+  const line = cssv("--line"), blue = cssv("--blue"), acc = cssv("--accent"), mut = cssv("--muted");
+  let p = reduce ? 1 : 0; const prev = S.prev, cur = S.s;
+  const frame = () => {
+    x.clearRect(0,0,W,W);
+    for (const lv of [.25,.5,.75,1]){ x.beginPath(); for (let k=0;k<5;k++){ const [a,b] = pt(k, lv); k?x.lineTo(a,b):x.moveTo(a,b); } x.closePath(); x.strokeStyle = line; x.lineWidth = 2; x.stroke(); }
+    const poly = (vals, fill, stroke) => { x.beginPath(); ST.forEach(([k],i)=>{ const [a,b] = pt(i, vals[k]/100); i?x.lineTo(a,b):x.moveTo(a,b); }); x.closePath(); x.fillStyle = fill; x.fill(); x.strokeStyle = stroke; x.lineWidth = 4; x.stroke(); };
+    const mid = {}; for (const [k] of ST) mid[k] = prev[k] + (cur[k]-prev[k])*p;
+    x.globalAlpha = .9; poly(mid, blue+"33", blue); x.globalAlpha = 1;
+    ST.forEach(([k,n],i)=>{ const [a,b] = pt(i, 1.17); x.fillStyle = cur[k]>prev[k]&&p>=1 ? acc : mut; x.font = "700 22px 'Zen Kaku Gothic New',sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText({spd:"速さ",tec:"技術",iq:"判断",phy:"体",men:"心"}[k], a, b); });
+    if (p < 1){ p = Math.min(1, p + .05); requestAnimationFrame(frame); }
+  };
+  frame();
+}
+let tt; function toast(m){ const t = $("toast"); t.textContent = m; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(()=>t.classList.remove("on"), 2200); }
+let ac; function beep(ok){ try{ ac = ac || new (window.AudioContext||window.webkitAudioContext)(); const o = ac.createOscillator(), g = ac.createGain(); o.type = "triangle"; o.frequency.value = ok ? 880 : 220; g.gain.setValueAtTime(.12, ac.currentTime); g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + .25); o.connect(g).connect(ac.destination); o.start(); o.stop(ac.currentTime + .26); if (navigator.vibrate) navigator.vibrate(ok?30:[20,40,20]); }catch(e){} }
+function confetti(){
+  if (reduce) return; const c = $("fx"), x = c.getContext("2d"); c.width = innerWidth; c.height = innerHeight;
+  const cols = ["#e8590c","#1d5fa8","#8ab8f0","#f2b632","#ffffff"];
+  const ps = Array.from({length:120}, () => ({x: innerWidth/2, y: innerHeight*0.35, vx:(R()-0.5)*12, vy:-R()*12-4, s:4+R()*6, c:cols[Math.floor(R()*cols.length)], r:R()*6}));
+  let n = 0; const step = () => { x.clearRect(0,0,c.width,c.height); for (const p of ps){ p.vy += .35; p.x += p.vx; p.y += p.vy; p.r += .2; x.save(); x.translate(p.x,p.y); x.rotate(p.r); x.fillStyle = p.c; x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); x.restore(); } if (++n < 110) requestAnimationFrame(step); else x.clearRect(0,0,c.width,c.height); };
+  step();
+}
+startScreen();
+})();
+
+</script>
+
+</body>
+</html>

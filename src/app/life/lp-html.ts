@@ -29,6 +29,7 @@ a{color:#1d5fa8}a:hover{color:#164a85}
 <p style="margin: 0; font-size: clamp(17px, 1.8vw, 20px); line-height: 1.85; max-width: 29em; color: #3c475a">小学生でサッカー選手として登録している子は、1学年およそ4.5万人。毎年プロになるのは約180人。その中の1人として生まれ、幼稚園の年長から70歳までを5分で生きる。</p>
 <div style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center">
 <a href="/life/play" style="display: inline-flex; align-items: center; gap: 12px; min-height: 60px; padding: 0 30px 0 34px; border-radius: 999px; background: #14213a; color: #ffffff; font-weight: 700; font-size: 18px; text-decoration: none; box-shadow: 0 10px 24px -10px rgba(20,33,58,.6)">年長の春から始める<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+<a href="/life/ikusei" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 22px; border-radius: 999px; background: #e8590c; color: #ffffff; font-weight: 700; font-size: 16px; text-decoration: none">育成モード（新）</a>
 <a href="/life/play#girl" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 22px; border-radius: 999px; border: 2px solid #14213a; color: #14213a; font-weight: 700; font-size: 16px; text-decoration: none">女子版で始める</a>
 <span style="font-size: 14px; color: #5a6576">所要5〜10分<br>スマホでそのまま遊べます</span>
 </div>
