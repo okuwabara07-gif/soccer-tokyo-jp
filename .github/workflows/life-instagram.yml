@@ -1,0 +1,67 @@
+name: 4.5万分の1 今日の1人（Instagram）
+
+# 毎朝 8:17（日本時間）に「今日の1人」の画像とキャプションを作り、Instagramに投稿する。
+# 必要なシークレット: INSTAGRAM_ACCOUNT_ID, META_ACCESS_TOKEN, NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+on:
+  schedule:
+    - cron: '17 23 * * *'
+  workflow_dispatch:
+    inputs:
+      date:
+        description: '投稿する日付（YYYY-MM-DD。空なら今日）'
+        required: false
+        type: string
+      dry_run:
+        description: '投稿せずに画像と文面だけ作る'
+        required: false
+        type: boolean
+        default: false
+      force:
+        description: '投稿済みでももう一度投稿する'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: life-instagram
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: 日付を決める
+        id: d
+        run: echo "date=${{ inputs.date || '' }}" >> "$GITHUB_OUTPUT"
+      - name: 画像の描画に使うブラウザと日本語フォントを入れる
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk
+          mkdir -p /tmp/pw && cd /tmp/pw && npm init -y >/dev/null && npm i -s playwright@1.48.2 && npx playwright install --with-deps chromium
+      - name: 今日の1人を作る
+        env:
+          PW_MODULE: /tmp/pw/node_modules/playwright
+        run: |
+          D="${{ steps.d.outputs.date }}"; [ -n "$D" ] || D=$(TZ=Asia/Tokyo date +%F)
+          echo "DATE=$D" >> "$GITHUB_ENV"
+          node scripts/life-post/make-post.mjs "$D" life-posts
+      - name: Instagramに投稿する
+        env:
+          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          DRY_RUN: ${{ inputs.dry_run && 'true' || 'false' }}
+          FORCE: ${{ inputs.force && 'true' || 'false' }}
+        run: node scripts/life-post/post-instagram.mjs "$DATE" life-posts
+      - name: 画像と文面を残す
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: life-post-${{ env.DATE }}
+          path: life-posts/
+          retention-days: 14
