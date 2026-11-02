@@ -45,6 +45,7 @@ export default async function ClubsPage(props: { searchParams: Promise<{ page?: 
     .from("clubs")
     .select("*", { count: "exact" })
     .eq("is_published", true)
+    .neq("team_gender", "girls")
     .order("name")
     .range(offset, offset + PAGE_SIZE - 1);
 
@@ -64,6 +65,9 @@ export default async function ClubsPage(props: { searchParams: Promise<{ page?: 
       <main className="kf-container" style={{ padding: "20px 16px 56px", maxWidth: 1180 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 2px" }}>クラブを探す</h1>
         <p style={{ fontSize: 13, color: "var(--kf-muted)", margin: "0 0 14px" }}>関東8都県・関西6府県 {totalClubs}クラブから検索。載っていないクラブは<Link href="/clubs/apply" style={{ color: "var(--kf-primary)", fontWeight: 700 }}>掲載を申請</Link>できます（無料）。</p>
+        <Link href="/clubs/girls" className="kf-card" style={{ display: "block", padding: "12px 14px", margin: "0 0 14px", textDecoration: "none", color: "var(--kf-text)", fontSize: 14 }}>
+          <strong style={{ color: "var(--kf-primary)" }}>女子チームはこちら</strong>：中学生年代の女子サッカーチーム（女子ジュニアユース）を都府県別に掲載しています →
+        </Link>
         <ClubsClient clubs={pageClubs} />
 
         {totalPages > 1 && (

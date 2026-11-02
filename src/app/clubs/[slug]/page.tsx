@@ -47,17 +47,26 @@ async function getClub(slug: string): Promise<PageClub | null> {
     .limit(1)
     .maybeSingle();
   if (error) console.error("[getClub] error:", error);
-  return (data as PageClub) ?? null;
+  if (data) return data as PageClub;
+  // v_page_club は club_leagues との内部結合なので、リーグ登録の無いクラブ（女子チームなど）は clubs から直接取る
+  const { data: c, error: e2 } = await supabase
+    .from("clubs")
+    .select("id,slug,name,name_kana,prefecture,city,club_type,official_url,instagram,monthly_fee,nearest_station,practice_days,practice_ground,strength_label")
+    .eq("slug", slug)
+    .eq("is_published", true)
+    .maybeSingle();
+  if (e2) console.error("[getClub] clubs fallback error:", e2);
+  return (c as PageClub) ?? null;
 }
 
-type ClubExtra = { notes: string | null; updated_at: string | null };
+type ClubExtra = { notes: string | null; updated_at: string | null; team_gender?: string | null };
 
 // v_page_club に含まれない列（公式サイトで確認した費用・所属の補足など）を clubs から取る
 async function getClubExtra(clubId?: string): Promise<ClubExtra> {
   if (!clubId) return { notes: null, updated_at: null };
   const { data, error } = await supabase
     .from("clubs")
-    .select("notes,updated_at")
+    .select("notes,updated_at,team_gender")
     .eq("id", clubId)
     .maybeSingle();
   if (error) console.error("[getClubExtra] error:", error);
@@ -126,10 +135,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!club) return { title: "クラブが見つかりません" };
 
   const location = [club.prefecture, club.city].filter(Boolean).join("");
-  const typeName = club.club_type === "j_academy" ? "Jリーグアカデミー" : club.club_type === "school" ? "学校のサッカー部" : "ジュニアサッカークラブ";
-  const leagueLabel = [club.league, club.block].filter(Boolean).join(" ");
   const sels = await getSelections(club.id);
   const extra = await getClubExtra(club.id);
+  const girls = extra.team_gender === "girls";
+  const typeName = girls ? "女子サッカーチーム（中学生年代）" : club.club_type === "j_academy" ? "Jリーグアカデミー" : club.club_type === "school" ? "学校のサッカー部" : "ジュニアサッカークラブ";
+  const leagueLabel = [club.league, club.block].filter(Boolean).join(" ");
   const active = sels.filter((s) => isActiveSelection(s));
   const latest = active[0] ?? sels[0];
   const selLabel = latest
@@ -145,7 +155,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         active.length > 0 && selLabel ? `${selLabel}の日程・会場・申込先を掲載。` : "練習日・練習場所・費用などを公式サイトの掲載内容から整理。",
       ].join("").slice(0, 150);
   const canonical = `https://soccer-selection.jp/clubs/${slug}`;
-  const title = `${club.name}｜${location}のジュニアサッカークラブ`;
+  const title = `${club.name}｜${location}の${girls ? "女子サッカーチーム（中学生）" : "ジュニアサッカークラブ"}`;
 
   return {
     title, description: desc,
@@ -164,6 +174,7 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
   const location = [club.prefecture, club.city].filter(Boolean).join("");
   const selections = await getSelections(club.id);
   const extra = await getClubExtra(club.id);
+  const girls = extra.team_gender === "girls";
   const today = todayJst();
   const current = selections
     .filter((s) => isActiveSelection(s, today))
@@ -193,10 +204,11 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Header />
       <main className="kf-container" style={{ padding: "24px 16px 56px", maxWidth: 820 }}>
-        <Link href="/clubs" style={{ fontSize: 13, color: "var(--kf-primary)", textDecoration: "none" }}>← クラブ一覧</Link>
+        <Link href={girls ? "/clubs/girls" : "/clubs"} style={{ fontSize: 13, color: "var(--kf-primary)", textDecoration: "none" }}>{girls ? "← 女子チーム一覧" : "← クラブ一覧"}</Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "12px 0 4px", flexWrap: "wrap" }}>
           <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>{club.name}</h1>
+          {girls && <span style={{ fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 999, background: "var(--kf-primary)", color: "#fff" }}>女子チーム</span>}
         </div>
 
         {club.name_kana && <div style={{ fontSize: 13, color: "var(--kf-muted)" }}>{club.name_kana}</div>}
@@ -205,7 +217,7 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
         <section style={{ marginTop: 24, borderTop: "1px solid var(--kf-border)", paddingTop: 20 }}>
           <h2 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 12px", color: "var(--kf-primary)" }}>基本情報</h2>
           <div className="kf-card" style={{ padding: 16 }}>
-            {club.club_type && <div style={{ marginBottom: 12 }}><strong>種別:</strong> {club.club_type === 'j_academy' ? 'Jリーグアカデミー' : club.club_type === 'school' ? '学校' : 'クラブ'}</div>}
+            {club.club_type && <div style={{ marginBottom: 12 }}><strong>種別:</strong> {girls ? '女子チーム（中学生年代）' : club.club_type === 'j_academy' ? 'Jリーグアカデミー' : club.club_type === 'school' ? '学校' : 'クラブ'}</div>}
             {club.strength_label && <div style={{ marginBottom: 12 }}><strong>レベル:</strong> {club.strength_label}</div>}
             {club.practice_days && <div style={{ marginBottom: 12 }}><strong>練習頻度:</strong> {club.practice_days}</div>}
             {club.practice_ground && <div style={{ marginBottom: 12 }}><strong>練習地:</strong> {club.practice_ground}</div>}

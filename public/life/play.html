@@ -1054,7 +1054,7 @@ function setRates(r){ RATES = r; }
   async function loadClubs(st){
     const box = $("nearClubs"); if (!box) return;
     try {
-      const r = await fetch(`/api/life/clubs?pref=${encodeURIComponent(st.pref)}&city=${encodeURIComponent(opt.city||"")}`);
+      const r = await fetch(`/api/life/clubs?pref=${encodeURIComponent(st.pref)}&city=${encodeURIComponent(opt.city||"")}${opt.girl?"&gender=girls":""}`);
       const d = await r.json();
       const apply = `<a class="apply" href="/clubs/apply?pref=${encodeURIComponent(st.pref)}&utm_source=life&utm_medium=game&utm_campaign=apply"><b>載っていないチームを教えてください</b><i aria-hidden="true">›</i><span>お子さんのチームや近所のクラブを、確認のうえ掲載します（無料）</span></a>`;
       if (!d.clubs || !d.clubs.length){ box.innerHTML = `<span class="fine">まだ掲載クラブがありません。</span>` + apply; return; }
