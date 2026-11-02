@@ -83,6 +83,8 @@ button{cursor:pointer}
 .near a{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;text-decoration:none;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
 .near a b{font-size:15px}
 .near a span{font-size:12px;color:var(--muted)}
+.near a.apply{border-style:dashed}
+.near a.apply b{color:var(--blue)}
 .near a em{font-style:normal;font-size:12px;font-weight:700;color:var(--you-ink);grid-column:1/-1}
 .count{background:var(--navy);color:var(--navy-fg);border-radius:18px;padding:16px;display:grid;gap:4px}
 .count span{font-size:12px;color:var(--navy-dim)}
@@ -580,7 +582,26 @@ function setRates(r){ RATES = r; }
   const TOP = [null,100,94.99,73.97,16.5,1.5,0.39,0.31,0.18,0.05,0.02];
   setRates({passJ12:2.89,passJ15:5.78,tr0:19.71,tr1:6.78,tr2:2.43,tr3:0.27,senshuken:1.38,bigInj:24.55});
   const SURV = {5:1,6:1,7:1,8:1,9:1,10:1,11:1,12:0.95,13:0.95,14:0.95,15:0.617,16:0.617,17:0.617,18:0.169,19:0.169,20:0.168,21:0.168,22:0.0143,23:0.0133,24:0.0129,25:0.0127,26:0.0016,27:0.0014,28:0.0012,29:0.0011,30:0.001,31:0.0009,32:0.0006,33:0.0004,34:0.0004,35:0.0002,36:0.0001,37:0.0001,38:0};
-  const NAMES = ["ハルト","ソウタ","ユウト","リク","レン"];
+  // 同期の名前：今の年長〜小学生世代（2014〜2021年生まれ）の男の子に多い名前から毎回選ぶ（2020年生まれの1位は「蒼」：明治安田生命）
+  const NAME_POOL = ["蒼","蓮","樹","陽翔","湊","大和","律","悠真","朝陽","蒼空","新","陽向","碧","暖","颯真","悠人","湊斗","大翔","結翔","奏太"];
+  let NAMES = ["ハルト","ソウタ","ユウト","リク","レン"];
+  const pickNames = () => { const R = rngFrom(seed ^ 0x2a7e); const pool = NAME_POOL.slice(); const out = []; while (out.length < 5){ const i = Math.floor(R()*pool.length); out.push(pool.splice(i,1)[0]); } return out; };
+  // 選択から見えた性格（ゲーム上の判定。名前や誕生日からは決めない）
+  function personality(st){
+    const lab = picks.map(p => p.opts[p.i].label).join("|");
+    const challenge = (lab.match(/セレクション|U-15|U-18|強豪|プロ契約|挑戦|JFL|上を目指す/g) || []).length;
+    const effort = /毎朝の自主練/.test(lab) ? 2 : /控えめ/.test(lab) ? 0 : 1;
+    const support = st.after && /coachv|ref/.test(st.after.mode||"") || (st.after && st.after.lic);
+    const stay = st.after && (st.after.playing || st.after.back || st.after.at70);
+    let t, d;
+    if (challenge >= 3) { t = "挑戦家"; d = "迷ったら高い方の壁を選ぶタイプ。不合格の悔しさも次の一歩に変えてきた。"; }
+    else if (support) { t = "支える人"; d = "自分が出るより、誰かを伸ばすことに喜びを見つけるタイプ。"; }
+    else if (effort === 2) { t = "コツコツ型"; d = "毎日の積み重ねで差をつけるタイプ。結果が出ない時期も練習をやめなかった。"; }
+    else if (stay) { t = "サッカーが好きな人"; d = "勝ち負けより、ボールを蹴る時間そのものを大切にするタイプ。"; }
+    else { t = "バランス型"; d = "サッカーと勉強や家族との時間を、自分なりに両立させるタイプ。"; }
+    const early = [1,2,3].includes(st.month) ? "早生まれは低学年ほど自信を持ちにくい傾向が研究で示されています。そのぶん、ここまで続けたこと自体が力です。" : "";
+    return {t, d, early};
+  }
   const SITE_REGIONS = ["関東","関西"];
   const ZUKAN = [["s1","小学校で卒業","小"],["s2","中学で卒業","中"],["s3","高校で卒業","高"],["s4","大学で卒業","大"],["jfl","JFL・地域リーグ","地"],["J3","J3でプロ","J3"],["J2","J2でプロ","J2"],["J1","J1でプロ","J1"],["abroad","海外クラブ","海"],["caps","日本代表","代"],["senshu","高校選手権に出場","杯"],["nat","ナショナルトレセン","◎"]];
   const $ = id => document.getElementById(id);
@@ -639,6 +660,7 @@ function setRates(r){ RATES = r; }
     while (!r.done){
       const v = r.value;
       if (v.t==="birth"){ birth = v.st; ref = v.ref;
+        NAMES = pickNames();
         mates = NAMES.map((n,k)=>{ const m = autoPlay(seed*7+k*101+1, {prefIdx: ref.prefIdx}); return {name:n, st:m.st, ev: mateEvents(m.log), end:m.st.endAge}; });
         queue.push({kind:"birth"}); }
       else if (v.t==="log") queue.push({kind:"log", v});
@@ -823,9 +845,10 @@ function setRates(r){ RATES = r; }
     try {
       const r = await fetch(`/api/life/clubs?pref=${encodeURIComponent(st.pref)}&city=${encodeURIComponent(opt.city||"")}`);
       const d = await r.json();
-      if (!d.clubs || !d.clubs.length){ box.innerHTML = `<span class="fine">まだ掲載クラブがありません。</span>`; return; }
+      const apply = `<a class="apply" href="/clubs/apply?pref=${encodeURIComponent(st.pref)}&utm_source=life&utm_medium=game&utm_campaign=apply"><b>載っていないチームを教えてください</b><i aria-hidden="true">›</i><span>お子さんのチームや近所のクラブを、確認のうえ掲載します（無料）</span></a>`;
+      if (!d.clubs || !d.clubs.length){ box.innerHTML = `<span class="fine">まだ掲載クラブがありません。</span>` + apply; return; }
       const head = d.scope==="city" ? "" : `<span class="fine">${opt.city?`${esc(opt.city)}の掲載クラブが見つからないため、`:""}${esc(st.pref)}の主なクラブを表示しています。</span>`;
-      box.innerHTML = head + d.clubs.map(c => `<a href="/clubs/${encodeURIComponent(c.slug)}?utm_source=life&utm_medium=game&utm_campaign=near"><b>${esc(c.name)}</b><i aria-hidden="true">›</i><span>${esc(c.city||st.pref)}${c.jleague?"・Jクラブ下部":""}</span>${c.next?`<em>次のセレクション ${esc((c.next.date||"").slice(5).replace("-","/"))}${c.next.deadline?`（締切 ${esc(c.next.deadline.slice(5).replace("-","/"))}）`:""}</em>`:""}</a>`).join("");
+      box.innerHTML = head + d.clubs.map(c => `<a href="/clubs/${encodeURIComponent(c.slug)}?utm_source=life&utm_medium=game&utm_campaign=near"><b>${esc(c.name)}</b><i aria-hidden="true">›</i><span>${esc(c.city||st.pref)}${c.estimated?"（推定）":""}${c.jleague?"・Jクラブ下部":""}</span>${c.next?`<em>次のセレクション ${esc((c.next.date||"").slice(5).replace("-","/"))}${c.next.deadline?`（締切 ${esc(c.next.deadline.slice(5).replace("-","/"))}）`:""}</em>`:""}</a>`).join("") + apply;
     } catch(e){ box.innerHTML = `<span class="fine">クラブ情報を読み込めませんでした。</span>`; }
   }
   function finish(){
@@ -838,6 +861,7 @@ function setRates(r){ RATES = r; }
       <div class="endhead"><span class="lab">${opt.name?esc(opt.name)+"くん・":""}${st.pref}・${st.month}月生まれ・${st.pos||""}の結末</span><h2>${st.ending}</h2>
         ${fresh.length?`<span class="new">図鑑に新しい結末</span>`:""}
         <span class="lab" style="margin-top:6px">一緒に始めた4.5万人のうち</span><span class="top">上位${top}%</span><span class="lab">ここまで来たのは約${ppl.toLocaleString("ja-JP")}人${st.earn?`・プロの年俸合計 約${st.earn>=10000?Math.floor(st.earn/10000)+"億"+(st.earn%10000?(st.earn%10000).toLocaleString("ja-JP")+"万":"")+"円":st.earn.toLocaleString("ja-JP")+"万円"}`:""}</span></div>
+      ${(() => { const P = personality(st); st.persona = P.t; return `<div class="box"><h3>選択から見えた性格</h3><b style="font-size:20px">「${P.t}」</b><p class="fine" style="font-size:14px;color:var(--fg)">${P.d}</p>${P.early?`<p class="fine">${P.early}<span class="tag">山口・伊藤・中室 2023</span></p>`:""}<p class="fine">あなたが選んだ道から判定しています。名前や誕生日から性格を決めることはしていません。</p></div>`; })()}
       <div class="box"><h3>6人の路線図</h3>${routeSvg(st)}</div>
       ${afterHtml(st)}
       ${ctaHtml(st)}
@@ -849,7 +873,7 @@ function setRates(r){ RATES = r; }
       <div class="toast" id="toast" role="status"></div>`;
     loadClubs(st);
     res.querySelectorAll(".alts button").forEach(b => b.onclick = () => { const k = +b.dataset.k, j = +b.dataset.j; start(seed, opt, picks.slice(0,k).map(p=>p.i).concat([j])); });
-    const text = `【4.5万分の1】${st.pref}・${st.month}月生まれの${st.pos||""}。結末は「${st.ending}」、第2章の称号は「${st.after?st.after.title:""}」。一緒に始めた4.5万人のうち上位${top}%。親の費用は${yen(st.cost)}・当番${st.toban}回。`;
+    const text = `【4.5万分の1】${st.pref}・${st.month}月生まれの${st.pos||""}。結末は「${st.ending}」、第2章の称号は「${st.after?st.after.title:""}」、性格は「${st.persona||""}」。一緒に始めた4.5万人のうち上位${top}%。親の費用は${yen(st.cost)}・当番${st.toban}回。`;
     const link = src => `https://soccer-selection.jp/life/play?utm_source=${src}&utm_medium=share&utm_campaign=result#${hashKey()}`;
     const msg = text + " 同じ運命で、あなたならどう生きる？";
     $("shLine").href = `https://line.me/R/share?text=${encodeURIComponent(msg + "\n" + link("line"))}`;
@@ -876,6 +900,7 @@ function setRates(r){ RATES = r; }
     const still = mates.filter(m=>m.st.level>=st.level).length; x.fillText(`同じチームの5人中、ここまで来たのは${still}人`, 110, 810);
     if (st.earn){ x.fillStyle = "#8ab8f0"; x.font = "700 34px 'Zen Kaku Gothic New', sans-serif"; x.fillText(`プロの年俸合計 約${st.earn>=10000?Math.floor(st.earn/10000)+"億"+(st.earn%10000?(st.earn%10000).toLocaleString("ja-JP")+"万":"")+"円":st.earn.toLocaleString("ja-JP")+"万円"}`, 110, 880); }
     if (st.after){ x.fillStyle = "#e8590c"; x.font = "700 34px 'Zen Kaku Gothic New', sans-serif"; x.fillText(`第2章：「${st.after.title}」・サッカー歴${st.after.career}年`, 110, 950); }
+    if (st.persona){ x.fillStyle = "#eef2f8"; x.font = "700 30px 'Zen Kaku Gothic New', sans-serif"; x.fillText(`選択から見えた性格：${st.persona}`, 110, 1000); }
     x.fillStyle = "#9aa7bc"; x.font = "700 28px 'Zen Kaku Gothic New', sans-serif"; x.fillText("親が払ったもの（18歳まで）", 110, 1050);
     x.fillStyle = "#eef2f8"; x.font = "800 56px 'JetBrains Mono', monospace"; x.fillText(yen(st.cost), 110, 1124);
     x.font = "700 34px 'Zen Kaku Gothic New', sans-serif"; x.fillText(`当番 ${st.toban}回・送迎 ${st.drive.toLocaleString("ja-JP")}時間`, 110, 1180);

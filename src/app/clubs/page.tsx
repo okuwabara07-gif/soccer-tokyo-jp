@@ -63,7 +63,7 @@ export default async function ClubsPage(props: { searchParams: Promise<{ page?: 
       <Header />
       <main className="kf-container" style={{ padding: "20px 16px 56px", maxWidth: 1180 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 2px" }}>クラブを探す</h1>
-        <p style={{ fontSize: 13, color: "var(--kf-muted)", margin: "0 0 14px" }}>関東8都県・関西6府県 {totalClubs}クラブから検索</p>
+        <p style={{ fontSize: 13, color: "var(--kf-muted)", margin: "0 0 14px" }}>関東8都県・関西6府県 {totalClubs}クラブから検索。載っていないクラブは<Link href="/clubs/apply" style={{ color: "var(--kf-primary)", fontWeight: 700 }}>掲載を申請</Link>できます（無料）。</p>
         <ClubsClient clubs={pageClubs} />
 
         {totalPages > 1 && (

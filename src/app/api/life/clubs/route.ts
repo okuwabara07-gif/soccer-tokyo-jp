@@ -10,7 +10,7 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env
 
 const base = (s: string | null | undefined) => (s || "").replace(/\s/g, "").replace(/(市|区|町|村)$/, "");
 
-type ClubRow = { id: string; slug: string; name: string; city: string | null; club_type: string | null; strength_rank_pref: number | null };
+type ClubRow = { id: string; slug: string; name: string; city: string | null; city_norm: string | null; city_norm_source: string | null; club_type: string | null; strength_rank_pref: number | null };
 type SelRow = { club_id: string; title: string | null; event_date: string | null; event_date_end: string | null; apply_deadline: string | null; selection_type: string | null };
 
 export async function GET(req: Request) {
@@ -21,13 +21,16 @@ export async function GET(req: Request) {
 
   const { data, error } = await supabase
     .from("clubs")
-    .select("id,slug,name,city,club_type,strength_rank_pref")
+    .select("id,slug,name,city,city_norm,city_norm_source,club_type,strength_rank_pref")
     .eq("is_published", true)
     .eq("prefecture", pref);
   if (error || !data) return NextResponse.json({ clubs: [], scope: "error" });
 
   const rows = data as ClubRow[];
-  let picked = city ? rows.filter((c) => base(c.city) === city) : [];
+  // city_norm（照合用に整えた市区町村）を優先し、無ければ city を整えて照合する。確認済み（city）を推定（estimated）より先に並べる
+  // 政令市は「横浜市港北区」と「横浜」のように粒度が違うので、2文字以上なら前方一致でも拾う
+  const hit = (n: string) => !!n && (n === city || (n.length >= 2 && city.length >= 2 && (n.startsWith(city) || city.startsWith(n))));
+  let picked = city ? rows.filter((c) => hit(c.city_norm || base(c.city))).sort((a, b) => (a.city_norm_source === "city" ? 0 : 1) - (b.city_norm_source === "city" ? 0 : 1)) : [];
   let scope: "city" | "pref" = "city";
   if (picked.length === 0) {
     scope = "pref";
@@ -57,7 +60,8 @@ export async function GET(req: Request) {
     return {
       slug: c.slug,
       name: c.name,
-      city: c.city,
+      city: c.city || (c.city_norm ? c.city_norm : null),
+      estimated: c.city_norm_source === "estimated",
       jleague: c.club_type === "j_academy",
       next: next ? { date: next.event_date, deadline: next.apply_deadline, type: next.selection_type } : null,
     };
