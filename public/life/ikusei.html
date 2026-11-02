@@ -177,6 +177,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .job > span{font-size:13px;color:var(--muted)}
 .job .door{color:var(--blue);font-weight:700}
 
+.who{display:inline-flex;gap:4px;padding:4px;border-radius:999px;background:var(--bg);border:1px solid var(--line);justify-self:start}
+.wb{min-height:40px;padding:0 14px;border-radius:999px;border:0;background:none;color:var(--muted);font-weight:700;font-size:14px}
+.wb[aria-pressed="true"]{background:var(--navy);color:var(--navy-fg)}
+.les{border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:0;display:flex;flex-wrap:wrap;gap:6px 14px}
+.les legend{font-size:12px;font-weight:700;color:var(--muted);padding:0 4px}
+.chk{display:inline-flex;align-items:center;gap:6px;min-height:36px;font-size:14px}
+.chk input{width:18px;height:18px}
 .form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .field{display:grid;gap:4px;min-width:0}
 .field label{font-size:12px;font-weight:700;color:var(--muted)}
@@ -282,6 +289,13 @@ const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const esc = t => String(t).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 const addTr = tr => { for (const [k,v] of Object.entries(tr||{})) S.tr[k] = (S.tr[k]||0) + v; };
 
+let WHO = "p";
+// 学校保健統計（令和6年度・男子・全国平均身長cm）と、ばらつきの目安
+const HEIGHT = {5:110.6,6:116.7,7:122.6,8:128.5,9:134.0,10:139.7,11:146.0,12:154.0,13:161.1,14:166.1};
+const HSD = {5:4.7,6:4.9,7:5.1,8:5.4,9:5.7,10:6.2,11:7.0,12:7.9,13:7.8,14:6.9};
+const BMI_REF = {5:15.4,6:15.6,8:16.2,10:17.2,12:18.6}; // 想定：年齢ごとの標準的なBMI
+const LESSONS = [["swim","水泳"],["gym","体操"],["run","陸上"],["base","野球"],["budo","武道"],["dance","ダンス"],["juku","塾"]];
+const LES_FX = {swim:[{phy:1},0.93,"水泳で体の芯が強くなった"],gym:[{tec:1},0.93,"体操で体の使い方がうまくなった"],run:[{spd:2},1,"陸上で走り方を覚えた"],base:[{iq:1,phy:1},1,"野球で投げる・打つ動きも覚えた"],budo:[{men:2},1,"武道で礼儀と負けない心を学んだ"],dance:[{tec:1,spd:1},1,"ダンスでリズム感がついた"],juku:[{iq:1},1,"塾と両立して、時間の使い方がうまくなった"]};
 // 親の身長から大人になったときの身長の目安（男子：（父＋母＋13）÷2、幅はおよそ±9cm）
 const midParent = (d, m) => (d && m) ? Math.round((d + m + 13) / 2) : null;
 const bodyType = (pr) => { const b = []; if (pr.dh && pr.dw) b.push(pr.dw / (pr.dh/100) ** 2); if (pr.mh && pr.mw) b.push(pr.mw / (pr.mh/100) ** 2); if (!b.length) return null; const v = b.reduce((a,c)=>a+c,0)/b.length; return v >= 25 ? "がっしり" : v < 20 ? "細身" : "ふつう"; };
@@ -297,18 +311,30 @@ function newRun(seed, pr){
   if (mph) { const d = clamp((mph - 171) * 0.6, -6, 6); s.phy = clamp(Math.round(s.phy + d), 1, 99); if (d < -2) s.spd = clamp(s.spd + 2, 1, 99); }
   if (bt === "がっしり"){ s.phy += 2; s.spd -= 1; } if (bt === "細身"){ s.spd += 2; s.phy -= 1; }
   if ([1,2,3].includes(month) && start <= 3){ s.phy -= 2; s.men += 1; }
-  const team = start >= 4 ? "街クラブJY" : "地元の少年団";
-  S = { seed, s, prev:{...s}, i:start, start, fat:20, team, pos:"", rank:"", skills:[], log:[], rival:{name:"ハヤト", ovr:ovr(s)+3}, flags:{}, month, injuries:0, highFat:0, tr:{}, quotes:[], route:[], mph, bt, name:(pr.name||"").slice(0,10) };
+  const age0 = SEASONS[start].age, notes = [];
+  if (pr.h){ const zh = clamp((pr.h - HEIGHT[age0]) / HSD[age0], -3, 3); s.phy = clamp(Math.round(s.phy + zh*2), 1, 99); notes.push(`今の身長${pr.h}cm。${SEASONS[start].g}の全国平均（${HEIGHT[age0]}cm）より${Math.abs(pr.h-HEIGHT[age0]).toFixed(1)}cm${pr.h>=HEIGHT[age0]?"高い":"低い"}。`);
+    if (pr.w){ const bmi = pr.w / (pr.h/100) ** 2, ref = BMI_REF[age0] || 16; if (bmi - ref > 2.5){ s.phy += 2; s.spd -= 1; notes.push("体はがっしりタイプ。当たりに強い。"); } else if (bmi - ref < -2){ s.spd += 1; notes.push("体は細身タイプ。身のこなしが軽い。"); } } }
+  if (pr.good && s[pr.good] != null){ s[pr.good] = clamp(s[pr.good] + 4, 1, 99); notes.push(`得意なこと：${{spd:"足が速い",tec:"ドリブルが好き",iq:"考えるのが得意",phy:"体が強い",men:"負けず嫌い"}[pr.good]}。`); }
+  if (pr.sib==="old"){ s.tec += 2; notes.push("兄・姉の試合についていき、早くからボールに触れていた。"); }
+  if (pr.sib==="young"){ s.men += 1; notes.push("弟・妹の面倒を見るのが得意。"); }
+  let injM = 1; for (const k of (pr.les||[])){ const f = LES_FX[k]; if (!f) continue; for (const [st,v] of Object.entries(f[0])) s[st] = clamp(s[st]+v, 1, 99); injM *= f[1]; notes.push(f[2] + "。"); }
+  const elem = ["地元の少年団","街クラブ","JクラブU-12"], jh = ["街クラブJY","JクラブU-15","中学のサッカー部"];
+  let team = start >= 4 ? (jh.includes(pr.team) ? pr.team : "街クラブJY") : (elem.includes(pr.team) ? pr.team : start===0 && !pr.team ? "地元の少年団" : (pr.team ? "地元の少年団" : "地元の少年団"));
+  if (start>0 && start<4 && !pr.team) team = "まだチームに入っていない";
+  S = { seed, s, prev:{...s}, i:start, start, fat:20, team, pos:"", rank:"", skills:[], log:[], rival:{name:"ハヤト", ovr:ovr(s)+3}, flags:{}, month, injuries:0, highFat:0, tr:{}, quotes:[], route:[], mph, bt, name:(pr.name||"").slice(0,10), injM, commute: pr.com || 30, who: pr.who || "p" };
+  if (pr.pos){ const P0 = POSITIONS.find(x=>x[0]===pr.pos); if (P0){ S.pos = pr.pos; applyFx(P0[3]); addTr(P0[4]); S.prev = {...S.s}; } }
   S.rank = rankOf(); plan = []; evPending = null; evDone = false;
   addLog("good", `${S.name?S.name+"は":""}${month}月生まれ。${SEASONS[start].g}から、${S.team}でボールを蹴る。ライバルは同じチームの${S.rival.name}。`);
   if (mph) addLog(null, `両親の身長から、大人になったときの身長の目安は約${mph}cm（±9cmほど）。`);
   if (bt) addLog(null, `両親の体型は「${bt}」。体の使い方の傾向の目安にしている。`);
+  notes.forEach(t => addLog(null, t));
+  if (S.team==="まだチームに入っていない") addLog(null, "まだチームに入っていない。まずは近くのチームの体験に行くところから。");
   if ([1,2,3].includes(month)) addLog(null, "早生まれ。小学生のうちは体の大きさで不利になりやすいが、考える力で補える。");
   quote("start");
   render();
 }
 function rankOf(){
-  const lv = {"地元の少年団":28,"街クラブJY":36,"中学の部活":32,"JクラブU-15":46,"JクラブU-18":58,"強豪校":52,"高校のサッカー部":44,"海外のアカデミー":56}[S.team] || 30;
+  const lv = {"まだチームに入っていない":22,"街クラブ":31,"JクラブU-12":40,"地元の少年団":28,"街クラブJY":36,"中学の部活":32,"JクラブU-15":46,"JクラブU-18":58,"強豪校":52,"高校のサッカー部":44,"海外のアカデミー":56}[S.team] || 30;
   const d = ovr(S.s) - (lv + S.i*2.2);
   return d > 6 ? "エース" : d > 0 ? "スタメン" : d > -7 ? "途中出場" : "ベンチ外";
 }
@@ -330,27 +356,41 @@ function startScreen(){
       <p class="note">前の人生で取ったバッジで、新しい種が増えます。</p>
       <div class="seeds" id="seeds">${SEEDS.map(x => { const ok = x.base || got.has(x.need); return `<button class="seed" data-id="${x.id}" ${ok?"":"disabled"} aria-pressed="${x.id===pick}"><i>${ok?x.i:"？"}</i><span><b>${ok?x.n:"まだ持っていない種"}</b><span>${ok?x.d:"バッジ「"+BADGES.find(b=>b[0]===x.need)[1]+"」で手に入る"}</span></span></button>`; }).join("")}</div>
     </div>
-    <div class="card"><h2 style="font-size:16px">あなた（お子さん）の条件</h2>
-      <p class="note">すべて任意です。入れた条件で始まります。入力内容はこの端末の中だけに残り、送信はされません。</p>
+    <div class="card"><h2 style="font-size:16px" data-p="お子さんの条件" data-c="きみのこと">お子さんの条件</h2>
+      <div class="who" role="group" aria-label="だれが入力する？"><button type="button" class="wb" data-w="p" aria-pressed="true">保護者が入力</button><button type="button" class="wb" data-w="c" aria-pressed="false">子どもが自分で入力</button></div>
+      <p class="note" data-p="すべて任意です。入れた条件で始まります。入力内容はこの端末の中だけに残り、送信はされません。" data-c="わかるところだけでOK。入れたことは、このスマホやパソコンの中にだけ残ります。">すべて任意です。入れた条件で始まります。入力内容はこの端末の中だけに残り、送信はされません。</p>
       <div class="form">
-        <div class="field"><label for="fStart">始める時期</label><select id="fStart"><option value="0">年長から</option><option value="1">小1から</option><option value="2">小3から</option><option value="3">小5から</option><option value="4">中1から</option></select></div>
-        <div class="field"><label for="fMonth">生まれ月</label><select id="fMonth"><option value="">おまかせ</option>${[4,5,6,7,8,9,10,11,12,1,2,3].map(m=>`<option value="${m}">${m}月</option>`).join("")}</select></div>
-        <div class="field"><label for="fName">呼び名</label><input id="fName" type="text" maxlength="10" placeholder="例：ハルト" autocomplete="off"></div>
-        <div class="field"><label for="fDh">父の身長（cm）</label><input id="fDh" type="number" inputmode="decimal" min="140" max="210" placeholder="例：172"></div>
-        <div class="field"><label for="fMh">母の身長（cm）</label><input id="fMh" type="number" inputmode="decimal" min="130" max="200" placeholder="例：158"></div>
-        <div class="field"><label for="fDw">父の体重（kg）</label><input id="fDw" type="number" inputmode="decimal" min="35" max="180" placeholder="任意"></div>
-        <div class="field"><label for="fMw">母の体重（kg）</label><input id="fMw" type="number" inputmode="decimal" min="30" max="150" placeholder="任意"></div>
+        <div class="field"><label for="fStart" data-p="始める時期" data-c="いつから始める？">始める時期</label><select id="fStart"><option value="0">年長から</option><option value="1">小1から</option><option value="2">小3から</option><option value="3">小5から</option><option value="4">中1から</option></select></div>
+        <div class="field"><label for="fMonth" data-p="生まれ月" data-c="生まれた月">生まれ月</label><select id="fMonth"><option value="">おまかせ</option>${[4,5,6,7,8,9,10,11,12,1,2,3].map(m=>`<option value="${m}">${m}月</option>`).join("")}</select></div>
+        <div class="field"><label for="fName" data-p="呼び名" data-c="よばれたい名前">呼び名</label><input id="fName" type="text" maxlength="10" placeholder="例：ハルト" autocomplete="off"></div>
+        <div class="field"><label for="fPos" data-p="ポジション" data-c="ポジション">ポジション</label><select id="fPos"><option value="">まだ決まっていない</option><option value="FW">FW</option><option value="MF">MF</option><option value="DF">DF</option><option value="GK">GK</option></select></div>
+        <div class="field"><label for="fH" data-p="今の身長（cm）" data-c="いまの身長（cm）">今の身長（cm）</label><input id="fH" type="number" inputmode="decimal" min="90" max="200" placeholder="例：128"></div>
+        <div class="field"><label for="fW" data-p="今の体重（kg）" data-c="いまの体重（kg）">今の体重（kg）</label><input id="fW" type="number" inputmode="decimal" min="12" max="100" placeholder="例：26"></div>
+        <div class="field"><label for="fTeam" data-p="今のチーム" data-c="いまのチーム">今のチーム</label><select id="fTeam"><option value="">まだ入っていない</option><option value="地元の少年団">少年団</option><option value="街クラブ">街クラブ</option><option value="JクラブU-12">Jクラブのスクール・U-12</option><option value="街クラブJY">（中学）街クラブJY</option><option value="JクラブU-15">（中学）JクラブU-15</option><option value="中学のサッカー部">（中学）サッカー部</option></select></div>
+        <div class="field"><label for="fGood" data-p="得意なこと" data-c="とくいなこと">得意なこと</label><select id="fGood"><option value="">とくになし</option><option value="spd">足が速い</option><option value="tec">ドリブルが好き</option><option value="iq">考えるのが得意</option><option value="phy">体が強い</option><option value="men">負けず嫌い</option></select></div>
+        <div class="field"><label for="fSib" data-p="きょうだい" data-c="きょうだい">きょうだい</label><select id="fSib"><option value="">いない・ほかのことをしている</option><option value="old">兄・姉がサッカーをしている</option><option value="young">弟・妹がいる</option></select></div>
+        <div class="field"><label for="fCom" data-p="通える範囲（片道）" data-c="かよえるきょり（かたみち）">通える範囲（片道）</label><select id="fCom"><option value="30">30分まで</option><option value="15">15分まで</option><option value="60">1時間まで</option></select></div>
+        <div class="field"><label for="fDh" data-p="父の身長（cm）" data-c="お父さんの身長（cm）">父の身長（cm）</label><input id="fDh" type="number" inputmode="decimal" min="140" max="210" placeholder="例：172"></div>
+        <div class="field"><label for="fMh" data-p="母の身長（cm）" data-c="お母さんの身長（cm）">母の身長（cm）</label><input id="fMh" type="number" inputmode="decimal" min="130" max="200" placeholder="例：158"></div>
+        <div class="field"><label for="fDw" data-p="父の体重（kg）" data-c="お父さんの体重（kg）">父の体重（kg）</label><input id="fDw" type="number" inputmode="decimal" min="35" max="180" placeholder="任意"></div>
+        <div class="field"><label for="fMw" data-p="母の体重（kg）" data-c="お母さんの体重（kg）">母の体重（kg）</label><input id="fMw" type="number" inputmode="decimal" min="30" max="150" placeholder="任意"></div>
       </div>
-      <p class="note">両親の身長から、大人になったときの身長の目安（男子：（父＋母＋13）÷2）を出して、体の強さに反映します。体重は体型の傾向として軽く反映するだけです。</p>
+      <fieldset class="les"><legend data-p="サッカー以外の習いごと（いくつでも）" data-c="サッカーのほかにやっていること（いくつでも）">サッカー以外の習いごと（いくつでも）</legend>${LESSONS.map(([k,n])=>`<label class="chk"><input type="checkbox" value="${k}" name="les"> ${n}</label>`).join("")}</fieldset>
+      <p class="note" data-p="両親の身長から大人になったときの身長の目安（男子：（父＋母＋13）÷2）を出し、今の身長・体重は同じ学年の全国平均と比べて体格の個性にします。体重や習いごとは傾向として軽く反映するだけです。" data-c="お父さんとお母さんの身長から、大人になったときの身長の目安を出すよ。いまの身長は、同じ学年の平均とくらべるよ。">両親の身長から大人になったときの身長の目安（男子：（父＋母＋13）÷2）を出し、今の身長・体重は同じ学年の全国平均と比べて体格の個性にします。体重や習いごとは傾向として軽く反映するだけです。</p>
     </div>
     <div class="row"><button class="btn main" id="go">この条件で始める</button><a class="btn ghost" href="/life/play" style="display:inline-flex;align-items:center;text-decoration:none">統計で生きる通常モード</a>${SAVE.runs?`<span class="note">これまで${SAVE.runs}回の人生・見た結末 ${SAVE.ends.length}種類・語録 ${SAVE.quotes.length}/${Object.keys(QUOTES).length}</span>`:""}</div>
     ${SAVE.quotes.length?`<div class="card"><h3 style="font-size:15px">語録帳 ${SAVE.quotes.length}/${Object.keys(QUOTES).length}</h3><ul class="quotes">${SAVE.quotes.map(k=>`<li>${QUOTES[k]}</li>`).join("")}</ul></div>`:""}`;
   app.querySelectorAll(".seed").forEach(b => b.onclick = () => { pick = b.dataset.id; app.querySelectorAll(".seed").forEach(x => x.setAttribute("aria-pressed", String(x===b))); });
   const P = store.get("ikusei-profile", {});
-  for (const [id,k] of [["fStart","start"],["fMonth","month"],["fName","name"],["fDh","dh"],["fMh","mh"],["fDw","dw"],["fMw","mw"]]) if (P[k]!=null && P[k]!=="") $(id).value = P[k];
+  const FIELDS = [["fStart","start"],["fMonth","month"],["fName","name"],["fPos","pos"],["fH","h"],["fW","w"],["fTeam","team"],["fGood","good"],["fSib","sib"],["fCom","com"],["fDh","dh"],["fMh","mh"],["fDw","dw"],["fMw","mw"]];
+  for (const [id,k] of FIELDS) if (P[k]!=null && P[k]!=="") $(id).value = P[k];
+  (P.les||[]).forEach(k => { const c = app.querySelector(`input[name="les"][value="${k}"]`); if (c) c.checked = true; });
+  const setWho = w => { app.querySelectorAll(".wb").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.w===w))); app.querySelectorAll("[data-p]").forEach(el => el.textContent = w==="c" ? el.dataset.c : el.dataset.p); WHO = w; };
+  app.querySelectorAll(".wb").forEach(b => b.onclick = () => setWho(b.dataset.w));
+  setWho(P.who || "p");
   $("go").onclick = () => {
     const n = id => { const v = parseFloat($(id).value); return isFinite(v) ? v : null; };
-    const pr = {start:+$("fStart").value, month: $("fMonth").value ? +$("fMonth").value : null, name:$("fName").value.trim(), dh:n("fDh"), mh:n("fMh"), dw:n("fDw"), mw:n("fMw")};
+    const pr = {who:WHO, start:+$("fStart").value, month: $("fMonth").value ? +$("fMonth").value : null, name:$("fName").value.trim(), pos:$("fPos").value, h:n("fH"), w:n("fW"), team:$("fTeam").value, good:$("fGood").value, sib:$("fSib").value, com:+$("fCom").value||30, dh:n("fDh"), mh:n("fMh"), dw:n("fDw"), mw:n("fMw"), les:[...app.querySelectorAll('input[name="les"]:checked')].map(c=>c.value)};
     store.set("ikusei-profile", pr); newRun(pick, pr);
   };
 }
@@ -404,7 +444,7 @@ function choosePos(k){
   render();
 }
 function projFat(){ let f = S.fat; for (const id of plan) f += DRILLS.find(d=>d.id===id).fat; return clamp(f,0,100); }
-function injRisk(){ const f = projFat(); return Math.round(clamp((f-45)*0.9, 2, 60)); }
+function injRisk(){ const f = projFat(); return Math.round(clamp((f-45)*0.9*(S.injM||1), 2, 60)); }
 
 // ── 出来事（ライバル・コーチ・親・友だち） ───────────────
 // o: [ラベル, 補足, 能力, 特別処理, 疲れ, 向き（仕事の傾向）, 語録]
@@ -458,7 +498,9 @@ function runSeason(){
   const lateM = S.seed==="late" ? (se.k==="es"?0.7: se.k==="hs"?1.6:1) : 1, bugM = S.seed==="bug" ? 1.15 : 1;
   const injured = R()*100 < injRisk();
   for (const id of plan){ const d = DRILLS.find(x=>x.id===id); const fx = {}; for (const [k,v] of Object.entries(d.fx)) fx[k] = v * g[k] * lateM * bugM * (injured?0.4:1) * (1.1 + R()*0.5); applyFx(fx); fat += d.fat; addTr(d.tr); if (id==="play") quote("play"); if (id==="note") quote("note"); if (id==="rest") quote("rest"); }
-  const env = {"JクラブU-15":1.5,"JクラブU-18":1.5,"海外のアカデミー":1.5,"強豪校":1.3,"街クラブJY":1.1}[S.team] || 0.9;
+  const env = {"JクラブU-12":1.4,"JクラブU-15":1.5,"JクラブU-18":1.5,"海外のアカデミー":1.5,"強豪校":1.3,"街クラブJY":1.1,"街クラブ":1.05,"まだチームに入っていない":0.7}[S.team] || 0.9;
+  // 通える範囲が狭いのに遠いチームへ通うと、移動で疲れる
+  if (["JクラブU-12","JクラブU-15","JクラブU-18","強豪校","街クラブJY"].includes(S.team)) fat += {15:10,30:5,60:2}[S.commute] || 5;
   for (const [k] of ST) S.s[k] = clamp(Math.round(S.s[k] + env*g[k]*lateM*(0.6+R()*0.6)), 1, 99);
   S.fat = clamp(fat - 8, 0, 100);
   if (S.fat > 70) S.highFat++;
@@ -474,6 +516,7 @@ function runSeason(){
 }
 function nextSeason(){
   S.i++;
+  if (S.team==="まだチームに入っていない"){ S.team = "地元の少年団"; addLog("good", "体験に行った地元の少年団に入った。"); }
   if (S.i >= SEASONS.length) return finalChoice();
   S.rank = rankOf(); render(); window.scrollTo({top:0, behavior: reduce?"auto":"smooth"});
 }
@@ -489,7 +532,8 @@ function routeChoice(kind){
             ["abroad","海外のアカデミーに挑戦","とても難しい・言葉の壁がある"],
             ["koko","地元の高校のサッカー部","試験なし・試合に出やすい"]]; }
   if (kind==="pk"){ return pkIntro(); }
-  inn.innerHTML = `<span class="eyebrow" style="color:var(--navy-dim)">進路の岐路</span><h2>${q}</h2><div class="routes">${opts.map(o=>`<button class="route" data-r="${o[0]}"><b>${o[1]}</b><span>${o[2]}</span></button>`).join("")}</div>`;
+  const comNote = S.commute<=15 ? "通える範囲は片道15分。遠いチームは移動で疲れがたまりやすい。" : S.commute>=60 ? "片道1時間まで通える。遠くの強いチームも選べる。" : "";
+  inn.innerHTML = `<span class="eyebrow" style="color:var(--navy-dim)">進路の岐路</span><h2>${q}</h2>${comNote?`<p>${comNote}</p>`:""}<div class="routes">${opts.map(o=>`<button class="route" data-r="${o[0]}"><b>${o[1]}</b><span>${o[2]}</span></button>`).join("")}</div>`;
   inn.querySelectorAll(".route").forEach(b => b.onclick = () => startTrial(kind, b.dataset.r));
 }
 function startTrial(kind, r){
