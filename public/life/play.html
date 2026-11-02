@@ -84,6 +84,9 @@ button{cursor:pointer}
 .near a b{font-size:15px}
 .near a span{font-size:12px;color:var(--muted)}
 .near a.apply{border-style:dashed}
+.near .lc{display:grid;gap:2px;padding:8px 14px;border-left:3px solid var(--line)}
+.near .lc b{font-size:14px}
+.near .lc span{font-size:12px;color:var(--muted)}
 .near a.apply b{color:var(--blue)}
 .near a em{font-style:normal;font-size:12px;font-weight:700;color:var(--you-ink);grid-column:1/-1}
 .count{background:var(--navy);color:var(--navy-fg);border-radius:18px;padding:16px;display:grid;gap:4px}
@@ -848,7 +851,7 @@ function setRates(r){ RATES = r; }
       const apply = `<a class="apply" href="/clubs/apply?pref=${encodeURIComponent(st.pref)}&utm_source=life&utm_medium=game&utm_campaign=apply"><b>載っていないチームを教えてください</b><i aria-hidden="true">›</i><span>お子さんのチームや近所のクラブを、確認のうえ掲載します（無料）</span></a>`;
       if (!d.clubs || !d.clubs.length){ box.innerHTML = `<span class="fine">まだ掲載クラブがありません。</span>` + apply; return; }
       const head = d.scope==="city" ? "" : `<span class="fine">${opt.city?`${esc(opt.city)}の掲載クラブが見つからないため、`:""}${esc(st.pref)}の主なクラブを表示しています。</span>`;
-      box.innerHTML = head + d.clubs.map(c => `<a href="/clubs/${encodeURIComponent(c.slug)}?utm_source=life&utm_medium=game&utm_campaign=near"><b>${esc(c.name)}</b><i aria-hidden="true">›</i><span>${esc(c.city||st.pref)}${c.estimated?"（推定）":""}${c.jleague?"・Jクラブ下部":""}</span>${c.next?`<em>次のセレクション ${esc((c.next.date||"").slice(5).replace("-","/"))}${c.next.deadline?`（締切 ${esc(c.next.deadline.slice(5).replace("-","/"))}）`:""}</em>`:""}</a>`).join("") + apply;
+      box.innerHTML = head + d.clubs.map(c => `<a href="/clubs/${encodeURIComponent(c.slug)}?utm_source=life&utm_medium=game&utm_campaign=near"><b>${esc(c.name)}</b><i aria-hidden="true">›</i><span>${esc(c.city||st.pref)}${c.estimated?"（推定）":""}${c.jleague?"・Jクラブ下部":""}</span>${c.next?`<em>次のセレクション ${esc((c.next.date||"").slice(5).replace("-","/"))}${c.next.deadline?`（締切 ${esc(c.next.deadline.slice(5).replace("-","/"))}）`:""}</em>`:""}</a>`).join("") + (d.more && d.more.length ? `<span class="fine" style="margin-top:6px">ほかに${esc(opt.city||st.pref)}周辺でリーグに登録しているクラブ（掲載準備中）</span>` + d.more.map(m => `<div class="lc"><b>${esc(m.name)}</b><span>${esc(m.city||"")}${m.estimated?"（推定）":""}${m.league?"・"+esc(m.league):""}</span></div>`).join("") : "") + apply;
     } catch(e){ box.innerHTML = `<span class="fine">クラブ情報を読み込めませんでした。</span>`; }
   }
   function finish(){

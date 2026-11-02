@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { todayJst } from "@/lib/club-quality";
+// クラブページは未公開だが、各都県のU-15リーグ編成に載っている実在クラブ（名前・所属リーグ・市区町村の推定のみ）。
+// ゲームの「近くのクラブ」にだけ、リンクなしで表示する（2026-11-02 決定）。更新は DB から再生成する。
+import LEAGUE_CLUBS from "@/data/life-league-clubs.json";
 
 // サッカー人生シミュレーターの結末画面で「住んでいる市区町村から通えるクラブ」を出すためのAPI。
 // 掲載中（is_published）のクラブだけを返す。市区町村は「区・市・町・村」を外した名前で照合する（表記ゆれ対策）。
@@ -38,6 +41,11 @@ export async function GET(req: Request) {
   }
   picked = picked.slice(0, 6);
 
+  type LC = { n: string; p: string; c?: string; e?: boolean; l?: string };
+  const leagueOnly = city
+    ? (LEAGUE_CLUBS as LC[]).filter((x) => x.p === pref && x.c && hit(x.c)).slice(0, 6)
+    : [];
+
   const today = todayJst();
   const ids = picked.map((c) => c.id);
   const sels: SelRow[] = [];
@@ -67,5 +75,7 @@ export async function GET(req: Request) {
     };
   });
 
-  return NextResponse.json({ clubs, scope }, { headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" } });
+  const more = leagueOnly.map((x) => ({ name: x.n, city: x.c || null, estimated: !!x.e, league: x.l || null }));
+
+  return NextResponse.json({ clubs, more, scope }, { headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" } });
 }
