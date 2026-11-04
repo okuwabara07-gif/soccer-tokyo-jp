@@ -138,7 +138,7 @@ export default async function HomePage() {
       <section style={{ background: "var(--kf-surface)", borderBottom: "1px solid var(--kf-border)" }}>
         <div style={{ position:"relative", maxWidth:"var(--kf-maxw)", margin:"0 auto" }}>
           <div className="kf-hero-wrap" style={{ position:"relative", minHeight:480, display:"flex", alignItems:"center" }}>
-            <img src="/images/kf/hero.jpg" alt="サッカーボールを持つ子ども" style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", objectPosition:"right center" }} />
+            <img src="/images/kf/hero-v2.jpg" alt="青空を見上げるサッカーユニフォームの子ども" style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", objectPosition:"right center" }} />
             <div style={{ position:"absolute", inset:0, background:"linear-gradient(90deg,#fff 26%,rgba(255,255,255,.82) 44%,rgba(255,255,255,0) 68%)" }} />
             <div style={{ position:"relative", padding:"48px 16px", maxWidth:640 }}>
               <h1 style={{ margin:0, fontSize:42, lineHeight:1.2, fontWeight:800 }}>お子さんに合う<br/>サッカークラブを探そう</h1>
@@ -265,7 +265,7 @@ export default async function HomePage() {
 
       <SiteFooter />
       <BottomNav />
-      <style>{`@media (max-width:760px){.kf-hero-wrap h1{font-size:30px !important}.kf-hero-wrap>div:last-child{background:rgba(255,255,255,.7)}}`}</style>
+      <style>{`@media (max-width:760px){.kf-hero-wrap h1{font-size:30px !important}.kf-hero-wrap>img{object-position:75% center !important}.kf-hero-wrap>div:last-child{background:rgba(255,255,255,.7)}}`}</style>
     </div>
     );
   } catch (error) {
