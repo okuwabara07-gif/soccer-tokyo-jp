@@ -187,6 +187,12 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .les legend{font-size:12px;font-weight:700;color:var(--muted);padding:0 4px}
 .chk{display:inline-flex;align-items:center;gap:6px;min-height:36px;font-size:14px}
 .chk input{width:18px;height:18px}
+.ptab{width:100%;display:grid;gap:2px;font-size:13px}
+.pr{display:grid;grid-template-columns:3em minmax(0,1fr) 3em 3em 6.5em;gap:6px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,.06);text-align:left}
+.pr.ph{background:none;color:var(--navy-dim);font-weight:700}
+.pstat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.pstat div{background:var(--bg);border-radius:12px;padding:8px 10px;display:grid}
+.pstat span{font-size:11px;color:var(--muted);font-weight:700} .pstat b{font-size:17px}
 .form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .field{display:grid;gap:4px;min-width:0}
 .field label{font-size:12px;font-weight:700;color:var(--muted)}
@@ -663,6 +669,105 @@ function carTalk(res, my, op, opp){
   });
 }
 
+// ── プロ編：1年ごとに出場・得点・年俸・移籍・ケガ・代表を記録し、引退まで生きる ─────────
+// 実在のクラブ名は使わず、リーグと地域で表す。最低年俸はJ1 480万・J2 360万・J3 240万円、WEリーグ B・C契約270万円
+const REG = ["北海道","東北","関東","北信越","東海","関西","中国","四国","九州"];
+const LG_B = {J3:{lv:70,floor:240,med:380,g:38,next:"J2",down:null}, J2:{lv:76,floor:360,med:800,g:38,next:"J1",down:"J3"}, J1:{lv:82,floor:480,med:2000,g:38,next:"海外1部",down:"J2"},
+  "海外2部":{lv:78,floor:500,med:1100,g:34,next:"海外1部",down:"J2"}, "海外1部":{lv:86,floor:1200,med:3500,g:34,next:"欧州5大リーグ",down:"J1"}, "欧州5大リーグ":{lv:93,floor:5000,med:15000,g:34,next:null,down:"海外1部"}};
+const LG_G = {"なでしこリーグ":{lv:64,floor:0,med:0,g:18,next:"WEリーグ",down:null}, "WEリーグ":{lv:70,floor:270,med:420,g:22,next:"海外女子リーグ",down:"なでしこリーグ"}, "海外女子リーグ":{lv:80,floor:833,med:1300,g:22,next:null,down:"WEリーグ"}};
+const ABR_B = {"海外2部":["ベルギー2部","ポルトガル2部","ドイツ2部"], "海外1部":["ベルギー","ポルトガル","オランダ","スコットランド","デンマーク"], "欧州5大リーグ":["ドイツ","イングランド","スペイン","イタリア","フランス"]};
+const ABR_G = ["イングランド（WSL）","アメリカ（NWSL）","スペイン"];
+const man = n => n >= 10000 ? `${(n/10000).toFixed(n%10000?1:0)}億円` : `${Math.round(n).toLocaleString()}万円`;
+function clubName(lg){ if (GIRL) return lg==="海外女子リーグ" ? `${ABR_G[Math.floor(R()*3)]}のクラブ` : `${lg}・${REG[Math.floor(R()*9)]}のクラブ`;
+  if (ABR_B[lg]) { const a = ABR_B[lg]; return `${a[Math.floor(R()*a.length)]}のクラブ`; } return `${lg}・${REG[Math.floor(R()*9)]}のクラブ`; }
+function proChapter(entry, done){
+  const LG = GIRL ? LG_G : LG_B; const big = $("big"), inn = $("bigIn"); big.hidden = false;
+  const P0 = ovr(S.s) + (S.skills.length) * 0.8; // 入団時の実力（育成の結果）
+  const C = {lg: entry.lg, club: clubName(entry.lg), age: entry.age, P: P0, y: 0, seasons: [], clubs: [], games:0, goals:0, ast:0, caps:0, sal:0, peak:0, inj:false, hurt:0, retired:false, note:[]};
+  C.clubs.push({n:C.club, from:C.age});
+  const rate = {FW:[.24,.08], MF:[.07,.1], DF:[.02,.03], GK:[0,0]}[S.pos||"MF"];
+  let auto = false;
+  const header = () => `<span class="eyebrow" style="color:var(--navy-dim)">プロ編・${C.y+1}年目（${C.age}歳）</span><h2>${C.club}</h2>`;
+  const season = () => {
+    const L = LG[C.lg];
+    // 年齢による伸びと衰え（想定値）
+    C.P += C.age < 24 ? 0.6 + R()*1.6 : C.age < 27 ? R()*1.0 : C.age < 31 ? -0.8 - R()*1.0 : C.age < 34 ? -2 - R()*1.2 : -3.5 - R()*1.5;
+    C.P -= C.hurt; C.hurt = 0;
+    let injured = R() < (S.hab && S.hab.daily==="sleep" ? 0.07 : 0.11) + (C.age>30?0.04:0);
+    const fit = 1/(1+Math.exp(-(C.P - L.lv)/4.5));
+    let g = Math.round(L.g * clamp(fit*1.05 + (R()-0.5)*0.2, 0, 1) * (injured ? 0.45 : 1));
+    const goals = Math.round(g * rate[0] * (0.6 + fit*0.8) * (0.7 + R()*0.6)), ast = Math.round(g * rate[1] * (0.6 + R()*0.8));
+    let sal = L.med ? clamp(L.med * Math.exp((C.P - L.lv)/9) * (0.85 + R()*0.3), L.floor, L.med*4) : 0;
+    if (C.y === 0 && !GIRL && C.lg.startsWith("J")) sal = Math.min(sal, 1200);
+    if (C.y === 0 && GIRL && C.lg==="WEリーグ") sal = Math.min(sal, 460);
+    sal = Math.round(sal/10)*10;
+    let caps = 0; if (!GIRL && C.P >= 88 && L.lv >= 82 && R() < 0.3) caps = 1 + Math.floor(R()*6); if (GIRL && C.P >= 80 && L.lv >= 70 && R() < 0.3) caps = 1 + Math.floor(R()*5);
+    C.games += g; C.goals += goals; C.ast += ast; C.caps += caps; C.sal += sal; C.peak = Math.max(C.peak, sal);
+    const row = {age:C.age, club:C.club, lg:C.lg, g, goals, ast, sal, caps, injured};
+    C.seasons.push(row);
+    const lines = [`リーグ戦 ${g}試合${S.pos==="GK"?"":`・${goals}得点・${ast}アシスト`}。年俸 ${sal?man(sal):"なし（仕事と両立）"}。`];
+    if (injured) lines.push("シーズン途中に大きなケガ。リハビリの時間が長かった。");
+    if (caps) lines.push(`${GIRL?"なでしこジャパン":"日本代表"}に選ばれ、${caps}試合に出場した。`);
+    if (C.y===0) lines.push(GIRL ? "B・C契約の最低年俸は270万円。最初は練習場とアルバイトの往復だった。" : "1年目の契約は年俸の上限が決まっている。まずは試合に出ることが目標。");
+    C.y++; C.age++;
+    // 岐路
+    const L2 = LG[C.lg]; const opts = [];
+    if (injured && !C.inj){ C.inj = true; return choose(lines, "ひざのケガ。どうする？", [["手術して完全に治す","半年かかるが、選手生命を守る",()=>{ C.hurt = 1; addLog(null,"プロ編：ケガは手術して治した。"); }],["痛みを抱えて出続ける","今の出番は守れるが、後に響く",()=>{ C.hurt = 0; C.P -= 3; addLog(null,"プロ編：痛みを抱えたまま出続けた。"); }]]); }
+    if (g >= L.g*0.7 && L.next && C.P >= LG[L.next].lv - 3 && R() < 0.6){
+      return choose(lines, `${L.next==="J1"||L.next==="J2"||L.next==="WEリーグ"?L.next+"のクラブ":L.next+"のクラブ"}から移籍のオファーが来た。`, [["移籍して上を目指す", L.next.startsWith("海外")||L.next.startsWith("欧州")?"言葉も生活も変わる":"出番は減るかもしれない", ()=>{ move(L.next, "移籍"); }],["今のクラブに残り、中心選手になる","",()=>{ C.P += 0.8; addLog(null,"プロ編：オファーを断り、今のクラブに残った。"); }]]);
+    }
+    if (g < L.g*0.25 && C.age < 33){
+      const dn = L.down;
+      return choose(lines, "ほとんど試合に出られなかった。", dn ? [[`${dn}のクラブへ移り、出番を取る`,"試合に出て経験を積む",()=>move(dn,"移籍")],["残って勝負する","",()=>{ if (R()<0.4) C.P += 2; }]] : [["残って勝負する","",()=>{ if (R()<0.4) C.P += 2; }],["プロを引退する","",()=>{ C.retired = true; }]]);
+    }
+    const fit2 = 1/(1+Math.exp(-(C.P - L2.lv)/4.5));
+    const cut = C.P < L2.lv - 5 || (C.y >= 2 && fit2 < 0.45 && R() < 0.5) || (C.age >= 32 && R() < 0.25) || (C.age >= 35 && R() < 0.5) || C.age >= 39;
+    if (cut){
+      const dn = L2.down;
+      return choose(lines, `${C.age}歳。契約満了を告げられた。`, [["現役を引退する","セカンドキャリアへ",()=>{ C.retired = true; }], ...(dn && C.age < 38 ? [[`${dn}のクラブで現役を続ける`,"",()=>move(dn,"移籍")]] : []), ["社会人・地域リーグで続ける","プロは引退、サッカーは続ける",()=>{ C.retired = true; C.note.push("amateur"); }]]);
+    }
+    return show(lines);
+  };
+  const move = (lg, why) => { C.lg = lg; C.club = clubName(lg); C.clubs.push({n:C.club, from:C.age}); addLog("good", `プロ編：${C.club}へ${why}。`); if (lg.startsWith("海外")||lg.startsWith("欧州")) { S.flags.abroad = 1; quote("abroad"); } };
+  const table = () => `<div class="ptab"><div class="pr ph"><span>年齢</span><span>リーグ</span><span>試合</span><span>${S.pos==="GK"?"—":"得点"}</span><span>年俸</span></div>${C.seasons.slice(-4).map(r=>`<div class="pr"><span class="num">${r.age}</span><span>${r.lg}</span><span class="num">${r.g}</span><span class="num">${S.pos==="GK"?"—":r.goals}</span><span class="num">${r.sal?man(r.sal):"—"}</span></div>`).join("")}</div>`;
+  const show = (lines) => {
+    if (C.retired) return end();
+    inn.innerHTML = `${header().replace(`${C.y+1}年目（${C.age}歳）`, `${C.y}年目（${C.age-1}歳）`)}<p>${lines.join("<br>")}</p>${table()}<div class="row" style="justify-content:center"><button class="btn main" id="pNext">次のシーズンへ</button><button class="btn ghost" id="pAuto" style="color:var(--navy-fg);border-color:rgba(255,255,255,.3)">次の岐路まで進める</button></div>`;
+    $("pNext").onclick = season; $("pAuto").onclick = () => { auto = true; season(); };
+    if (auto) { setTimeout(season, reduce ? 0 : 350); }
+  };
+  const choose = (lines, q, opts) => {
+    auto = false;
+    inn.innerHTML = `${header().replace(`${C.y+1}年目（${C.age}歳）`, `${C.y}年目（${C.age-1}歳）`)}<p>${lines.join("<br>")}</p>${table()}<p><b style="color:#ff8a4c">${q}</b></p><div class="routes">${opts.map((o,i)=>`<button class="route" data-i="${i}"><b>${o[0]}</b>${o[1]?`<span>${o[1]}</span>`:""}</button>`).join("")}</div>`;
+    inn.querySelectorAll(".route").forEach(b => b.onclick = () => { opts[+b.dataset.i][2](); if (C.retired) return end(); season(); });
+  };
+  const end = () => {
+    const years = C.seasons.length, top = C.seasons.reduce((a,r)=> (LG[r.lg].lv > LG[a].lv ? r.lg : a), C.seasons[0].lg);
+    const yTop = C.seasons.filter(r=>r.lg===top).length;
+    const res = {years, top, yTop, games:C.games, goals:C.goals, ast:C.ast, caps:C.caps, peak:C.peak, total:C.sal, retire:C.age, clubs:C.clubs, seasons:C.seasons, amateur:C.note.includes("amateur")};
+    res.end = `${top}で${yTop}年。プロ${years}年・通算${C.games}試合${S.pos==="GK"?"":`${C.goals}得点`}、${C.age}歳で引退`;
+    addLog("good", `プロ編：${C.age}歳で引退。プロ${years}年、通算${C.games}試合${S.pos==="GK"?"":`${C.goals}得点`}${C.caps?`、代表${C.caps}試合`:""}。`);
+    if (C.caps) S.flags.caps = 1;
+    closeBig(); done(res);
+  };
+  inn.innerHTML = `<span class="eyebrow" style="color:var(--navy-dim)">プロ編</span><h2>${entry.lead}</h2><p>${C.club}に加入。ここから先は、1年ごとの記録で生きる。</p><button class="btn main" id="pGo">プロ1年目を始める</button>`;
+  $("pGo").onclick = season; $("pGo").focus();
+}
+function proEntry(path, sc){
+  const tryOK = need => sc + (R()-0.5)*8 >= need;
+  if (GIRL){
+    if (path==="pro") return {lg:"WEリーグ", age:18, lead:"WEリーグのクラブとプロ契約"};
+    if (path==="abroad") return tryOK(82) ? {lg:"海外女子リーグ", age:18, lead:"海外のクラブとプロ契約"} : null;
+    if (path==="nade") return {lg:"なでしこリーグ", age:18, lead:"なでしこリーグのクラブへ"};
+    if (path==="uni" && sc >= 74 && R() < (sc-70)/14) return {lg:"WEリーグ", age:22, lead:"大学4年間を経て、大卒でWEリーグへ"};
+    return null;
+  }
+  if (path==="pro") return {lg: S.team==="JクラブU-18" || sc >= 90 ? "J1" : sc >= 86 ? "J2" : "J3", age:18, lead: S.team==="JクラブU-18" ? "ユースからトップチームへ昇格" : "高卒でプロ契約"};
+  if (path==="abroad") return tryOK(82) ? {lg:"海外2部", age:18, lead:"海外のクラブとプロ契約"} : null;
+  if (path==="uni" && sc >= 74 && R() < (sc-70)/14) return {lg: sc >= 82 ? "J1" : sc >= 78 ? "J2" : "J3", age:22, lead:"大学4年間を経て、大卒でプロへ"};
+  return null;
+}
+
 // ── 進路の岐路（大一番の前に、どこに挑むか選ぶ） ─────────
 function routeChoice(kind){
   const big = $("big"), inn = $("bigIn"); big.hidden = false;
@@ -813,7 +918,7 @@ function finalChoice(){
   opts.push(["senmon", "専門学校で学ぶ（トレーナー・栄養など）", "サッカーを支える側の資格を取る"]);
   opts.push(["work", "就職して社会人チームで続ける", "仕事とサッカーを両立する"]);
   inn.innerHTML = `<span class="eyebrow" style="color:var(--navy-dim)">高3の冬・最後の岐路</span><h2>次の4年を、どう生きる？</h2><p>総合力 ${ovr(S.s)}・特技 ${S.skills.length}個${S.flags.pk?"・選手権出場":""}</p><div class="routes">${opts.map(o=>`<button class="route" data-r="${o[0]}"><b>${o[1]}</b><span>${o[2]}</span></button>`).join("")}</div>`;
-  inn.querySelectorAll(".route").forEach(b => b.onclick = () => { closeBig(); finish(b.dataset.r, sc); });
+  inn.querySelectorAll(".route").forEach(b => b.onclick = () => { const r = b.dataset.r; const e = proEntry(r, sc); if (e) return proChapter(e, res => finish(r, sc, res)); closeBig(); finish(r, sc); });
 }
 
 // ── 結末 ─────────────────────────────────────────────
@@ -831,9 +936,10 @@ function aptitude(){
   const min = Math.min(...Object.values(A));
   return Object.entries(A).map(([k,v]) => [k, Math.round(40 + 56*(v-min)/Math.max(1,max-min))]).sort((a,b)=>b[1]-a[1]);
 }
-function finish(path, sc){
+function finish(path, sc, PR){
   const o = ovr(S.s), sk = S.skills.length;
   let end, tier = 0;
+  if (PR){ S.flags.pro = 1; if (PR.top.startsWith("海外")||PR.top.startsWith("欧州")) S.flags.abroad = 1; }
   const tryOK = (need) => sc + (R()-0.5)*8 >= need;
   if (path==="pro"){ end = S.team==="JクラブU-18" ? "ユースからJ1のクラブとプロ契約" : sc >= 88 ? "高卒でJ1のクラブとプロ契約" : "高卒でJ2のクラブとプロ契約"; tier = 4; S.flags.pro = 1; }
   else if (path==="abroad"){ if (tryOK(82)){ end = "海外のクラブとプロ契約。言葉の壁を越えて"; tier = 4; S.flags.pro = 1; } else { end = "海外のトライアウトは不合格。帰国して大学でもう一度"; tier = 2; } S.flags.abroad = 1; quote("abroad"); }
@@ -841,6 +947,8 @@ function finish(path, sc){
   else if (path==="nade"){ end = "なでしこリーグで、働きながら全国の舞台に立つ"; tier = 3; addTr({front:1}); }
   else if (path==="senmon"){ end = "専門学校でトレーナーを学び、選手を支える側へ"; tier = 2; addTr({trainer:4, nutri:2}); }
   else { end = sc >= 70 ? "社会人リーグで夢を追い続ける" : "仕事をしながら、週末はフットサルで"; tier = 1; addTr({front:1}); }
+  if (PR){ end = PR.end; tier = 4; }
+  if (!PR && path==="abroad" && tier===4){ end = "海外のトライアウトは不合格。帰国して大学でもう一度"; tier = 2; }
   quote("end");
   if (S.injuries===0) S.flags.noinj = 1;
   if (S.highFat===0) S.flags.rest = 1;
@@ -861,6 +969,10 @@ function finish(path, sc){
       ${S.model&&S.model.name?`<p style="margin:0;color:var(--navy-dim);font-size:14px">お手本の${esc(S.model.name)}を追いかけた人生。公式戦は${S.flags.wins||0}勝。</p>`:`<p style="margin:0;color:var(--navy-dim);font-size:14px">公式戦は${S.flags.wins||0}勝。</p>`}
       ${S.mph?`<p style="margin:0;color:var(--navy-dim);font-size:14px">大人になったときの身長の目安：約${S.mph}cm（両親の身長から）</p>`:""}
       <p style="margin:0;color:var(--navy-dim);font-size:14px">ライバルのハヤトは総合力${S.rival.ovr}。${o>=S.rival.ovr?"最後は、あなたが上だった。":"最後まで、背中を追いかけた。"}</p></div>
+    ${PR?`<div class="card"><h3 style="font-size:15px">プロ編の記録</h3>
+      <div class="pstat"><div><span>プロ</span><b class="num">${PR.years}年</b></div><div><span>通算</span><b class="num">${PR.games}試合</b></div>${S.pos==="GK"?"":`<div><span>得点</span><b class="num">${PR.goals}</b></div>`}<div><span>最高年俸</span><b class="num">${PR.peak?man(PR.peak):"—"}</b></div>${PR.caps?`<div><span>代表</span><b class="num">${PR.caps}試合</b></div>`:""}<div><span>引退</span><b class="num">${PR.retire}歳</b></div></div>
+      <ol class="future">${PR.clubs.map(c=>`<li><b>${c.from}歳</b><span>${c.n}</span></li>`).join("")}</ol>
+      <p class="note">${GIRL?"WEリーグのB・C契約の最低年俸は270万円、A契約は460万円。":"Jリーグの最低年俸はJ1 480万円・J2 360万円・J3 240万円。Jリーガーの平均引退年齢は約26歳（日本プロサッカー選手会）。"}出場や年俸の伸び方はゲームの判定です。</p></div>`:""}
     <div class="card"><h3 style="font-size:15px">未来のあなた（想像）</h3><ol class="future">${fut.map(f=>`<li><b>${f[0]}</b><span>${f[1]}</span></li>`).join("")}</ol><p class="note">ここまでの選び方から想像した未来です。本当の未来は、これからの選び方で何度でも変わります。</p></div>
     <div class="card"><h3 style="font-size:15px">サッカーに関わる仕事、向いているのは</h3><div class="jobs">${jobs.map(([k,v],i)=>`<div class="job"><div class="jh"><b>${i+1}. ${JOBS[k].n}</b><span class="num">${v}%</span></div><span class="jt"><i style="width:${v}%"></i></span><span>${JOBS[k].d}</span><span class="door">入口：${JOBS[k].door}</span></div>`).join("")}</div>
       <p class="note">練習・出来事での選び方と能力から判定しています（試作の判定です）。プロにならなくても、サッカーの仕事はたくさんあります。</p></div>
