@@ -111,6 +111,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .drill{text-align:left;border-radius:14px;border:1px solid var(--line);background:var(--surface);padding:10px 12px;display:grid;gap:2px;min-height:76px}
 .drill:hover{border-color:var(--blue)}
 .drill b{font-size:14px}
+.mtag{font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:1px 6px;vertical-align:2px}
 .drill span{font-size:12px;color:var(--muted)}
 .drill .fx{font-family:var(--f-num);font-size:11px;color:var(--blue)}
 .drill[disabled]{opacity:.4}
@@ -290,6 +291,8 @@ const esc = t => String(t).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">"
 const addTr = tr => { for (const [k,v] of Object.entries(tr||{})) S.tr[k] = (S.tr[k]||0) + v; };
 
 let WHO = "p";
+// お手本の型ごとに、伸びやすい練習（実在の選手についての事実は書かない。名前は利用者が入れたものだけを表示）
+const MODEL_STYLE = {drib:{n:"ドリブラー", d:["drib","play"]}, maestro:{n:"司令塔", d:["game","video"]}, striker:{n:"ストライカー", d:["dash","drib"]}, anchor:{n:"守備の要", d:["body","game"]}, gk:{n:"GK", d:["body","video"]}};
 // 学校保健統計（令和6年度・男子・全国平均身長cm）と、ばらつきの目安
 const HEIGHT = {5:110.6,6:116.7,7:122.6,8:128.5,9:134.0,10:139.7,11:146.0,12:154.0,13:161.1,14:166.1};
 const HSD = {5:4.7,6:4.9,7:5.1,8:5.4,9:5.7,10:6.2,11:7.0,12:7.9,13:7.8,14:6.9};
@@ -321,13 +324,14 @@ function newRun(seed, pr){
   const elem = ["地元の少年団","街クラブ","JクラブU-12"], jh = ["街クラブJY","JクラブU-15","中学のサッカー部"];
   let team = start >= 4 ? (jh.includes(pr.team) ? pr.team : "街クラブJY") : (elem.includes(pr.team) ? pr.team : start===0 && !pr.team ? "地元の少年団" : (pr.team ? "地元の少年団" : "地元の少年団"));
   if (start>0 && start<4 && !pr.team) team = "まだチームに入っていない";
-  S = { seed, s, prev:{...s}, i:start, start, fat:20, team, pos:"", rank:"", skills:[], log:[], rival:{name:"ハヤト", ovr:ovr(s)+3}, flags:{}, month, injuries:0, highFat:0, tr:{}, quotes:[], route:[], mph, bt, name:(pr.name||"").slice(0,10), injM, commute: pr.com || 30, who: pr.who || "p" };
+  S = { seed, s, prev:{...s}, i:start, start, fat:20, team, pos:"", rank:"", skills:[], log:[], rival:{name:"ハヤト", ovr:ovr(s)+3}, flags:{}, month, injuries:0, highFat:0, tr:{}, quotes:[], route:[], mph, bt, name:(pr.name||"").slice(0,10), injM, commute: pr.com || 30, who: pr.who || "p", model: (pr.model || pr.style) ? {name: pr.model || "", style: pr.style || ""} : null };
   if (pr.pos){ const P0 = POSITIONS.find(x=>x[0]===pr.pos); if (P0){ S.pos = pr.pos; applyFx(P0[3]); addTr(P0[4]); S.prev = {...S.s}; } }
   S.rank = rankOf(); plan = []; evPending = null; evDone = false;
-  addLog("good", `${S.name?S.name+"は":""}${month}月生まれ。${SEASONS[start].g}から、${S.team}でボールを蹴る。ライバルは同じチームの${S.rival.name}。`);
+  addLog("good", `${S.name?esc(S.name)+"は":""}${month}月生まれ。${SEASONS[start].g}から、${S.team}でボールを蹴る。ライバルは同じチームの${S.rival.name}。`);
   if (mph) addLog(null, `両親の身長から、大人になったときの身長の目安は約${mph}cm（±9cmほど）。`);
   if (bt) addLog(null, `両親の体型は「${bt}」。体の使い方の傾向の目安にしている。`);
   notes.forEach(t => addLog(null, t));
+  if (S.model) addLog("good", `お手本は${S.model.name?esc(S.model.name):"あこがれの選手"}${S.model.style?`（${MODEL_STYLE[S.model.style].n}）`:""}。プレーの動画を見て、まねするところから始めた。`);
   if (S.team==="まだチームに入っていない") addLog(null, "まだチームに入っていない。まずは近くのチームの体験に行くところから。");
   if ([1,2,3].includes(month)) addLog(null, "早生まれ。小学生のうちは体の大きさで不利になりやすいが、考える力で補える。");
   quote("start");
@@ -370,6 +374,8 @@ function startScreen(){
         <div class="field"><label for="fGood" data-p="得意なこと" data-c="とくいなこと">得意なこと</label><select id="fGood"><option value="">とくになし</option><option value="spd">足が速い</option><option value="tec">ドリブルが好き</option><option value="iq">考えるのが得意</option><option value="phy">体が強い</option><option value="men">負けず嫌い</option></select></div>
         <div class="field"><label for="fSib" data-p="きょうだい" data-c="きょうだい">きょうだい</label><select id="fSib"><option value="">いない・ほかのことをしている</option><option value="old">兄・姉がサッカーをしている</option><option value="young">弟・妹がいる</option></select></div>
         <div class="field"><label for="fCom" data-p="通える範囲（片道）" data-c="かよえるきょり（かたみち）">通える範囲（片道）</label><select id="fCom"><option value="30">30分まで</option><option value="15">15分まで</option><option value="60">1時間まで</option></select></div>
+        <div class="field"><label for="fModel" data-p="お手本の選手（名前）" data-c="あこがれの選手（名前）">お手本の選手（名前）</label><input id="fModel" type="text" maxlength="16" placeholder="例：好きな選手の名前" autocomplete="off"></div>
+        <div class="field"><label for="fStyle" data-p="お手本のプレーの型" data-c="その選手のタイプ">お手本のプレーの型</label><select id="fStyle"><option value="">選ばない</option><option value="drib">ドリブラー</option><option value="maestro">司令塔（パスで組み立てる）</option><option value="striker">ストライカー（点を取る）</option><option value="anchor">守備の要</option><option value="gk">GK</option></select></div>
         <div class="field"><label for="fDh" data-p="父の身長（cm）" data-c="お父さんの身長（cm）">父の身長（cm）</label><input id="fDh" type="number" inputmode="decimal" min="140" max="210" placeholder="例：172"></div>
         <div class="field"><label for="fMh" data-p="母の身長（cm）" data-c="お母さんの身長（cm）">母の身長（cm）</label><input id="fMh" type="number" inputmode="decimal" min="130" max="200" placeholder="例：158"></div>
         <div class="field"><label for="fDw" data-p="父の体重（kg）" data-c="お父さんの体重（kg）">父の体重（kg）</label><input id="fDw" type="number" inputmode="decimal" min="35" max="180" placeholder="任意"></div>
@@ -382,7 +388,7 @@ function startScreen(){
     ${SAVE.quotes.length?`<div class="card"><h3 style="font-size:15px">語録帳 ${SAVE.quotes.length}/${Object.keys(QUOTES).length}</h3><ul class="quotes">${SAVE.quotes.map(k=>`<li>${QUOTES[k]}</li>`).join("")}</ul></div>`:""}`;
   app.querySelectorAll(".seed").forEach(b => b.onclick = () => { pick = b.dataset.id; app.querySelectorAll(".seed").forEach(x => x.setAttribute("aria-pressed", String(x===b))); });
   const P = store.get("ikusei-profile", {});
-  const FIELDS = [["fStart","start"],["fMonth","month"],["fName","name"],["fPos","pos"],["fH","h"],["fW","w"],["fTeam","team"],["fGood","good"],["fSib","sib"],["fCom","com"],["fDh","dh"],["fMh","mh"],["fDw","dw"],["fMw","mw"]];
+  const FIELDS = [["fModel","model"],["fStyle","style"],["fStart","start"],["fMonth","month"],["fName","name"],["fPos","pos"],["fH","h"],["fW","w"],["fTeam","team"],["fGood","good"],["fSib","sib"],["fCom","com"],["fDh","dh"],["fMh","mh"],["fDw","dw"],["fMw","mw"]];
   for (const [id,k] of FIELDS) if (P[k]!=null && P[k]!=="") $(id).value = P[k];
   (P.les||[]).forEach(k => { const c = app.querySelector(`input[name="les"][value="${k}"]`); if (c) c.checked = true; });
   const setWho = w => { app.querySelectorAll(".wb").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.w===w))); app.querySelectorAll("[data-p]").forEach(el => el.textContent = w==="c" ? el.dataset.c : el.dataset.p); WHO = w; };
@@ -390,7 +396,7 @@ function startScreen(){
   setWho(P.who || "p");
   $("go").onclick = () => {
     const n = id => { const v = parseFloat($(id).value); return isFinite(v) ? v : null; };
-    const pr = {who:WHO, start:+$("fStart").value, month: $("fMonth").value ? +$("fMonth").value : null, name:$("fName").value.trim(), pos:$("fPos").value, h:n("fH"), w:n("fW"), team:$("fTeam").value, good:$("fGood").value, sib:$("fSib").value, com:+$("fCom").value||30, dh:n("fDh"), mh:n("fMh"), dw:n("fDw"), mw:n("fMw"), les:[...app.querySelectorAll('input[name="les"]:checked')].map(c=>c.value)};
+    const pr = {who:WHO, start:+$("fStart").value, month: $("fMonth").value ? +$("fMonth").value : null, name:$("fName").value.trim(), pos:$("fPos").value, h:n("fH"), w:n("fW"), team:$("fTeam").value, good:$("fGood").value, sib:$("fSib").value, com:+$("fCom").value||30, dh:n("fDh"), mh:n("fMh"), dw:n("fDw"), mw:n("fMw"), les:[...app.querySelectorAll('input[name="les"]:checked')].map(c=>c.value), model:$("fModel").value.trim().slice(0,16), style:$("fStyle").value};
     store.set("ikusei-profile", pr); newRun(pick, pr);
   };
 }
@@ -421,7 +427,7 @@ function render(){
     <div class="card plan" ${evDone && !needPos?"":"hidden"} id="plan">
       <h2>今シーズンの練習を3つ選ぶ</h2>
       <div class="slots">${[0,1,2].map(k=>`<button class="slot ${plan[k]?"on":""}" data-k="${k}" aria-label="枠${k+1}">${plan[k]?DRILLS.find(d=>d.id===plan[k]).n+"<br><span style='font-size:11px;color:var(--muted)'>タップで外す</span>":"空き"}</button>`).join("")}</div>
-      <div class="drills">${drills.map(d=>`<button class="drill" data-id="${d.id}" ${plan.length>=3?"disabled":""}><b>${d.n}</b><span>${d.d}</span><span class="fx">${Object.entries(d.fx).map(([k,v])=>ST.find(x=>x[0]===k)[1]+"+"+v).join(" ")}${d.fat<0?" 疲れ"+d.fat:" 疲れ+"+d.fat}</span></button>`).join("")}</div>
+      <div class="drills">${drills.map(d=>`<button class="drill" data-id="${d.id}" ${plan.length>=3?"disabled":""}><b>${d.n}${S.model&&S.model.style&&MODEL_STYLE[S.model.style].d.includes(d.id)?' <span class="mtag">お手本流</span>':""}</b><span>${d.d}</span><span class="fx">${Object.entries(d.fx).map(([k,v])=>ST.find(x=>x[0]===k)[1]+"+"+v).join(" ")}${d.fat<0?" 疲れ"+d.fat:" 疲れ+"+d.fat}</span></button>`).join("")}</div>
       <div class="risk ${risk<10?"lo":risk<25?"mid":"hi"}">このまま進んだときのケガのしやすさ：<b>${risk<10?"低い":risk<25?"ふつう":"高い"}</b>（<span class="num">${risk}%</span>）${risk>=25?"　休みを入れよう":""}</div>
       <button class="btn main" id="next" ${plan.length<3?"disabled":""}>${se.big?"この練習で大一番へ":"このシーズンを過ごす"}</button>
     </div>
@@ -497,7 +503,8 @@ function runSeason(){
   let fat = S.fat; const g = GROW[se.k];
   const lateM = S.seed==="late" ? (se.k==="es"?0.7: se.k==="hs"?1.6:1) : 1, bugM = S.seed==="bug" ? 1.15 : 1;
   const injured = R()*100 < injRisk();
-  for (const id of plan){ const d = DRILLS.find(x=>x.id===id); const fx = {}; for (const [k,v] of Object.entries(d.fx)) fx[k] = v * g[k] * lateM * bugM * (injured?0.4:1) * (1.1 + R()*0.5); applyFx(fx); fat += d.fat; addTr(d.tr); if (id==="play") quote("play"); if (id==="note") quote("note"); if (id==="rest") quote("rest"); }
+  for (const id of plan){ const d = DRILLS.find(x=>x.id===id); const fx = {}; const mb = S.model && S.model.style && MODEL_STYLE[S.model.style].d.includes(id) ? 1.2 : 1;
+    for (const [k,v] of Object.entries(d.fx)) fx[k] = v * g[k] * lateM * bugM * mb * (injured?0.4:1) * (1.1 + R()*0.5); applyFx(fx); fat += d.fat; addTr(d.tr); if (id==="play") quote("play"); if (id==="note") quote("note"); if (id==="rest") quote("rest"); }
   const env = {"JクラブU-12":1.4,"JクラブU-15":1.5,"JクラブU-18":1.5,"海外のアカデミー":1.5,"強豪校":1.3,"街クラブJY":1.1,"街クラブ":1.05,"まだチームに入っていない":0.7}[S.team] || 0.9;
   // 通える範囲が狭いのに遠いチームへ通うと、移動で疲れる
   if (["JクラブU-12","JクラブU-15","JクラブU-18","強豪校","街クラブJY"].includes(S.team)) fat += {15:10,30:5,60:2}[S.commute] || 5;
@@ -512,13 +519,121 @@ function runSeason(){
   addLog(null, `練習：${plan.map(id=>DRILLS.find(d=>d.id===id).n).join("・")}。総合力 ${ovr(S.prev)} → ${ovr(S.s)}`);
   plan = []; evPending = null; evDone = false;
   if (se.big) return routeChoice(se.big);
-  nextSeason();
+  matchGame();
 }
 function nextSeason(){
   S.i++;
   if (S.team==="まだチームに入っていない"){ S.team = "地元の少年団"; addLog("good", "体験に行った地元の少年団に入った。"); }
   if (S.i >= SEASONS.length) return finalChoice();
   S.rank = rankOf(); render(); window.scrollTo({top:0, behavior: reduce?"auto":"smooth"});
+}
+
+// ── 毎シーズンの公式戦（3つのプレーを自分で選ぶ） ─────────
+const OPPS = ["北FC","南SC","中央ユナイテッド","港クラブ","川辺FC","丘の上SC","東レッズ","西グランデ"];
+function phasesOf(pos){ return pos==="GK" ? ["save","save","save"] : pos==="DF" ? ["def","att","def"] : pos==="MF" ? ["att","def","att"] : ["att","att","att"]; }
+const MOPT = {
+  att:[["pass","パス","味方にあずけて崩す"],["drib","ドリブル","自分で運ぶ"],["shoot","シュート","思い切って打つ"]],
+  def:[["press","奪いに行く","取れれば一気にチャンス"],["cut","コースを切る","パスの道をふさぐ"],["back","下がって守る","失点しにくいが攻めにつながらない"]],
+  save:[["L","左に飛ぶ",""],["C","正面で構える",""],["R","右に飛ぶ",""]],
+};
+const SIT = {
+  att:["相手ゴール前、ボールが足元に来た。","右サイドでボールを受けた。前に1人。","カウンター。前が開いている。"],
+  def:["相手のエースがドリブルで向かってくる。","自陣の左サイドを突破されかけている。","相手がゴール前にクロスを上げようとしている。"],
+  save:["相手のシュート。","ゴール前の混戦から、シュートが飛んでくる。","相手のフリーキック。"],
+};
+function matchGame(){
+  const se = SEASONS[S.i], big = $("big"), inn = $("bigIn"); big.hidden = false;
+  const opp = OPPS[Math.floor(R()*OPPS.length)];
+  const lv = ({"まだチームに入っていない":22,"街クラブ":31,"JクラブU-12":40,"地元の少年団":28,"街クラブJY":36,"中学のサッカー部":32,"JクラブU-15":46,"JクラブU-18":58,"強豪校":52,"高校のサッカー部":44,"海外のアカデミー":56}[S.team] || 30) + S.i*2.2;
+  const rel = ovr(S.s) - lv; const s = S.s;
+  const ph = phasesOf(S.pos);
+  let k = 0, my = 0, op = R() < 0.45 ? 1 : 0; const notes = [];
+  const draw = (ball, end, tone) => {
+    const c = $("mc"); if (!c) return; const x = c.getContext("2d"); x.clearRect(0,0,900,520);
+    x.fillStyle = "#0f1a30"; x.fillRect(0,0,900,520);
+    x.strokeStyle = "rgba(255,255,255,.35)"; x.lineWidth = 3; x.strokeRect(20,20,860,480);
+    x.beginPath(); x.moveTo(450,20); x.lineTo(450,500); x.stroke(); x.beginPath(); x.arc(450,260,60,0,Math.PI*2); x.stroke();
+    x.strokeRect(20,160,100,200); x.strokeRect(780,160,100,200);
+    x.fillStyle = "rgba(255,255,255,.6)"; x.fillRect(10,220,10,80); x.fillRect(880,220,10,80);
+    const me = ph[k]==="att", gk = ph[k]==="save";
+    const mates = gk ? [[150,190],[150,340],[260,150],[420,260]] : me ? [[520,160],[560,360],[640,260],[380,260]] : [[200,160],[200,360],[320,260],[120,260]];
+    const opps = gk ? [[300,200],[320,330],[210,260]] : me ? [[700,200],[700,330],[820,260],[600,260]] : [[340,200],[300,330],[420,260],[520,260]];
+    for (const [a,b] of mates){ x.fillStyle = "#8ab8f0"; x.beginPath(); x.arc(a,b,14,0,Math.PI*2); x.fill(); }
+    for (const [a,b] of opps){ x.fillStyle = "#ff8a4c"; x.beginPath(); x.arc(a,b,14,0,Math.PI*2); x.fill(); }
+    const you = gk ? [60,260] : me ? [600,260] : [260,260];
+    x.fillStyle = "#ffffff"; x.beginPath(); x.arc(you[0],you[1],17,0,Math.PI*2); x.fill(); x.fillStyle = "#14213a"; x.font = "700 16px 'Zen Kaku Gothic New',sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("you", you[0], you[1]);
+    if (ball){ x.fillStyle = "#ffffff"; x.beginPath(); x.arc(ball[0], ball[1], 9, 0, Math.PI*2); x.fill(); x.strokeStyle = "#14213a"; x.lineWidth = 2; x.stroke(); }
+    if (tone){ x.fillStyle = tone==="ok" ? "#8ab8f0" : "#ff8a4c"; x.font = "900 44px 'Dela Gothic One',sans-serif"; x.fillText(end, 450, 60); }
+  };
+  const anim = (from, to, label, tone, done) => { const t0 = performance.now(); const go = now => { const p = Math.min(1,(now-t0)/600); draw([from[0]+(to[0]-from[0])*p, from[1]+(to[1]-from[1])*p], label, p>=1?tone:null); if (p<1) requestAnimationFrame(go); else setTimeout(done, 500); }; reduce ? (draw(to,label,tone), setTimeout(done,500)) : requestAnimationFrame(go); };
+  const show = () => {
+    const kind = ph[k];
+    const hint = kind==="save" && R() < 0.3 + s.iq/200 ? (S._dir = ["L","C","R"][Math.floor(R()*3)], `キッカーの目線が${{L:"左",C:"まん中",R:"右"}[S._dir]}を見た。`) : (S._dir = ["L","C","R"][Math.floor(R()*3)], "");
+    inn.innerHTML = `<span class="eyebrow" style="color:var(--navy-dim)">${se.g}の公式戦 vs ${opp}</span><h2 class="num" style="font-family:var(--f-num)">${my} - ${op}</h2>
+      <canvas id="mc" width="900" height="520" aria-label="試合の様子"></canvas>
+      <p>プレー ${k+1}/3：${SIT[kind][k%3]}${hint?"<br><b style='color:#ff8a4c'>"+hint+"</b>":""}</p>
+      <div class="routes">${MOPT[kind].map(o=>`<button class="route mopt" data-o="${o[0]}"><b>${o[1]}</b>${o[2]?`<span>${o[2]}</span>`:""}</button>`).join("")}</div>`;
+    draw(kind==="att"?[600,260]:kind==="def"?[330,260]:[250,260]);
+    inn.querySelectorAll(".mopt").forEach(b => b.onclick = () => play(kind, b.dataset.o));
+  };
+  const play = (kind, o) => {
+    inn.querySelectorAll(".mopt").forEach(b => b.disabled = true);
+    const m = clamp(rel*0.012, -0.25, 0.25) + (S.model && S.model.style ? ({att:{striker:.05,drib:.05,maestro:.04},def:{anchor:.06},save:{gk:.08}}[kind]||{})[S.model.style]||0 : 0);
+    let goal = false, conc = false, txt = "";
+    if (kind==="att"){
+      if (o==="shoot"){ goal = R() < clamp(0.22 + (s.tec*0.5+s.men*0.3)/220 + m + (S.pos==="FW"?0.08:0), 0.08, 0.8); txt = goal?"ゴール！":"シュートはGKに止められた。"; addTr({media:1}); }
+      if (o==="pass"){ const ok = R() < clamp(0.55 + s.iq*0.6/220 + m, 0.2, 0.92); goal = ok && R() < 0.42; txt = ok ? (goal?"パスがつながり、味方が決めた！":"パスはつながったが、味方のシュートは外れた。") : "パスを読まれてカットされた。"; addTr({coach:1,analyst:1}); }
+      if (o==="drib"){ const ok = R() < clamp(0.38 + (s.tec*0.4+s.spd*0.4)/220 + m, 0.12, 0.88); goal = ok && R() < 0.55; txt = ok ? (goal?"2人抜いて、そのまま決めた！":"抜いたが、最後のタッチが大きくなった。") : "ドリブルを止められた。"; addTr({gear:1}); }
+      if (goal) my++;
+      return anim([600,260], goal?[880,260]:[720,250], goal?"GOAL":"", goal?"ok":"ng", () => next(txt, goal));
+    }
+    if (kind==="def"){
+      let ok;
+      if (o==="press"){ ok = R() < clamp(0.35 + (s.phy*0.4+s.spd*0.3)/220 + m, 0.1, 0.85); conc = !ok && R() < 0.5; if (ok && R() < 0.22){ my++; goal = true; } txt = ok ? (goal?"奪ってカウンター、そのままゴール！":"ボールを奪った！") : (conc?"かわされて失点した。":"かわされたが、味方がカバーした。"); addTr({front:1}); }
+      if (o==="cut"){ ok = R() < clamp(0.5 + s.iq/440 + m, 0.2, 0.9); conc = !ok && R() < 0.35; txt = ok ? "パスコースを消して、相手のミスを誘った。" : (conc?"逆を突かれて失点した。":"パスを通されたが、シュートは外れた。"); addTr({analyst:1,ref:1}); }
+      if (o==="back"){ ok = R() < 0.62 + m; conc = !ok && R() < 0.25; txt = ok ? "下がって守り切った。" : (conc?"押し込まれて失点した。":"押し込まれたが、なんとか防いだ。"); addTr({coach:1}); }
+      if (conc) op++;
+      return anim([330,260], conc?[20,260]:goal?[880,260]:[260,260], conc?"失点":goal?"GOAL":"", conc?"ng":"ok", () => next(txt, goal));
+    }
+    const right = o===S._dir; const save = R() < (right ? 0.82 : 0.14) + m;
+    if (!save) op++; else S.flags.gkSave = (S.flags.gkSave||0) + 1;
+    txt = save ? "止めた！" : "決められた。";
+    addTr({trainer:1});
+    return anim([250,260], save?[70,{L:200,C:260,R:320}[o]]:[15,{L:200,C:260,R:320}[S._dir]], save?"SAVE":"失点", save?"ok":"ng", () => next(txt, save));
+  };
+  const next = (txt, good) => { notes.push(txt); k++; if (k < 3) return show(); finishMatch(); };
+  const finishMatch = () => {
+    const res = my > op ? "win" : my === op ? "draw" : "lose";
+    if (res==="win"){ applyFx({men:1}); S.flags.wins = (S.flags.wins||0) + 1; }
+    addLog(res==="win"?"good":res==="lose"?"bad":null, `公式戦 vs ${opp}：${my}-${op}で${{win:"勝った",draw:"引き分け",lose:"負けた"}[res]}。`);
+    S.rank = rankOf();
+    carTalk(res, my, op, opp);
+  };
+  show();
+}
+// ── 帰りの車の会話（保護者が選ぶ／子どもが選ぶ） ─────────
+function carTalk(res, my, op, opp){
+  const inn = $("bigIn"); const r = {win:"勝った",draw:"引き分けだった",lose:"負けた"}[res];
+  const P = [
+    ["「楽しかった？」", {men:2}, 0, "「うん、楽しかった！」少し笑った。"],
+    ["「何がうまくいった？」", {iq:1,men:1}, 0, "うまくいったプレーを3つ話してくれた。"],
+    ["「あのミス、なんで？」", {iq:1,men:-2}, 0, "黙ってしまった。少し元気がない。"],
+    ["何も言わず、好きなものを食べに行く", {men:1}, -8, "ラーメンを食べて、元気が戻った。"]];
+  const C = [
+    ["今日うまくいったことを話す", {iq:1,men:1}, 0, "話しているうちに、次にやることが見えた。"],
+    [res==="lose"?"悔しかったことを話す":"うれしかったことを話す", {men:2}, 0, "言葉にしたら、気持ちがすっきりした。"],
+    ["「次はこうしたい」と話す", {iq:2}, 0, "親が「いいね」と言ってくれた。"],
+    ["つかれたので寝る", {}, -10, "家に着くまで、ぐっすり眠った。"]];
+  const child = S.who === "c", opts = child ? C : P;
+  inn.innerHTML = `<span class="eyebrow" style="color:var(--navy-dim)">帰りの車</span><h2>${my}-${op}で${r}。</h2><p>${child?"きみから、何を話す？":"お子さんに、何と声をかける？"}</p>
+    <div class="routes">${opts.map((o,i)=>`<button class="route talk" data-i="${i}"><b>${o[0]}</b></button>`).join("")}</div>`;
+  inn.querySelectorAll(".talk").forEach(b => b.onclick = () => {
+    const o = opts[+b.dataset.i]; S.prev = {...S.s}; applyFx(o[1]); S.fat = clamp(S.fat + o[2], 0, 100);
+    if (!child && b.dataset.i==="1") addTr({coach:1}); if (child && b.dataset.i!=="3") addTr({media:1});
+    quote("parent"); addLog(null, `帰りの車：${o[0]}。${o[3]}`);
+    inn.innerHTML = `<span class="eyebrow" style="color:var(--navy-dim)">帰りの車</span><h2>${o[3]}</h2><p class="hint">試合のあとの会話で、次の日のやる気が変わります（ゲームの判定です）。</p><button class="btn main" id="bigNext">次のシーズンへ</button>`;
+    $("bigNext").onclick = () => { closeBig(); nextSeason(); }; $("bigNext").focus();
+  });
 }
 
 // ── 進路の岐路（大一番の前に、どこに挑むか選ぶ） ─────────
@@ -714,6 +829,7 @@ function finish(path, sc){
   app.innerHTML = `
     <div class="card end"><span class="eyebrow" style="color:var(--navy-dim)">${S.name?esc(S.name)+"・":""}高3の冬・結末${newEnd?"（新しい結末）":""}</span><h2>${end}</h2>
       <div class="row" style="gap:18px"><span><span class="eyebrow" style="color:var(--navy-dim)">総合力</span><br><b class="num" style="font-size:34px">${o}</b></span><span><span class="eyebrow" style="color:var(--navy-dim)">${S.pos||"ポジション"}・特技</span><br><b style="font-size:16px">${sk?S.skills.map(x=>x.n).join("・"):"なし"}</b></span></div>
+      ${S.model&&S.model.name?`<p style="margin:0;color:var(--navy-dim);font-size:14px">お手本の${esc(S.model.name)}を追いかけた人生。公式戦は${S.flags.wins||0}勝。</p>`:`<p style="margin:0;color:var(--navy-dim);font-size:14px">公式戦は${S.flags.wins||0}勝。</p>`}
       ${S.mph?`<p style="margin:0;color:var(--navy-dim);font-size:14px">大人になったときの身長の目安：約${S.mph}cm（両親の身長から）</p>`:""}
       <p style="margin:0;color:var(--navy-dim);font-size:14px">ライバルのハヤトは総合力${S.rival.ovr}。${o>=S.rival.ovr?"最後は、あなたが上だった。":"最後まで、背中を追いかけた。"}</p></div>
     <div class="card"><h3 style="font-size:15px">未来のあなた（想像）</h3><ol class="future">${fut.map(f=>`<li><b>${f[0]}</b><span>${f[1]}</span></li>`).join("")}</ol><p class="note">ここまでの選び方から想像した未来です。本当の未来は、これからの選び方で何度でも変わります。</p></div>
