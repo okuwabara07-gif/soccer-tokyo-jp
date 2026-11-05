@@ -27,7 +27,7 @@ const BIG = [
 const SUPPORT = [
   { label: "準備物・グッズ", href: "/goods", img: "/images/kf/panels/p_goods.jpg", desc: "必要なものをチェック" },
   { label: "スパイク診断", href: "/shoes", img: "/images/kf/panels/p_shoes.jpg", desc: "最適なスパイクを見つける" },
-  { label: "親のための本", href: "/books", img: "/books/books-panel.jpg", desc: "お金・当番・進路と親子ノート" },
+  { label: "親のための本", href: "/books", img: "/books/books-panel.jpg", desc: "親の心得・お金と進路・サッカーノート" },
   { label: "栄養・補食ガイド", href: "/nutrition", img: "/images/kf/panels/p_nutrition.jpg", desc: "成長を支える食事のヒント" },
   { label: "AI足型診断", href: "/foot-check", img: "/images/kf/panels/p_foot.jpg", desc: "足の特徴をAIが診断" },
   { label: "体格診断", href: "/body-check", img: "/images/kf/panels/p_body.jpg", desc: "体格に合ったポジションを提案" },
