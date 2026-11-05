@@ -95,6 +95,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/books`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE}/books/oyako-soccer-note`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE}/books/okane-toban-shinro`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE}/books/tenha-pitch`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE}/goods`, lastModified: now, changeFrequency: "weekly", priority: 0.6 },
     { url: `${BASE}/shoes`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE}/nutrition`, changeFrequency: "monthly", priority: 0.5 },
