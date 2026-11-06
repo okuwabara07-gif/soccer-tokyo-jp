@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>1億3250万分の1 世界版｜どの国に生まれるかでサッカー人生が変わるゲーム | サッカーセレクション</title>
+<meta name="description" content="世界で1年に生まれる約1億3250万人。実際の出生数の割合で生まれる国が決まり、日本・欧州・南米・アフリカ・アジアなど国ごとに違う育ち方と進路でプロをめざす無料ゲーム。女子版・おまかせモードあり。">
+<link rel="canonical" href="https://soccer-selection.jp/life/world">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="サッカーセレクション">
+<meta property="og:title" content="1億3250万分の1 世界版">
+<meta property="og:description" content="どの国に生まれるかで、サッカーの道はどう変わる？">
+<meta property="og:url" content="https://soccer-selection.jp/life/world">
+<meta property="og:image" content="https://soccer-selection.jp/life/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0a1330">
+<style>html,body{margin:0}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}button{-webkit-tap-highlight-color:transparent}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* layout: 1カラムの「人生カード」が上から積み上がる。夜の地球（濃紺）×金の一点 */
+:root{
+  --bg:#0a1330; --panel:#121e47; --line:#24326a; --ink:#eef2ff; --mute:#9aa6c8;
+  --gold:#f2c14e; --sky:#6fb6ff; --rose:#ff9aa8;
+  --display:"Dela Gothic One","Hiragino Sans","Noto Sans JP",sans-serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",sans-serif;
+  color-scheme:dark;
+}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--body);font-size:15px;line-height:1.7;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,8vw,40px);line-height:1.15;margin:0;text-wrap:balance}
+h1 small{display:block;font-family:var(--body);font-size:13px;letter-spacing:.12em;color:var(--gold);font-weight:700;margin-bottom:6px}
+.lead{color:var(--mute);margin:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--sky);font-weight:700}
+.big{font-family:var(--display);font-size:clamp(26px,7vw,34px);line-height:1.2}
+.num{font-variant-numeric:tabular-nums}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit;font-weight:700;color:var(--bg);background:var(--gold);border:0;border-radius:999px;padding:12px 20px;cursor:pointer}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button.choice{width:100%;text-align:left;border-radius:12px;background:#1a2a5e;color:var(--ink);border:1px solid var(--line);padding:12px 14px;font-weight:500}
+button.choice b{display:block;font-weight:700}
+button.choice span{color:var(--mute);font-size:13px}
+button.choice:hover,button.choice:focus-visible{border-color:var(--gold)}
+button:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+button[disabled]{opacity:.45;cursor:not-allowed}
+.toggle{display:flex;gap:6px}
+.toggle button{padding:8px 14px;font-size:14px;background:transparent;color:var(--mute);border:1px solid var(--line)}
+.toggle button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.spin{font-family:var(--display);font-size:clamp(26px,8vw,36px);text-align:center;padding:18px 0;min-height:1.5em}
+.share{height:10px;border-radius:5px;background:#1a2a5e;overflow:hidden}
+.share i{display:block;height:100%;background:var(--gold)}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.stat{border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.stat .k{font-size:12px;color:var(--mute)}
+.stat .v{font-weight:700}
+.meter{display:flex;gap:3px}
+.meter i{width:14px;height:6px;border-radius:2px;background:#2a3a73}
+.meter i.f{background:var(--sky)}
+.log{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.log li{display:grid;grid-template-columns:3.2em 1fr;gap:8px}
+.log li .a{color:var(--gold);font-weight:700;font-variant-numeric:tabular-nums}
+.pbar{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mute)}
+.pbar .t{flex:1;height:6px;background:#1a2a5e;border-radius:3px;overflow:hidden}
+.pbar .t i{display:block;height:100%;background:var(--sky);transition:width .4s}
+.note{font-size:12px;color:var(--mute);margin:0}
+.end .big{color:var(--gold)}
+a{color:var(--sky)}
+a.lk{display:inline-block;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:12px 20px;font-weight:700;text-decoration:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app">
+  <header style="display:flex;flex-direction:column;gap:8px">
+    <h1><small>世界版</small>1億3250万分の1</h1>
+    <p class="lead">世界では1年に約1億3250万人の赤ちゃんが生まれます。どの国に生まれるかで、サッカーの道はどう変わる？</p>
+  </header>
+  <div id="stage"></div>
+</div>
+
+<script>
+// 出生数：国連「World Population Prospects 2024」2026年推計（Measured World掲載値）。単位：千人
+const WORLD = 132500;
+// [名前, 出生数(千人), 人気1-3, 育成環境1-4, 国内リーグ0-4, 代表1-4, 地域]
+// 人気・環境・リーグ・代表はゲーム上の設定（統計ではない）
+const C = [
+ ["インド",23000,1,2,1,1,"as"],["中国",8600,2,2,2,1,"as"],["ナイジェリア",7700,3,2,1,3,"af"],
+ ["パキスタン",6900,1,1,0,1,"as"],["コンゴ民主共和国",4600,3,1,1,2,"af"],["インドネシア",4400,3,2,1,2,"as"],
+ ["エチオピア",4200,2,1,1,1,"af"],["アメリカ",3700,2,4,3,3,"us"],["バングラデシュ",3400,2,1,1,1,"as"],
+ ["ブラジル",2500,3,4,3,4,"sa"],["タンザニア",2500,3,1,1,1,"af"],["エジプト",2500,3,2,2,2,"af"],
+ ["メキシコ",2000,3,3,3,3,"sa"],["フィリピン",1900,1,1,1,1,"as"],["ウガンダ",1700,3,1,1,1,"af"],
+ ["スーダン",1700,3,1,1,1,"af"],["ケニア",1600,3,1,1,1,"af"],["アフガニスタン",1500,2,1,0,1,"as"],
+ ["アンゴラ",1500,3,1,1,1,"af"],["イエメン",1400,2,1,0,1,"as"],["モザンビーク",1300,3,1,1,1,"af"],
+ ["ベトナム",1300,3,2,1,2,"as"],["ロシア",1200,3,3,2,2,"eu"],["イラク",1200,3,1,1,2,"as"],
+ ["南アフリカ",1200,2,2,2,2,"af"],["ニジェール",1200,3,1,0,1,"af"],["イラン",1100,3,2,2,3,"as"],
+ ["トルコ",1000,3,3,3,3,"eu"],["マダガスカル",1000,3,1,0,1,"af"],["コートジボワール",1000,3,3,1,3,"af"],
+ ["マリ",1000,3,2,1,2,"af"],["カメルーン",992,3,2,1,3,"af"],["チャド",910,2,1,0,1,"af"],
+ ["ガーナ",904,3,3,1,3,"af"],["ウズベキスタン",894,3,2,1,2,"as"],["ミャンマー",881,3,1,1,1,"as"],
+ ["ソマリア",836,3,1,0,1,"af"],["アルジェリア",832,3,2,2,3,"af"],["ブルキナファソ",748,3,2,1,2,"af"],
+ ["日本",746,2,4,3,3,"jp"],["ザンビア",721,3,1,1,2,"af"],["マラウイ",692,3,1,0,1,"af"],
+ ["ドイツ",690,3,4,4,4,"eu"],["コロンビア",685,3,3,2,3,"sa"],["イギリス",678,3,4,4,4,"eu"],
+ ["フランス",634,3,4,4,4,"eu"],["シリア",625,3,1,1,1,"as"],["モロッコ",614,3,3,2,3,"af"],
+ ["サウジアラビア",568,3,2,3,2,"gulf"],["タイ",566,3,2,2,2,"as"]
+];
+// 上位50か国以外（約4割）は、下の国からランダム（サンプル用の簡略化）
+const OTHERS = [
+ ["アルゼンチン",3,4,3,4,"sa"],["スペイン",3,4,4,4,"eu"],["イタリア",3,4,4,3,"eu"],["韓国",2,3,2,3,"as"],
+ ["オランダ",3,4,3,3,"eu"],["ポルトガル",3,4,3,4,"eu"],["ウルグアイ",3,3,2,3,"sa"],["クロアチア",3,3,2,3,"eu"],
+ ["セネガル",3,3,1,3,"af"],["オーストラリア",2,3,2,2,"as"],["ベルギー",3,4,3,3,"eu"],["カナダ",2,3,2,2,"us"],
+ ["ペルー",3,2,2,2,"sa"],["ポーランド",3,3,2,3,"eu"],["チリ",3,3,2,2,"sa"],["ネパール",2,1,0,1,"as"]
+];
+// 女子の設定 [環境1-4, 女子リーグ0-4, 女子代表1-4]（ゲーム上の設定）。書いていない国は [1,0,1]
+const GW = {"アメリカ":[4,4,4],"カナダ":[4,2,3],"ドイツ":[4,3,4],"イギリス":[4,4,4],"フランス":[4,3,3],"スペイン":[4,3,4],
+ "オランダ":[4,2,3],"日本":[3,2,3],"ブラジル":[3,2,3],"オーストラリア":[3,2,3],"中国":[2,2,2],"韓国":[2,2,2],
+ "ナイジェリア":[2,1,2],"イタリア":[3,2,2],"メキシコ":[3,3,2],"コロンビア":[2,2,2],"南アフリカ":[2,1,2],"ポルトガル":[3,2,2],
+ "ベルギー":[3,2,2],"アルゼンチン":[2,1,2],"ロシア":[2,1,1],"トルコ":[2,1,1],"モロッコ":[2,1,2],"ガーナ":[2,1,1],
+ "カメルーン":[2,1,2],"ザンビア":[2,1,2],"ベトナム":[2,1,2],"タイ":[2,1,2],"フィリピン":[2,1,2],"ポーランド":[2,1,2],
+ "クロアチア":[2,1,1],"チリ":[2,1,2],"ウズベキスタン":[2,1,1],"インドネシア":[2,1,1],"コートジボワール":[2,1,1]};
+
+const TOP = C.reduce((s,c)=>s+c[1],0), OTHER_K = WORLD - TOP;
+const R = Math.random, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+let S, GIRL=false, AUTO=false;
+const $ = s => document.querySelector(s);
+const stage = $("#stage");
+const meter = (n,max)=>`<span class="meter">${Array.from({length:max},(_,i)=>`<i class="${i<n?'f':''}"></i>`).join("")}</span>`;
+const nt = () => GIRL ? "女子代表" : "代表";
+const kids = () => GIRL ? "女の子" : "男の子";
+
+function mk(name,k,pop,aca,lg,nta,rg,girl){
+  const c={n:name,k,pop,aca,lg,nt:nta,rg};
+  if(girl){ const g=GW[name]||[1,0,1]; c.aca=g[0]; c.lg=g[1]; c.nt=g[2]; c.g=true; }
+  return c;
+}
+function pick(girl){
+  let r = R()*WORLD;
+  for(const c of C){ if((r-=c[1])<0) return mk(c[0],c[1],c[2],c[3],c[4],c[5],c[6],girl); }
+  const o = OTHERS[Math.floor(R()*OTHERS.length)];
+  return mk(o[0],null,o[1],o[2],o[3],o[4],o[5],girl);
+}
+
+// ===== 国（地域）ごとの「育ち方」 =====
+const BORN = {
+  jp:c=>"少年団、街クラブ、スクール。ボールを蹴る場所はたくさん。週末は家族で試合の送り迎え。",
+  us:c=>"サッカーも野球もバスケも。季節ごとに違うスポーツをする子が多い国。",
+  eu:c=>"どの町にもクラブがあり、週末は試合。プロクラブのスカウトが子どもの試合を見に来る。",
+  sa:c=>"道路、砂浜、フットサルコート。どこでもボールが転がっている。",
+  af:c=>c.aca<=1?"本物のボールは貴重。布やビニールを丸めた手作りのボールで遊ぶ子も多い。":"町のチームのほかに、海外のクラブとつながるサッカーアカデミーもある。",
+  gulf:c=>"国内リーグには世界の有名選手が集まる。スタジアムもりっぱ。",
+  as:c=>c.pop===1?"この国でいちばん人気のスポーツはサッカー以外。サッカー仲間を探すところから。":"学校のチームや町のクラブでサッカーを始める子が多い。"
+};
+const KEY = c => c.rg;
+const girlNote = c => c.g ? (c.aca<=1?"女子のチームはまだ少なく、男の子にまじって練習する子が多い。":c.aca>=4?"女子のクラブもリーグも充実している。":"女子のチームは少しずつ増えている。") : "";
+
+// 共通の小道具
+const add=n=>{S.P=clamp(S.P+n,1,99)};
+const L=t=>S.log.push([S.age,t]);
+const chance=p=>R()<p;
+function O(t,d,fn,off){return {t,d,fn,off}}
+
+// 段階ごとの場面（地域で中身が変わる）
+const SCN = {
+ s1:{
+  jp:c=>({title:"はじめてのチーム",text:"幼稚園の友だちと、どこに入るか相談中。",opts:[
+    O("地域の少年団に入る","友だちと一緒。親の当番もある",()=>{add(6);L("少年団に入る");return "毎週末が試合。ベンチから大声で応援する親たち。"}),
+    O("街クラブに入る","練習の質が高め。月謝もかかる",()=>{add(8);L("街クラブに入る");return "コーチに教わった両足のキックが武器に。"}),
+    O("いろんなスポーツをやってみる","水泳、体操、かけっこ",()=>{add(5);S.ath=1;L("いろんなスポーツに挑戦");return "体の使い方がうまくなった。"})]}),
+  us:c=>({title:"どのリーグで始める？",text:"週末は町の公園がサッカー場に変わる。",opts:[
+    O("町のレクリエーションリーグ","誰でも参加できる、楽しむリーグ",()=>{add(5);L("レクリエーションリーグで始める");return "点を決めたら、みんなでハイタッチ。"}),
+    O("選抜のクラブチーム","遠征が多く、費用も高め",()=>{add(9);L("選抜クラブチームに入る");return "週末は州をまたいで遠征。"}),
+    O("季節ごとに違うスポーツ","秋はサッカー、冬はバスケ、春は野球",()=>{add(5);S.ath=1;L("いろんなスポーツを掛け持ち");return "バスケで覚えた体の向きが、サッカーにも生きた。"})]}),
+  eu:c=>({title:"スカウトの目",text:"地元クラブの試合に、プロクラブのスカウトが来ている。",opts:[
+    O("いつも通り楽しんでプレー","力を出しきる",()=>{ if(chance(clamp((S.P-25)/40,0.1,0.8))){S.aca=1;add(10);L("8歳でプロクラブのアカデミーへ");return "アカデミーに誘われた！ 練習は週4回に。"} add(5);L("地元クラブで続ける");return "声はかからなかった。でも地元クラブで楽しく続ける。"}),
+    O("地元クラブで友だちと続ける","まだ遊びの時間を大事に",()=>{add(6);L("地元クラブで続ける");return "友だちと過ごした時間が、サッカーを好きでいる理由に。"})]}),
+  sa:c=>({title:"どこでボールを蹴る？",text:"家の前の道でも、砂浜でも、試合が始まる。",opts:[
+    O("フットサルコートに通う","狭いところで細かいボール扱い",()=>{add(9);S.skill=1;L("フットサルで育つ");return "足の裏でボールを転がすのが得意に。"}),
+    O("道ばたのストリートサッカー","年上の子に混じって、何でもあり",()=>{add(8);L("ストリートで年上と勝負");return "年上をドリブルで抜いたのは自慢の思い出。"}),
+    O("町のクラブに入る","大会にも出られる",()=>{add(6+c.aca);L("町のクラブに入る");return "初めての大会で優勝メダル。"})]}),
+  af:c=>({title:"はじめてのボール",text:BORN.af(c),opts:[
+    O("手作りボールで毎日遊ぶ","裸足で、空き地で、日が暮れるまで",()=>{add(8);L("手作りボールで毎日遊ぶ");return "どんなボールでも思い通りに動かせるように。"}),
+    O("町のチームに入る","大人が見てくれるチーム",()=>{add(5+c.aca);L("町のチームに入る");return "初めて本物のボールで試合をした日。"},c.aca<=1&&chance(.5)?"近くにチームがない":null)]}),
+  gulf:c=>SCN.s1.as(c),
+  as:c=>({title:"はじめてのボール",text:BORN.as(c),opts:[
+    O("学校のチームで始める","放課後に友だちと",()=>{add(6);L("学校のチームで始める");return "休み時間もボールを離さない子に。"}),
+    O("町のクラブに入る","コーチに教わる",()=>{add(4+c.aca*2);L("町のクラブに入る");return "コーチに褒められたのは左足のキック。"},c.aca<=1?"近くにクラブがない":null),
+    O("いろんなスポーツをやってみる",c.pop===1?"人気のクリケットもやってみる":"走る・跳ぶ・投げる",()=>{add(5);S.ath=1;L("いろんなスポーツに挑戦");return "体力がついた。"})]})
+ },
+ s2:{
+  jp:c=>({title:"トレセンの選考",text:"地区トレセン（地域の選抜）の選考会がある。",opts:[
+    O("選考を受ける","受かれば強い選手と練習できる",()=>{ if(chance(clamp((S.P-30)/40,.1,.85))){add(8);S.tre=1;L("地区トレセンに選ばれる");return "合格！ うまい子だらけで刺激の毎日。"} add(4);L("トレセン不合格");return "不合格。サッカーノートに悔しさを書いた。"}),
+    O("自主練の時間を増やす","朝の壁当てとリフティング",()=>{add(7);L("毎朝の自主練を始める");return "リフティングが1000回を超えた。"})]}),
+  us:c=>({title:"ほかのスポーツからの誘い",text:"バスケのコーチから「うちのチームに来ないか」と誘われた。",opts:[
+    O("サッカー一本にしぼる","練習時間を全部サッカーに",()=>{add(7);L("サッカー一本にしぼる");return "1年でぐっと上手くなった。"}),
+    O("両方続ける","いろんな動きが身につく",()=>{add(5);S.ath=1;L("サッカーとバスケを両立");return "体の強さとジャンプ力がついた。"})]}),
+  eu:c=>S.aca?({title:"アカデミーの毎年の評価",text:"アカデミーでは毎年、残れるかどうかが決まる。",opts:[
+    O("全力で評価の日にのぞむ","残れればプロに一歩近づく",()=>{ if(chance(clamp((S.P-35)/35,.2,.9))){add(8);L("アカデミーに残留");return "残留決定！ 同期の半分は別のクラブへ。"} S.aca=0;add(3);L("アカデミーから放出、地元クラブへ");return "放出が決まった。悔しいけど、別のクラブで出直し。"})]}):
+   ({title:"地元クラブのエース",text:"地元クラブで点を取りまくっている。別のアカデミーから声がかかるかも。",opts:[
+    O("別のアカデミーの練習に参加","もう一度チャンスをつかむ",()=>{ if(chance(clamp((S.P-35)/40,.1,.7))){S.aca=1;add(8);L("別のアカデミーに入る");return "チャンスをつかんだ！"} add(4);L("地元クラブで続ける");return "今回は届かず。でも次がある。"}),
+    O("地元クラブで試合に出続ける","出場時間を大事に",()=>{add(6);L("地元クラブでエースに");return "毎試合ゴール。"})]}),
+  sa:c=>({title:"名門クラブのテスト",text:"国内の名門クラブが、子どもの入団テストをしている。",opts:[
+    O("テストを受ける","何百人の中から数人",()=>{ if(chance(clamp((S.P-35)/35,.1,.75))){S.aca=1;add(10);L("名門クラブの下部組織に合格");return "合格！ 家族みんなで大喜び。"} add(4);L("名門クラブは不合格");return "不合格。でもストリートに戻ってさらに磨く。"}),
+    O("フットサルで技を磨き続ける","ボールタッチをもっと細かく",()=>{add(7);L("フットサルで技を磨く");return "股抜きが得意技に。"})]}),
+  af:c=>({title:"アカデミーのテスト",text:"寮で暮らしながら学校とサッカーを両立するアカデミーのテストがある。",opts:[
+    O("テストを受ける","家族と離れて寮生活",()=>{ if(chance(clamp((S.P-30)/40+(c.aca-2)*.1,.1,.8))){S.aca=1;add(10);L("寮のあるアカデミーに合格");return "合格。家族と離れる寂しさと、夢に近づくうれしさ。"} add(4);L("アカデミーは不合格");return "不合格。町のチームでエースに。"}),
+    O("家の手伝いをしながら町で続ける","家族のそばで",()=>{add(5);L("家族を手伝いながらサッカーを続ける");return "朝は手伝い、夕方はサッカー。"})]}),
+  gulf:c=>SCN.s2.as(c),
+  as:c=>c.pop===1?({title:"人気スポーツの誘い",text:"クラスの友だちはみんなクリケットに夢中。チームに誘われた。",opts:[
+    O("サッカーを続ける","仲間は少なくても好きなことを",()=>{add(7);L("サッカーを続けると決める");return "数少ないサッカー仲間と、毎日ボールを蹴った。"}),
+    O("両方やってみる","体力はつくけど時間は半分",()=>{add(4);S.ath=1;L("クリケットとサッカーを両立");return "走る力と集中力がついた。"})]}):
+   ({title:"地域選抜",text:"地域の選抜チームのセレクションがある。",opts:[
+    O("受ける","合格すれば大会で注目される",()=>{ if(chance(clamp((S.P-30)/40,.1,.8))){add(8);L("地域選抜に選ばれる");return "選抜のユニフォームを着た日。"} add(4);L("地域選抜は不合格");return "不合格。もっと練習しよう。"}),
+    O("自主練を増やす","朝と夜にボールを蹴る",()=>{add(6);L("自主練を増やす");return "毎日の積み重ね。"})]})
+ },
+ s3:{
+  jp:c=>({title:"中学でどこに行く？",text:"ジュニアユース（中学年代）のチームを選ぶ時期。",opts:[
+    O("Jクラブのジュニアユース選考","プロへの近道。合格は狭き門",()=>{ if(chance(clamp((S.P-38)/40+(S.tre?.1:0),.05,.8))){S.aca=1;add(10);L("Jクラブのジュニアユースに合格");return "合格！ エンブレムのついたジャージ。"} add(4);L("Jクラブは不合格、街クラブへ");return "不合格。街クラブで見返すと決めた。"}),
+    O("街クラブのジュニアユース","試合に出やすく、成長の場も多い",()=>{add(7);L("街クラブのジュニアユースへ");return "1年生から試合に出られた。"}),
+    O("中学校の部活","勉強や友だちとの時間も大事に",()=>{add(5);S.club3=1;L("中学校のサッカー部へ");return "仲間と目指す都大会。"})]}),
+  us:c=>({title:"プロクラブのアカデミー",text:"プロリーグのクラブがアカデミーの選手を探している。",opts:[
+    O("アカデミーの選考を受ける","学費のかからない育成組織",()=>{ if(chance(clamp((S.P-40)/35,.1,.8))){S.aca=1;add(9);L("プロクラブのアカデミーに入る");return "アカデミーに合格。"} add(4);L("アカデミーは不合格、高校チームへ");return "不合格。高校のチームでがんばる。"}),
+    O("高校のチームで中心選手に","学校の仲間と州大会をめざす",()=>{add(6);L("高校チームの中心選手に");return "州大会でベスト4。"})]}),
+  eu:c=>({title:"16歳の契約",text:"この年代で最初のプロ契約を結ぶ選手もいる。",opts:[
+    O("トップチームの練習に参加","大人の選手にまじって",()=>{ if(chance(clamp((S.P-50)/30,.05,.8))){S.early=1;add(9);L("16歳で最初のプロ契約");return "16歳でプロ契約！"} add(5);L("ユースチームで続ける");return "まだ早かった。ユースで力をためる。"}),
+    O("ユースで試合に出続ける","じっくり育つ",()=>{add(7);L("ユースで主力に");return "ユースリーグで得点王争い。"})]}),
+  sa:c=>({title:"10代のデビュー",text:"この国では16〜17歳でプロデビューする選手も多い。",opts:[
+    O("トップチームのデビューをめざす","チャンスは一瞬",()=>{ if(chance(clamp((S.P-50)/30+(S.aca?.1:0),.05,.75))){S.early=1;add(9);L("17歳でプロデビュー");return "スタジアムの歓声の中、デビュー！"} add(5);L("下部組織で続ける");return "出番はまだ。でも準備はできている。"}),
+    O("下部組織で力をためる","焦らず体づくり",()=>{add(7);L("体づくりに力を入れる");return "当たりに負けない体になった。"})]}),
+  af:c=>({title:"欧州のスカウト",text:"欧州のクラブのスカウトが試合を見に来た。海外移籍は18歳から（国際ルール）。",opts:[
+    O("スカウトの前で全力プレー","18歳になったら欧州へ行けるかも",()=>{ if(chance(clamp((S.P-45)/30,.05,.7))){S.promise=1;add(7);L("欧州クラブから声がかかる");return "「18歳になったら、うちに来てほしい」"} add(5);L("声はかからず");return "声はかからなかった。次のチャンスへ。"}),
+    O("国内の試合で経験を積む","大人のリーグでも出場",()=>{add(7);L("国内で経験を積む");return "大人相手でも通用し始めた。"})]}),
+  gulf:c=>SCN.s3.as(c),
+  as:c=>({title:"国内のアカデミー",text:"国内のプロクラブのアカデミー選考がある。",opts:[
+    O("選考を受ける","合格すればプロに近づく",()=>{ if(chance(clamp((S.P-35)/40+(c.aca-2)*.1,.05,.8))){S.aca=1;add(9);L("国内アカデミーに合格");return "合格！"} add(4);L("アカデミーは不合格");return "不合格。地元でエースに。"},c.lg===0?"国内にプロクラブがない":null),
+    O("地元チームで出場を増やす","試合で育つ",()=>{add(6);L("地元チームの中心に");return "毎試合フル出場。"})]})
+ }
+};
+
+function s4opts(c){
+  const k=KEY(c), o=[];
+  const need = c.lg===0?999:56+c.lg*5-(S.aca?4:0)-(S.early?6:0);
+  const homePro = (msg)=>()=>{ if(S.P+Math.floor(R()*10)>=need){startPro(18,c.lg>=3?2:1,`${c.n}のクラブとプロ契約`);return msg} L("プロ契約に届かず");S.over=1;return "あと一歩届かなかった。"};
+  if(k==="jp"){
+    o.push(O(S.aca?"ユースからトップ昇格をめざす":"高校サッカーで選手権をめざす",S.aca?"クラブのトップチームへ":"冬の全国大会で注目を集める",()=>{
+      if(!S.aca && chance(.35)){add(5);L("高校選手権に出場");}
+      if(S.P+Math.floor(R()*10)>=need){startPro(18,2,`${S.aca?"トップ昇格":"高卒でJクラブ"}とプロ契約`);return "プロ契約！"}
+      L("高卒プロには届かず");S.over=1;return "18歳でのプロは届かなかった。"}));
+    o.push(O("大学でサッカーを続ける","4年かけて力をつけてプロへ",()=>{add(8);S.age=22;
+      if(S.P+Math.floor(R()*10)>=need-2){startPro(22,2,"大学からJクラブとプロ契約");return "4年後、大学からプロへ！"}
+      L("大学卒業後は社会人チームで続ける");S.over=1;return "大学で全力を出しきった。社会人チームでサッカーを続ける。"}));
+  } else if(k==="us"){
+    o.push(O("大学のスポーツ奨学金","大学でプレーし、ドラフトでプロへ",()=>{add(8);S.age=22;
+      if(S.P+Math.floor(R()*10)>=need-3){startPro(22,2,"ドラフトで指名されプロへ");return "ドラフトで名前が呼ばれた！"}
+      L("大学卒業、別の仕事へ");S.over=1;return "大学4年間、全力でプレーした。"}));
+    o.push(O("アカデミーから直接プロ契約","18歳でプロへ",()=>{ if(!S.aca){S.over=1;L("アカデミー出身でないため契約できず");return "アカデミーの選手ではないので、この道は使えなかった。"} return homePro("アカデミーからプロ契約！")()}));
+  } else {
+    if(k==="af" && S.promise) o.push(O("約束どおり欧州へ","18歳で海を渡る",()=>{ if(S.P+Math.floor(R()*12)>=66){startPro(18,4,"18歳で欧州のクラブへ");S.cur="abroad";S.abroad=1;return "18歳の誕生日のすぐあと、飛行機に乗った。"} startPro(18,1,"欧州2部のクラブへ");S.cur="abroad";S.abroad=1;return "まずは欧州の2部リーグから。"}));
+    o.push(O("国内のプロクラブと契約をめざす",c.lg?"":"",homePro("プロ契約！ 背番号をもらった日。"),c.lg===0?"この国にはプロリーグがない":null));
+  }
+  o.push(O("海外のクラブのテストを受ける","言葉も文化も違う国へ",()=>{
+    if(S.P+Math.floor(R()*12)>=74){startPro(S.age<18?18:S.age,c.rg==="eu"?3:3,`海外のクラブと契約`);S.abroad=1;S.cur="abroad";return "テスト合格！ 海を渡った。"}
+    L("海外テストは不合格");S.over=1;return "不合格。それでも世界の広さを知った。"}));
+  if(k!=="jp"&&k!=="us") o.push(O("学びながらサッカーを続ける","勉強や仕事とサッカーを両立",()=>{L("学びながらサッカーを続ける");S.over=1;return "サッカーはずっと人生の一部。"}));
+  return o;
+}
+
+// レベル：1=国内の下位、2=国内のトップ、3=国内強豪/中東・日本など、4=欧州のクラブ、5=欧州5大リーグのトップ
+const NEED=[0,50,58,68,78,87];
+function lvName(lv,c){
+  const home=S.cur===c.n, asaf=(c.rg==="as"||c.rg==="af"||c.rg==="gulf");
+  if(lv>=5) return "欧州5大リーグのトップクラブ";
+  if(home){
+    if(lv===4) return `${c.n}の1部リーグ`;
+    if(lv===3) return `${c.n}の強豪クラブ`;
+    if(lv===2) return c.lg>=2?`${c.n}の1部リーグ`:"近くの国のリーグ";
+    return c.lg>=1?`${c.n}の2部リーグ`:"近くの国の2部リーグ";
+  }
+  if(lv===4) return "欧州のクラブ";
+  if(lv===3) return asaf?"中東や日本のリーグ":"欧州の中堅リーグ";
+  if(lv===2) return asaf?"アジアやアフリカの強いリーグ":"欧州の2部リーグ";
+  return "海外の2部リーグ";
+}
+function startPro(age,lv,msg){S.pro=1;S.start=age;S.age=age;S.lv=lv;S.best=lv;S.cur=S.c.n;L(msg)}
+
+function career(){
+  const c=S.c; let age=S.start, P=S.P;
+  const domCap = c.lg>=4?5:c.lg>=3?3:c.lg>=2?2:1;
+  const peak = 26+Math.floor(R()*3);
+  const goAbroad = {sa:.5,af:.5,jp:.3,us:.25,as:.3,gulf:.15,eu:.35}[c.rg];
+  while(age<38){
+    age++; S.age=age;
+    P = clamp(P + (age<=peak? Math.floor(R()*3)+(S.lv>=4?1:0) : -(2+Math.floor(R()*4))),1,99);
+    const next=S.lv+1;
+    if(next<=5 && P>=NEED[next]){
+      if(next<=domCap && S.cur===c.n){ if(chance(.5)){S.lv=next;L(`${lvName(next,c)}へステップアップ`);} }
+      else if(chance(goAbroad)){S.lv=next;S.cur="abroad";S.abroad=1;L(`${lvName(S.lv,c)}へ移籍`);}
+    }
+    if(P<NEED[S.lv]-8 && S.lv>1 && age>peak){S.lv--;L(`${lvName(S.lv,c)}へ移籍`);}
+    S.best=Math.max(S.best,S.lv);
+    const need = 60 + c.nt*7;
+    if(P>=need && chance(.6)){ if(!S.caps) L(`${nt()}に初選出`); S.caps += 3+Math.floor(R()*6);
+      if(age%4===2 && chance([0,0.05,0.3,0.7,0.95][c.nt])){S.wc++; L("ワールドカップに出場");} }
+    if(P < 52 || (age>=33 && chance(.35))){ L("現役引退"); break; }
+  }
+  S.P=P; S.years=age-S.start; S.bestName=lvName(S.best,{...c});
+  ending();
+}
+
+function rankOf(P,pro){ const top=Math.pow(1-P/100,3.2)+(pro?0:0.002); return Math.max(1,Math.round(WORLD*1000*top)); }
+
+// 同じ日に世界で生まれた3人（おまかせで一生を計算）
+function others(){
+  const out=[];
+  for(let i=0;i<3;i++){
+    const g=R()<.5, c=pick(g);
+    let P=30+Math.floor(R()*20)+c.aca*4+Math.floor(R()*25)+c.pop*2;
+    P=clamp(P,1,95);
+    let t;
+    if(P>=88 && c.nt>=2) t=`${g?"女子":""}代表としてワールドカップへ`;
+    else if(P>=80) t="欧州のクラブでプレー";
+    else if(P>=66 && c.lg>=1) t="国内リーグのプロ選手に";
+    else if(P>=58) t="地元のチームでサッカーを続けた";
+    else t=["先生になり、休日は子どもにサッカーを教える","エンジニアになり、週末はフットサル","家族の店を継ぎ、地元クラブを応援","看護師になり、職場のチームでプレー"][Math.floor(R()*4)];
+    out.push({c,g,t});
+  }
+  return out;
+}
+
+// ===== 画面 =====
+function home(){
+  stage.innerHTML = `<div class="card">
+    <div class="eyebrow">はじめる前に</div>
+    <div class="toggle" role="group" aria-label="性別">
+      <button id="gB" class="${GIRL?'':'on'}">男の子</button><button id="gG" class="${GIRL?'on':''}">女の子</button>
+    </div>
+    <div class="toggle" role="group" aria-label="進め方">
+      <button id="aM" class="${AUTO?'':'on'}">自分で選ぶ</button><button id="aA" class="${AUTO?'on':''}">おまかせで見る</button>
+    </div>
+    <p class="note">生まれる国は、実際の出生数の割合で決まります。日本に生まれるのは約0.56%。</p>
+    <div class="row"><button id="go">生まれる</button></div>
+  </div>`;
+  $("#gB").onclick=()=>{GIRL=false;home()}; $("#gG").onclick=()=>{GIRL=true;home()};
+  $("#aM").onclick=()=>{AUTO=false;home()}; $("#aA").onclick=()=>{AUTO=true;home()};
+  $("#go").onclick=born;
+}
+
+function born(){
+  const c = pick(GIRL);
+  S = {c, age:0, P: 34+Math.floor(R()*20), log:[], caps:0, wc:0, pro:0, lv:0, best:0};
+  stage.innerHTML = `<div class="card"><div class="eyebrow">生まれる国を決めています</div><div class="spin" id="sp">…</div></div>`;
+  const sp=$("#sp"); let i=0;
+  const names=[...C.map(x=>x[0]),...OTHERS.map(x=>x[0])];
+  const t=setInterval(()=>{sp.textContent=names[Math.floor(R()*names.length)]; if(++i>18){clearInterval(t); reveal();}},70);
+}
+
+function reveal(){
+  const c=S.c, share=c.k?(c.k/WORLD*100):null;
+  stage.innerHTML = `<div class="card">
+    <div class="eyebrow">あなたが生まれた国</div>
+    <div class="big">${c.n}</div>
+    ${c.k?`<div class="num">この国で1年に生まれる子ども 約${(c.k/10).toLocaleString()}万人（世界の${share.toFixed(2)}%）</div>
+    <div class="share" aria-hidden="true"><i style="width:${Math.max(1,share*4)}%"></i></div>`:
+    `<div>上位50か国以外の国（世界の約${Math.round(OTHER_K/WORLD*100)}%）</div>`}
+    <div class="stats">
+      <div class="stat"><div class="k">サッカーの人気</div><div class="v">${meter(c.pop,3)}</div></div>
+      <div class="stat"><div class="k">${c.g?"女子の":""}育つ環境</div><div class="v">${meter(c.aca,4)}</div></div>
+      <div class="stat"><div class="k">${c.g?"女子":"国内"}リーグ</div><div class="v">${meter(c.lg,4)}</div></div>
+      <div class="stat"><div class="k">${nt()}の強さ</div><div class="v">${meter(c.nt,4)}</div></div>
+    </div>
+    <p style="margin:0">${BORN[c.rg](c)}${girlNote(c)}</p>
+    <p class="note">人気・環境・リーグ・代表はゲーム上の設定です。</p>
+    <div class="row"><button id="n">5歳になる</button></div>
+  </div>`;
+  $("#n").onclick=()=>scene("s1",5,()=>scene("s2",10,()=>scene("s3",13,s4)));
+  if(AUTO) setTimeout(()=>$("#n")&&$("#n").click(),900);
+}
+
+function bar(){return `<div class="pbar">力 <span class="t"><i style="width:${S.P}%"></i></span><span class="num">${S.P}</span></div>`}
+function ask(age, sc, next){
+  S.age=age;
+  stage.innerHTML = `<div class="card">
+    <div class="eyebrow">${S.c.n}・${age}歳</div>
+    <div class="big" style="font-size:22px">${sc.title}</div>
+    <p style="margin:0">${sc.text}</p>${bar()}
+    <div style="display:flex;flex-direction:column;gap:8px">${sc.opts.map((o,i)=>`<button class="choice" id="o${i}" ${o.off?'disabled':''}><b>${o.t}</b><span>${o.off||o.d||""}</span></button>`).join("")}</div>
+  </div>`;
+  const ok=[];
+  sc.opts.forEach((o,i)=>{ if(!o.off){ ok.push(i); $("#o"+i).onclick=()=>{ const msg=o.fn(); result(msg,next); }; } });
+  if(AUTO) setTimeout(()=>{const b=$("#o"+ok[Math.floor(R()*ok.length)]); b&&b.click();},900);
+}
+function result(msg, next){
+  stage.innerHTML = `<div class="card"><div class="eyebrow">${S.c.n}・${S.age}歳</div><p style="margin:0">${msg}</p>${bar()}<div class="row"><button id="n">つぎへ</button></div></div>`;
+  $("#n").onclick=next;
+  if(AUTO) setTimeout(()=>$("#n")&&$("#n").click(),900);
+}
+function scene(key,age,next){ const f=SCN[key][S.c.rg]||SCN[key].as; ask(age,f(S.c),next); }
+function s4(){ ask(18,{title:"18歳の決断",text:"ここからが本当の勝負。どの道を選ぶ？",opts:s4opts(S.c)},()=>S.pro?career():ending()); }
+
+function ending(){
+  const c=S.c, pro=S.pro;
+  const title = !pro ? "サッカーと生きる人生" :
+    S.wc ? "ワールドカップに立った選手" : S.caps ? `${c.n}${nt()}の選手` :
+    S.best>=5 ? "欧州トップクラブの選手" : S.abroad ? "海を渡ったプロ選手" : "プロサッカー選手";
+  const rank=rankOf(S.P,pro).toLocaleString();
+  const ot=others();
+  const share=`【1億3250万分の1】${c.n}に生まれた${kids()}の人生は「${title}」。世界の同い年で約${rank}番目。`;
+  const tip = c.nt>=4&&pro&&!S.caps ? "強い国に生まれると、育つ環境は良いけれど代表に入る競争はとても厳しい。" :
+    c.aca<=1&&pro ? "環境が少ない国からプロになるのは、本当にすごいこと。" :
+    c.pop===1 ? "サッカーがいちばん人気ではない国で続けたこと自体が、ひとつの挑戦。" : "";
+  stage.innerHTML = `<div class="card end">
+    <div class="eyebrow">${c.n}に生まれた${kids()}の人生</div>
+    <div class="big">${title}</div>
+    <div class="stats">
+      <div class="stat"><div class="k">いちばん上のクラブ</div><div class="v">${pro?S.bestName:"アマチュア"}</div></div>
+      <div class="stat"><div class="k">プロ年数</div><div class="v num">${pro?S.years+"年":"―"}</div></div>
+      <div class="stat"><div class="k">${nt()}</div><div class="v num">${S.caps?S.caps+"試合":"―"}</div></div>
+      <div class="stat"><div class="k">ワールドカップ</div><div class="v num">${S.wc?S.wc+"大会":"―"}</div></div>
+    </div>
+    <div class="num">世界の同い年 1億3250万人の中で <b style="color:var(--gold)">約${rank}番目</b></div>
+    <p class="note">順位はゲーム上の推定です。</p>
+    <ul class="log">${S.log.map(([a,t])=>`<li><span class="a">${a}歳</span><span>${t}</span></li>`).join("")}</ul>
+    ${tip?`<p class="note">${tip}</p>`:""}
+  </div>
+  <div class="card">
+    <div class="eyebrow">同じ日に世界で生まれた3人</div>
+    <ul class="log">${ot.map(o=>`<li style="grid-template-columns:7.5em 1fr"><span class="a" style="font-size:13px">${o.c.n}・${o.g?"女":"男"}</span><span>${o.t}</span></li>`).join("")}</ul>
+  </div>
+  <div class="card">
+    <div class="row">
+      <button id="again">もう一度生まれる</button>
+      <button class="ghost" id="cp">結果をコピー</button>
+      <a class="lk" href="/life/ikusei">もし日本に生まれていたら？</a>
+    </div>
+    <p class="note" id="cpm" aria-live="polite"></p>
+  </div>`;
+  $("#again").onclick=born;
+  $("#cp").onclick=()=>{ navigator.clipboard.writeText(share+" https://soccer-selection.jp/life/world").then(()=>{$("#cpm").textContent="コピーしました"},()=>{$("#cpm").textContent=share}); };
+}
+home();
+</script>
+<p class="note" style="max-width:560px;margin:24px auto 0;text-align:center">出生数：国連「World Population Prospects 2024」の2026年推計。サッカーの人気・環境・リーグ・代表の強さはゲーム上の設定です。<br><a href="/life">4.5万分の1 トップ</a>・<a href="/">サッカーセレクション</a></p>
+</body>
+</html>
