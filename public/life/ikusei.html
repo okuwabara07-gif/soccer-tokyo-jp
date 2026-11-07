@@ -210,6 +210,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};window.lifeLog=function(e,d){try{var u=(location.search.match(/utm_source=([^&]+)/)||[])[1]||"";var b=JSON.stringify(Object.assign({e:e,ref:document.referrer||"",utm:decodeURIComponent(u)},d||{}));if(navigator.sendBeacon)navigator.sendBeacon("/api/life/log",new Blob([b],{type:"application/json"}));else fetch("/api/life/log",{method:"POST",body:b,keepalive:true});}catch(_){}};</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -331,6 +333,7 @@ const midParent = (d, m) => (d && m) ? Math.round((d + m + (GIRL ? -13 : 13)) / 
 const bodyType = (pr) => { const b = []; if (pr.dh && pr.dw) b.push(pr.dw / (pr.dh/100) ** 2); if (pr.mh && pr.mw) b.push(pr.mw / (pr.mh/100) ** 2); if (!b.length) return null; const v = b.reduce((a,c)=>a+c,0)/b.length; return v >= 25 ? "がっしり" : v < 20 ? "細身" : "ふつう"; };
 function newRun(seed, pr){
   pr = pr || {};
+  window.lifeLog && lifeLog("start", {m:"ikusei", g: pr.girl!=null ? !!pr.girl : GIRL});
   const s = {spd:18+Math.round(R()*8), tec:18+Math.round(R()*8), iq:16+Math.round(R()*8), phy:16+Math.round(R()*8), men:18+Math.round(R()*8)};
   if (seed==="left") s.tec += 8; if (seed==="fast") s.spd += 8; if (seed==="brain") s.iq += 8; if (seed==="heart") s.men += 8;
   const month = pr.month || [4,5,6,7,8,9,10,11,12,1,2,3][Math.floor(R()*12)];
@@ -949,6 +952,7 @@ function aptitude(){
   return Object.entries(A).map(([k,v]) => [k, Math.round(40 + 56*(v-min)/Math.max(1,max-min))]).sort((a,b)=>b[1]-a[1]);
 }
 function finish(path, sc, PR){
+  window.lifeLog && lifeLog("end", {m:"ikusei", g:GIRL, r: PR ? "pro" : String(path||"")});
   const o = ovr(S.s), sk = S.skills.length;
   let end, tier = 0;
   if (PR){ S.flags.pro = 1; if (PR.clubs.some(c=>/のクラブ$/.test(c.n) && !/^(J1|J2|J3|WEリーグ|なでしこリーグ)・/.test(c.n))) S.flags.abroad = 1; }

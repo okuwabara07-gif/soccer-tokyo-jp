@@ -21,6 +21,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ja" className={geistSans.variable}>
       <head>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3460729726810386" crossOrigin="anonymous"></script>
+        {/* Vercel Web Analytics（管理画面で Web Analytics を有効にすると集計が始まる） */}
+        <script dangerouslySetInnerHTML={{ __html: "window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)}" }}/>
+        <script defer src="/_vercel/insights/script.js"></script>
         <link rel="apple-touch-icon" href="/icon-192.png"/>
         <meta name="apple-mobile-web-app-capable" content="yes"/>
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
