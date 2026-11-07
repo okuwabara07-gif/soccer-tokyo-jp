@@ -71,6 +71,8 @@ a{color:var(--sky)}
 a.lk{display:inline-block;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:12px 20px;font-weight:700;text-decoration:none}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};window.lifeLog=function(e,d){try{var u=(location.search.match(/utm_source=([^&]+)/)||[])[1]||"";var b=JSON.stringify(Object.assign({e:e,ref:document.referrer||"",utm:decodeURIComponent(u)},d||{}));if(navigator.sendBeacon)navigator.sendBeacon("/api/life/log",new Blob([b],{type:"application/json"}));else fetch("/api/life/log",{method:"POST",body:b,keepalive:true});}catch(_){}};</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -292,6 +294,7 @@ function career(){
   while(age<38){
     age++; S.age=age;
     P = clamp(P + (age<=peak? Math.floor(R()*3)+(S.lv>=4?1:0) : -(2+Math.floor(R()*4))),1,99);
+    S.peakP=Math.max(S.peakP||0,P);
     const next=S.lv+1;
     if(next<=5 && P>=NEED[next]){
       if(next<=domCap && S.cur===c.n){ if(chance(.5)){S.lv=next;L(`${lvName(next,c)}へステップアップ`);} }
@@ -349,6 +352,7 @@ function home(){
 function born(){
   const c = pick(GIRL);
   S = {c, age:0, P: 34+Math.floor(R()*20), log:[], caps:0, wc:0, pro:0, lv:0, best:0};
+  window.lifeLog && lifeLog("start", {m:"world", g:GIRL, c:c.n});
   stage.innerHTML = `<div class="card"><div class="eyebrow">生まれる国を決めています</div><div class="spin" id="sp">…</div></div>`;
   const sp=$("#sp"); let i=0;
   const names=[...C.map(x=>x[0]),...OTHERS.map(x=>x[0])];
@@ -403,7 +407,8 @@ function ending(){
   const title = !pro ? "サッカーと生きる人生" :
     S.wc ? "ワールドカップに立った選手" : S.caps ? `${c.n}${nt()}の選手` :
     S.best>=5 ? "欧州トップクラブの選手" : S.abroad ? "海を渡ったプロ選手" : "プロサッカー選手";
-  const rank=rankOf(S.P,pro).toLocaleString();
+  const rank=rankOf(Math.max(S.P,S.peakP||0),pro).toLocaleString();
+  window.lifeLog && lifeLog("end", {m:"world", g:GIRL, c:c.n, r:title});
   const ot=others();
   const share=`【1億3250万分の1】${c.n}に生まれた${kids()}の人生は「${title}」。世界の同い年で約${rank}番目。`;
   const tip = c.nt>=4&&pro&&!S.caps ? "強い国に生まれると、育つ環境は良いけれど代表に入る競争はとても厳しい。" :

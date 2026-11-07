@@ -224,6 +224,8 @@ button{cursor:pointer}
 @media (max-width:380px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.zukan{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style>
 
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};window.lifeLog=function(e,d){try{var u=(location.search.match(/utm_source=([^&]+)/)||[])[1]||"";var b=JSON.stringify(Object.assign({e:e,ref:document.referrer||"",utm:decodeURIComponent(u)},d||{}));if(navigator.sendBeacon)navigator.sendBeacon("/api/life/log",new Blob([b],{type:"application/json"}));else fetch("/api/life/log",{method:"POST",body:b,keepalive:true});}catch(_){}};</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -843,6 +845,7 @@ function setRates(r){ RATES = r; }
   // ── 進行 ──
   function start(s, o, f){
     seed = s ?? Math.floor(Math.random()*1e9); opt = o || {}; forced = f || []; picks = []; setSex(opt.girl);
+    window.lifeLog && lifeLog("start", {m:"play", g:!!opt.girl});
     $("legendDot").textContent = `点1つ＝約${Math.round(COH/900)}人`;
     try{ history.replaceState(null,"","#"+hashKey()); }catch(e){}
     $("start").hidden = true; $("game").hidden = false;
@@ -1065,6 +1068,7 @@ function setRates(r){ RATES = r; }
   }
   function finish(){
     const st = endSt || ref; updateHud(st.age);
+    window.lifeLog && lifeLog("end", {m:"play", g:!!st.girl, r: st.pro ? "pro" : "level"+st.level});
     const top = TOP[st.level]; const ppl = Math.max(1, Math.round(COH*top/100));
     const ZUKAN = st.girl ? ZUKAN_G : ZUKAN_B, zk = st.girl ? "ss-life-zukan-g" : "ss-life-zukan";
     const keys = zukanKeys(st); const got = new Set(store.get(zk) || []); const fresh = keys.filter(k=>!got.has(k)); keys.forEach(k=>got.add(k)); store.set(zk, [...got]);
