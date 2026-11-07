@@ -13,7 +13,7 @@ const outDir = process.argv[3] || "life-posts";
 fs.mkdirSync(outDir, { recursive: true });
 
 const html = fs.readFileSync(new URL("../../public/life/play.html", import.meta.url), "utf8");
-const engine = html.match(/<script>\s*([\s\S]*?)<\/script>/)[1];
+const engine = [...html.matchAll(/<script>\s*([\s\S]*?)<\/script>/g)].map(m => m[1]).find(s => /function autoPlay/.test(s));
 const ctx = {}; vm.createContext(ctx);
 vm.runInContext(engine + "\n;globalThis.__E = { autoPlay, PREFS };", ctx);
 // ゲーム画面と同じ「上位◯%」の表（男子・女子それぞれ16万回の自動プレイで測った値）
