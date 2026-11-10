@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
 import { isActiveSelection, isClubIndexable, todayJst } from "@/lib/club-quality";
+import ClubTracker, { TrackedLink } from "@/components/ClubTracker";
 
 export const revalidate = 3600;
 
@@ -59,14 +60,18 @@ async function getClub(slug: string): Promise<PageClub | null> {
   return (c as PageClub) ?? null;
 }
 
-type ClubExtra = { notes: string | null; updated_at: string | null; team_gender?: string | null };
+type ClubExtra = {
+  notes: string | null; updated_at: string | null; team_gender?: string | null;
+  intro?: string | null; line_url?: string | null; contact_url?: string | null; logo_url?: string | null;
+  photos?: { url: string; caption?: string | null }[] | null; partner_plan?: string | null;
+};
 
 // v_page_club に含まれない列（公式サイトで確認した費用・所属の補足など）を clubs から取る
 async function getClubExtra(clubId?: string): Promise<ClubExtra> {
   if (!clubId) return { notes: null, updated_at: null };
   const { data, error } = await supabase
     .from("clubs")
-    .select("notes,updated_at,team_gender")
+    .select("notes,updated_at,team_gender,intro,line_url,contact_url,logo_url,photos,partner_plan")
     .eq("id", clubId)
     .maybeSingle();
   if (error) console.error("[getClubExtra] error:", error);
@@ -181,6 +186,9 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
     .sort((a, b) => (a.event_date ?? "9999").localeCompare(b.event_date ?? "9999"));
   const past = selections.filter((s) => !isActiveSelection(s, today));
   const noteLines = (extra.notes ?? "").split("\n").map((l) => l.trim()).filter(Boolean);
+  const photoLimit = extra.partner_plan === "standard" || extra.partner_plan === "premium" ? 20 : 3;
+  const photos = (Array.isArray(extra.photos) ? extra.photos : []).filter((p) => p && typeof p.url === "string").slice(0, photoLimit);
+  const intro = extra.intro || club.description || "";
   const checkedLabel = extra.updated_at ? `${new Date(extra.updated_at).getFullYear()}年${new Date(extra.updated_at).getMonth() + 1}月` : "";
   const leagueLabel = [club.league, club.block].filter(Boolean).join(" ");
   const jsonLd = {
@@ -206,7 +214,12 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
       <main className="kf-container" style={{ padding: "24px 16px 56px", maxWidth: 820 }}>
         <Link href={girls ? "/clubs/girls" : "/clubs"} style={{ fontSize: 13, color: "var(--kf-primary)", textDecoration: "none" }}>{girls ? "← 女子チーム一覧" : "← クラブ一覧"}</Link>
 
+        {club.id && <ClubTracker clubId={club.id} />}
         <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "12px 0 4px", flexWrap: "wrap" }}>
+          {extra.logo_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={extra.logo_url} alt="" width={48} height={48} style={{ borderRadius: 999, objectFit: "contain", background: "#fff", border: "1px solid var(--kf-border)" }} />
+          )}
           <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>{club.name}</h1>
           {girls && <span style={{ fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 999, background: "var(--kf-primary)", color: "#fff" }}>女子チーム</span>}
         </div>
@@ -283,7 +296,7 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
                     {sel.notes && <div style={{ marginTop: 4, color: "var(--kf-muted)" }}>{sel.notes}</div>}
                     <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 8, fontSize: 13 }}>
                       {sel.apply_url && !isPast && (
-                        <a href={sel.apply_url} target="_blank" rel="noopener noreferrer" className="kf-btn kf-btn--primary" style={{ padding: "8px 14px", fontSize: 13 }}>申込ページ</a>
+                        <TrackedLink clubId={club.id} kind="apply_click" href={sel.apply_url} className="kf-btn kf-btn--primary" style={{ padding: "8px 14px", fontSize: 13 }}>申込ページ</TrackedLink>
                       )}
                       {sel.source_url && (
                         <a href={sel.source_url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--kf-primary)" }}>情報元を確認 →</a>
@@ -315,10 +328,22 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
           </section>
         )}
 
-        {club.description && (
+        {(intro || photos.length > 0) && (
           <section style={{ marginTop: 24, borderTop: "1px solid var(--kf-border)", paddingTop: 20 }}>
             <h2 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 12px", color: "var(--kf-primary)" }}>クラブ紹介</h2>
-            <p style={{ fontSize: 14, lineHeight: 1.8 }}>{club.description}</p>
+            {intro && <p style={{ fontSize: 14, lineHeight: 1.8, whiteSpace: "pre-line" }}>{intro}</p>}
+            {photos.length > 0 && (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 10, marginTop: 10 }}>
+                {photos.map((p, i) => (
+                  <figure key={i} style={{ margin: 0 }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={p.url} alt={p.caption || `${club.name}の写真`} loading="lazy" style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", borderRadius: 10 }} />
+                    {p.caption && <figcaption style={{ fontSize: 12, color: "var(--kf-muted)", marginTop: 4 }}>{p.caption}</figcaption>}
+                  </figure>
+                ))}
+              </div>
+            )}
+            {extra.intro && <p style={{ fontSize: 12, color: "var(--kf-muted)", marginTop: 8 }}>※紹介文・写真はクラブから提供いただいたものです。</p>}
           </section>
         )}
 
@@ -326,16 +351,31 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
           <h2 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 12px", color: "var(--kf-primary)" }}>公式情報</h2>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
             {club.official_url && (
-              <a href={club.official_url} target="_blank" rel="noopener noreferrer" className="kf-btn kf-btn--primary" style={{ padding: "10px 16px", fontSize: 13 }}>
+              <TrackedLink clubId={club.id} kind="official_click" href={club.official_url} className="kf-btn kf-btn--primary" style={{ padding: "10px 16px", fontSize: 13 }}>
                 公式サイト
-              </a>
+              </TrackedLink>
             )}
             {club.instagram && (
-              <a href={club.instagram} target="_blank" rel="noopener noreferrer" className="kf-btn kf-btn--ghost" style={{ padding: "10px 16px", fontSize: 13 }}>
+              <TrackedLink clubId={club.id} kind="instagram_click" href={club.instagram} className="kf-btn kf-btn--ghost" style={{ padding: "10px 16px", fontSize: 13 }}>
                 Instagram
-              </a>
+              </TrackedLink>
+            )}
+            {extra.line_url && (
+              <TrackedLink clubId={club.id} kind="line_click" href={extra.line_url} className="kf-btn kf-btn--ghost" style={{ padding: "10px 16px", fontSize: 13 }}>
+                LINEで問い合わせる
+              </TrackedLink>
+            )}
+            {extra.contact_url && (
+              <TrackedLink clubId={club.id} kind="contact_click" href={extra.contact_url} className="kf-btn kf-btn--ghost" style={{ padding: "10px 16px", fontSize: 13 }}>
+                問い合わせフォーム
+              </TrackedLink>
             )}
           </div>
+          {(!extra.partner_plan || extra.partner_plan === "none") && (
+            <p style={{ fontSize: 12, color: "var(--kf-muted)", marginTop: 12 }}>
+              このクラブの関係者の方へ：<Link href="/partner" style={{ color: "var(--kf-primary)" }}>チーム紹介や写真、募集情報を無料で登録できます</Link>
+            </p>
+          )}
         </section>
 
         {club.opponents && club.opponents.length > 0 && (
