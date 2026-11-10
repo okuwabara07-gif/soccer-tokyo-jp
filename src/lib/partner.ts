@@ -3,7 +3,8 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { SignJWT, jwtVerify } from "jose";
 import { randomBytes } from "crypto";
 
-export const SITE = (process.env.NEXT_PUBLIC_BASE_URL || "https://soccer-selection.jp").replace(/\/$/, "");
+// 公開URL。NEXT_PUBLIC_BASE_URL は旧ドメイン（soccer-tokyo-jp.vercel.app）を指しているため使わない。
+export const SITE = "https://soccer-selection.jp";
 
 export type Plan = "free" | "standard" | "premium";
 
