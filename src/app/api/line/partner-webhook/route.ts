@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
 import { admin, lineReply, manageUrl, signLineUser, SITE } from "@/lib/partner";
 
-// 運営のパートナー向け LINE公式アカウントの Webhook。
-// ・友だち追加 → 登録フォームのリンクを返す（LINEのユーザーIDを署名付きでフォームに渡し、登録後の通知をLINEで送れるようにする）
-// ・「登録」「掲載」→ 同上 / 「募集」「管理」→ 登録済みなら管理ページのリンク
+// サッカーセレクションのLINE公式アカウント（保護者・チーム共用）の Webhook。
+// ・友だち追加 → 保護者向けの案内＋「クラブ・チームの方」ボタン
+// ・「チーム」「掲載」→ 登録フォームのリンク（LINEのユーザーIDを署名付きで渡し、登録後の通知をLINEで送れるようにする）
+// ・登録済みのチームが「募集」「管理」など → 管理ページのリンク
 // ・それ以外の文面には自動では返さない（運営が手で返す）
 export const dynamic = "force-dynamic";
 
@@ -30,20 +31,23 @@ export async function POST(req: NextRequest) {
     const { data: acc } = await sb.from("club_accounts").select("manage_token,status").eq("line_user_id", uid).maybeSingle();
     const registerUrl = `${SITE}/partner/register?lu=${encodeURIComponent(await signLineUser(uid))}`;
 
+    // 保護者とチームが同じアカウントを使うので、友だち追加では両方向けに案内し、チームの方はボタンで登録へ進む
+    const teamButton = { type: "action", action: { type: "message", label: "クラブ・チームの方", text: "チーム掲載の登録" } };
     if (ev.type === "follow") {
       const text = acc?.manage_token
         ? `友だち追加ありがとうございます。チームの管理ページはこちらです。\n${manageUrl(acc.manage_token)}`
-        : `友だち追加ありがとうございます。soccer-selection.jp への掲載は無料です。\n\n下のリンクから、チーム責任者の方が登録してください（3分ほど）。内容を確認して掲載します。\n${registerUrl}`;
-      await lineReply(ev.replyToken, [{ type: "text", text }]);
+        : `友だち追加ありがとうございます。関東・関西のセレクション・練習会は ${SITE}/selection で探せます。\n\nクラブ・チームの方は、下のボタンから無料で掲載の登録ができます。`;
+      await lineReply(ev.replyToken, [{ type: "text", text, ...(acc ? {} : { quickReply: { items: [teamButton] } }) }]);
       continue;
     }
     if (ev.type === "message" && ev.message?.type === "text") {
       const t = ev.message.text ?? "";
-      if (/登録|掲載/.test(t) && !acc) {
-        await lineReply(ev.replyToken, [{ type: "text", text: `登録フォームはこちらです。\n${registerUrl}` }]);
-      } else if (/募集|管理|更新|登録|掲載/.test(t) && acc?.manage_token) {
+      if (acc?.manage_token && /募集|管理|更新|掲載|チーム/.test(t)) {
         await lineReply(ev.replyToken, [{ type: "text", text: `管理ページから、チーム情報の更新とセレクション・練習会の登録ができます。\n${manageUrl(acc.manage_token)}` }]);
+      } else if (!acc && /チーム|掲載/.test(t)) {
+        await lineReply(ev.replyToken, [{ type: "text", text: `チーム責任者の方は、こちらから登録してください（3分ほど）。運営が確認してから掲載します。掲載は無料です。\n${registerUrl}` }]);
       }
+      // それ以外（保護者からの質問など）には自動で返さない。運営がチャットで返信する。
     }
   }
   return NextResponse.json({ ok: true });
