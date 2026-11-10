@@ -83,7 +83,7 @@ export async function verifyLineUser(token: string | null | undefined): Promise<
 
 // ---- 通知（LINE があれば LINE、無ければメール。どちらも無ければ送らない） ----
 // @641jwqts（サッカーセレクション）の Messaging API チャネルID。公開しても問題のない識別子。
-const LINE_PARTNER_CHANNEL_ID = process.env.LINE_PARTNER_CHANNEL_ID || "";
+const LINE_PARTNER_CHANNEL_ID = process.env.LINE_PARTNER_CHANNEL_ID || "2012520950";
 let statelessToken: { value: string; exp: number } | null = null;
 
 // アクセストークン。チャネルID＋チャネルシークレットから15分有効のトークンをその都度発行する（手で貼るトークンの入れ間違いを避ける）。
