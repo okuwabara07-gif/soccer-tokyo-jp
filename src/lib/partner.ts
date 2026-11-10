@@ -82,20 +82,46 @@ export async function verifyLineUser(token: string | null | undefined): Promise<
 }
 
 // ---- 通知（LINE があれば LINE、無ければメール。どちらも無ければ送らない） ----
+// @641jwqts（サッカーセレクション）の Messaging API チャネルID。公開しても問題のない識別子。
+const LINE_PARTNER_CHANNEL_ID = process.env.LINE_PARTNER_CHANNEL_ID || "";
+let statelessToken: { value: string; exp: number } | null = null;
+
+// アクセストークン。チャネルID＋チャネルシークレットから15分有効のトークンをその都度発行する（手で貼るトークンの入れ間違いを避ける）。
+// 発行できないときだけ、環境変数の長期トークンを使う。
+async function lineToken(): Promise<string | null> {
+  const secret = process.env.LINE_PARTNER_CHANNEL_SECRET;
+  if (LINE_PARTNER_CHANNEL_ID && secret) {
+    if (statelessToken && statelessToken.exp > Date.now() + 60_000) return statelessToken.value;
+    const r = await fetch("https://api.line.me/oauth2/v3/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ grant_type: "client_credentials", client_id: LINE_PARTNER_CHANNEL_ID, client_secret: secret }),
+    });
+    if (r.ok) {
+      const j = (await r.json()) as { access_token: string; expires_in: number };
+      statelessToken = { value: j.access_token, exp: Date.now() + j.expires_in * 1000 };
+      return j.access_token;
+    }
+    console.warn("[line token] stateless token failed", r.status, (await r.text()).slice(0, 200));
+  }
+  return process.env.LINE_PARTNER_CHANNEL_ACCESS_TOKEN || null;
+}
+
 export async function linePush(to: string, messages: unknown[]) {
-  const token = process.env.LINE_PARTNER_CHANNEL_ACCESS_TOKEN;
+  const token = await lineToken();
   if (!token) return { ok: false, reason: "line_not_configured" };
   const r = await fetch("https://api.line.me/v2/bot/message/push", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     body: JSON.stringify({ to, messages }),
   });
+  if (!r.ok) console.warn("[line push] failed", r.status, (await r.text()).slice(0, 300));
   return { ok: r.ok, reason: r.ok ? "" : `line_${r.status}` };
 }
 
 export async function lineReply(replyToken: string, messages: unknown[]) {
-  const token = process.env.LINE_PARTNER_CHANNEL_ACCESS_TOKEN;
-  if (!token) { console.warn("[line reply] LINE_PARTNER_CHANNEL_ACCESS_TOKEN is not set"); return { ok: false }; }
+  const token = await lineToken();
+  if (!token) { console.warn("[line reply] no access token"); return { ok: false }; }
   const r = await fetch("https://api.line.me/v2/bot/message/reply", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
