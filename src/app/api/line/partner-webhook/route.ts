@@ -40,8 +40,9 @@ export async function POST(req: NextRequest) {
     if (ev.type === "follow") {
       const text = acc?.manage_token
         ? `友だち追加ありがとうございます。チームの管理ページはこちらです。\n${manageUrl(acc.manage_token)}`
-        : `友だち追加ありがとうございます。関東・関西のセレクション・練習会は ${SITE}/selection で探せます。\n\nクラブ・チームの方は、下のボタンから無料で掲載の登録ができます。`;
-      await lineReply(ev.replyToken, [{ type: "text", text, ...(acc ? {} : { quickReply: { items: [teamButton] } }) }]);
+        : `友だち追加ありがとうございます。関東・関西のセレクション・練習会は ${SITE}/selection で探せます。\n\n⚽ サッカー人生シミュレーター「4.5万分の1」\n小学生の登録選手は1学年約4.5万人。その中の1人として、年長から70歳までのサッカー人生を5分で体験できます（無料）。\n${SITE}/life\n\nクラブ・チームの方は、下のボタンから無料で掲載の登録ができます。`;
+      const lifeButton = { type: "action", action: { type: "uri", label: "4.5万分の1をあそぶ", uri: `${SITE}/life` } };
+      await lineReply(ev.replyToken, [{ type: "text", text, ...(acc ? {} : { quickReply: { items: [lifeButton, teamButton] } }) }]);
       continue;
     }
     if (ev.type === "message" && ev.message?.type === "text") {
