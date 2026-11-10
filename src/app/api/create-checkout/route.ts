@@ -35,8 +35,8 @@ export async function POST(req: NextRequest) {
       mode: isSub ? 'subscription' : 'payment',
       metadata: { line_user_id: lineUserId, plan },
       ...(isSub && { subscription_data: { metadata: { line_user_id: lineUserId, plan } } }),
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/member/success?plan=${plan}&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/member`,
+      success_url: `${req.nextUrl.origin}/member/success?plan=${plan}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.nextUrl.origin}/member`,
     })
 
     return NextResponse.json({ url: session.url })
