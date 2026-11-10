@@ -102,7 +102,9 @@ async function handleClubEvent(supabase: SB, event: Stripe.Event): Promise<boole
     const id = (a as { id: string } | null)?.id ?? sub.metadata.account_id
     if (!id) return true
     const ended = event.type === 'customer.subscription.deleted' || ['canceled', 'unpaid', 'incomplete_expired'].includes(sub.status)
-    const periodEnd = (sub as unknown as { current_period_end?: number }).current_period_end
+    // 新しいAPIバージョンでは期間の終わりが items 側にある
+    const raw = sub as unknown as { current_period_end?: number; items?: { data?: { current_period_end?: number }[] } }
+    const periodEnd = raw.current_period_end ?? raw.items?.data?.[0]?.current_period_end
     await supabase.from('club_accounts').update({
       plan: ended ? 'free' : (sub.metadata.plan === 'premium' ? 'premium' : 'standard'),
       plan_status: ended ? 'canceled' : sub.status === 'past_due' ? 'past_due' : sub.status === 'trialing' ? 'trialing' : 'active',
