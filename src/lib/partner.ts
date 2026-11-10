@@ -95,12 +95,13 @@ export async function linePush(to: string, messages: unknown[]) {
 
 export async function lineReply(replyToken: string, messages: unknown[]) {
   const token = process.env.LINE_PARTNER_CHANNEL_ACCESS_TOKEN;
-  if (!token) return { ok: false };
+  if (!token) { console.warn("[line reply] LINE_PARTNER_CHANNEL_ACCESS_TOKEN is not set"); return { ok: false }; }
   const r = await fetch("https://api.line.me/v2/bot/message/reply", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     body: JSON.stringify({ replyToken, messages }),
   });
+  if (!r.ok) console.warn("[line reply] failed", r.status, (await r.text()).slice(0, 300));
   return { ok: r.ok };
 }
 

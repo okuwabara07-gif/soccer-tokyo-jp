@@ -21,8 +21,12 @@ type LineEvent = { type: string; replyToken?: string; source?: { userId?: string
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
-  if (!verify(body, req.headers.get("x-line-signature"))) return NextResponse.json({ error: "signature" }, { status: 401 });
+  if (!verify(body, req.headers.get("x-line-signature"))) {
+    console.warn("[partner-webhook] signature mismatch", { hasSecret: !!process.env.LINE_PARTNER_CHANNEL_SECRET });
+    return NextResponse.json({ error: "signature" }, { status: 401 });
+  }
   const events: LineEvent[] = JSON.parse(body).events ?? [];
+  console.log("[partner-webhook] events", events.map((e) => `${e.type}:${e.message?.type ?? ""}`).join(","), { hasToken: !!process.env.LINE_PARTNER_CHANNEL_ACCESS_TOKEN });
   const sb = admin();
 
   for (const ev of events) {
