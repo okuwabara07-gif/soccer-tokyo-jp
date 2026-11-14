@@ -210,7 +210,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
-<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};window.lifeLog=function(e,d){try{var u=(location.search.match(/utm_source=([^&]+)/)||[])[1]||"";var b=JSON.stringify(Object.assign({e:e,ref:document.referrer||"",utm:decodeURIComponent(u)},d||{}));if(navigator.sendBeacon)navigator.sendBeacon("/api/life/log",new Blob([b],{type:"application/json"}));else fetch("/api/life/log",{method:"POST",body:b,keepalive:true});}catch(_){}};</script>
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};window.lifeLog=function(e,d){try{var u=(location.search.match(/utm_source=([^&]+)/)||[])[1]||"";var b=JSON.stringify(Object.assign({e:e,ref:document.referrer||"",utm:decodeURIComponent(u)},d||{}));var ok=false;try{ok=!!(navigator.sendBeacon&&navigator.sendBeacon("/api/life/log",new Blob([b],{type:"application/json"})))}catch(_){}if(!ok)fetch("/api/life/log",{method:"POST",headers:{"Content-Type":"application/json"},body:b,keepalive:true}).catch(function(){});}catch(_){}};lifeLog("view",{m:"ikusei"});</script>
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>

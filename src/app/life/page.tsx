@@ -14,6 +14,14 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", images: ["/life/og.png"] },
 };
 
+const LP_LOG = `(function(){try{var u=(location.search.match(/utm_source=([^&]+)/)||[])[1]||"";var b=JSON.stringify({e:"view",m:"lp",ref:document.referrer||"",utm:decodeURIComponent(u)});var ok=false;try{ok=!!(navigator.sendBeacon&&navigator.sendBeacon("/api/life/log",new Blob([b],{type:"application/json"})))}catch(_){}if(!ok)fetch("/api/life/log",{method:"POST",headers:{"Content-Type":"application/json"},body:b,keepalive:true}).catch(function(){});}catch(_){}})();`;
+
 export default function LifePage() {
-  return <div dangerouslySetInnerHTML={{ __html: LP_HTML }} />;
+  return (
+    <>
+      <div dangerouslySetInnerHTML={{ __html: LP_HTML }} />
+      {/* 紹介ページを開いた回数を life_plays に記録する（/api/life/log） */}
+      <script dangerouslySetInnerHTML={{ __html: LP_LOG }} />
+    </>
+  );
 }
