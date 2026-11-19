@@ -7,6 +7,7 @@ import SelectionClient from "@/components/SelectionClient";
 import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { isActiveSelection, todayJst } from "@/lib/club-quality";
+import { formatPeriod, safeSourceUrl } from "@/lib/selection-period";
 
 export const metadata = pageMeta(
   "/selection",
@@ -19,7 +20,7 @@ export const revalidate = 3600;
 type Selection = {
   id: string; slug: string; club_name: string; prefecture: string; city: string;
   selection_type: string; event_date: string; event_date_end: string; apply_deadline: string; venue: string;
-  apply_url: string | null; title: string; is_jleague: boolean;
+  apply_url: string | null; source_url: string | null; title: string; is_jleague: boolean;
 };
 
 const supabase = createClient(
@@ -30,8 +31,10 @@ const supabase = createClient(
 export default async function SelectionPage() {
   const { data: allSelections, error } = await supabase
     .from("selections")
-    .select("id,club_id,selection_type,title,event_date,event_date_end,apply_deadline,venue,apply_url,clubs(slug,name,prefecture,city,club_type)")
+    // 公開中のクラブにひもづく募集だけを出す（非公開クラブの募集は名前なしの空行になるため）
+    .select("id,club_id,selection_type,title,event_date,event_date_end,apply_deadline,venue,apply_url,source_url,clubs!inner(slug,name,prefecture,city,club_type,is_published)")
     .eq("status", "published")
+    .eq("clubs.is_published", true)
     .order("event_date", { ascending: false });
 
   if (error) {
@@ -39,6 +42,7 @@ export default async function SelectionPage() {
   }
 
   const selections: Selection[] = (allSelections || [])
+    .filter((row: any) => row.clubs?.name && row.clubs?.slug)
     .map((row: any) => ({
       id: row.id,
       slug: row.clubs?.slug || "",
@@ -52,7 +56,8 @@ export default async function SelectionPage() {
       is_jleague: row.clubs?.club_type === "j_academy",
       apply_deadline: row.apply_deadline || "",
       venue: row.venue || "",
-      apply_url: row.apply_url || null,
+      apply_url: safeSourceUrl(row.apply_url),
+      source_url: safeSourceUrl(row.source_url),
     }));
 
   const today = todayJst();
@@ -81,14 +86,20 @@ export default async function SelectionPage() {
           <section style={{ marginTop: 32 }}>
             <h2 style={{ fontSize: 17, fontWeight: 800, margin: "0 0 6px" }}>過去の実施例（受付終了）</h2>
             <p style={{ fontSize: 12, color: "var(--kf-muted)", margin: "0 0 12px", lineHeight: 1.7 }}>
-              今年度に実施されたセレクション・練習会です（{past.length}件）。翌年度の募集時期の目安としてご覧ください。
+              受付が終わったセレクション・練習会です（{past.length}件）。翌年度の募集時期の目安としてご覧ください。時期が月単位のものは、情報元が月までしか示していない募集です。「情報元」は各クラブの公式発表です。
             </p>
             <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, lineHeight: 1.9 }}>
               {past.map((x) => (
                 <li key={x.id}>
-                  {x.event_date ? x.event_date.slice(5).replace("-", "/") : ""}{"　"}
-                  {x.slug ? <Link href={`/clubs/${x.slug}`} style={{ color: "var(--kf-primary)" }}>{x.club_name}</Link> : x.club_name}
-                  {"　"}{x.selection_type}（{x.prefecture}{x.city}）
+                  {formatPeriod(x.event_date, x.event_date_end, true)}{"　"}
+                  <Link href={`/clubs/${x.slug}`} style={{ color: "var(--kf-primary)" }}>{x.club_name}</Link>
+                  {"　"}{x.selection_type}{x.title ? `「${x.title}」` : ""}（{x.prefecture}{x.city}）
+                  {x.source_url && (
+                    <>
+                      {"　"}
+                      <a href={x.source_url} target="_blank" rel="noopener noreferrer nofollow" style={{ color: "var(--kf-muted)", textDecoration: "underline" }}>情報元</a>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>

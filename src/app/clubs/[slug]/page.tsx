@@ -1,3 +1,4 @@
+import { formatPeriod } from "@/lib/selection-period";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -279,7 +280,7 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
                 const end = sel.event_date_end || sel.event_date;
                 const isPast = !!end && end < today;
                 const dateLabel = sel.event_date
-                  ? fmtDate(sel.event_date) + (sel.event_date_end && sel.event_date_end !== sel.event_date ? `〜${fmtDate(sel.event_date_end)}` : "")
+                  ? formatPeriod(sel.event_date, sel.event_date_end || "", true)
                   : "随時受付";
                 return (
                   <div key={sel.id} className="kf-card" style={{ padding: 16, fontSize: 14, lineHeight: 1.8 }}>
@@ -319,7 +320,7 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ slu
             <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, lineHeight: 1.9 }}>
               {past.map((sel) => (
                 <li key={sel.id}>
-                  {sel.event_date ? fmtDate(sel.event_date) : ""}{sel.event_date_end && sel.event_date_end !== sel.event_date ? `〜${fmtDate(sel.event_date_end)}` : ""}
+                  {sel.event_date ? formatPeriod(sel.event_date, sel.event_date_end || "", true) : ""}
                   {"　"}{sel.title || [sel.intake_year ? `${sel.intake_year}年度入団` : "", sel.selection_type].filter(Boolean).join(" ")}
                   {sel.source_url && <>{"　"}<a href={sel.source_url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--kf-primary)" }}>情報元</a></>}
                 </li>

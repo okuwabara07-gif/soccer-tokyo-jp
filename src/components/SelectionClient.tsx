@@ -1,11 +1,12 @@
 "use client";
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { formatPeriod } from "@/lib/selection-period";
 
 type Selection = {
   id: string; slug: string; club_name: string; prefecture: string; city: string;
   selection_type: string; event_date: string; event_date_end: string; apply_deadline: string; venue: string;
-  apply_url: string | null; title: string; is_jleague: boolean;
+  apply_url: string | null; source_url?: string | null; title: string; is_jleague: boolean;
 };
 
 const PREFS = ["すべて", "東京都", "神奈川県", "埼玉県", "千葉県",
@@ -70,12 +71,17 @@ export default function SelectionClient({ selections }: { selections: Selection[
               </div>
               <div style={{ fontSize: 13, color: "var(--kf-muted)", marginTop: 8, lineHeight: 1.8 }}>
                 {s.title && <div style={{ color: "var(--kf-text)", fontWeight: 600 }}>{s.title}</div>}
-                開催: {s.event_date ? fmt(s.event_date) + (s.event_date_end && s.event_date_end !== s.event_date ? `〜${fmt(s.event_date_end)}` : "") : "随時"}／種別: {s.selection_type}／{s.prefecture} {s.city}
+                開催: {formatPeriod(s.event_date, s.event_date_end)}／種別: {s.selection_type}／{s.prefecture} {s.city}
               </div>
               <div style={{ marginTop: 10 }}>
                 {s.apply_url
                   ? <a href={s.apply_url} target="_blank" rel="noopener noreferrer" className="kf-btn kf-btn--primary" style={{ padding: "8px 16px", fontSize: 13 }}>公式サイトで確認</a>
-                  : <Link href={`/clubs/${s.slug}`} className="kf-btn kf-btn--ghost" style={{ padding: "8px 16px", fontSize: 13 }}>チーム詳細を見る</Link>}
+                  : s.source_url
+                    ? <a href={s.source_url} target="_blank" rel="noopener noreferrer" className="kf-btn kf-btn--primary" style={{ padding: "8px 16px", fontSize: 13 }}>公式の告知を確認</a>
+                    : <Link href={`/clubs/${s.slug}`} className="kf-btn kf-btn--ghost" style={{ padding: "8px 16px", fontSize: 13 }}>チーム詳細を見る</Link>}
+                {(s.apply_url || s.source_url) && (
+                  <Link href={`/clubs/${s.slug}`} style={{ marginLeft: 12, fontSize: 13, color: "var(--kf-primary)" }}>チーム詳細</Link>
+                )}
               </div>
             </div>
           ))}
