@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import PageViewTracker from "@/components/PageViewTracker";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 
@@ -28,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-capable" content="yes"/>
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
       </head>
-      <body style={{margin:0,padding:0}}>{children}</body>
+      <body style={{margin:0,padding:0}}>{children}<PageViewTracker /></body>
     </html>
   );
 }
