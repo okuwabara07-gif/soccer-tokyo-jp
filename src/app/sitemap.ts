@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { isClubIndexable } from "@/lib/club-quality";
+import { POSITION_VIDEOS } from "@/lib/positionVideos";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -100,6 +101,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/shoes`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE}/nutrition`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE}/position`, changeFrequency: "monthly", priority: 0.5 },
+    ...POSITION_VIDEOS.map((v) => ({ url: `${BASE}/position/${v.pos}/${v.slug}`, changeFrequency: "monthly" as const, priority: 0.6 })),
     { url: `${BASE}/rules`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE}/manga`, changeFrequency: "monthly", priority: 0.4 },
     { url: `${BASE}/company`, changeFrequency: "yearly", priority: 0.2 },

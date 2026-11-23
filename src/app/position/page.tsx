@@ -6,6 +6,7 @@ import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
 import RakutenItems from "@/components/RakutenItems";
 import MangaCover from "@/components/MangaCover";
+import { POSITION_VIDEOS, POSITION_LABEL, videoPath, type PositionId } from "@/lib/positionVideos";
 
 const POS_TABS = [
   { id: "gk", label: "GK", color: "#2b9348" },
@@ -67,6 +68,30 @@ function Pitch({ fmt }: { fmt: "8" | "11" }) {
   );
 }
 
+function VideoCards({ pos }: { pos: string }) {
+  const mine = POSITION_VIDEOS.filter((v) => v.pos === pos);
+  const list = mine.length ? mine : POSITION_VIDEOS;
+  return (
+    <div className="kf-card" style={{ margin: "0 16px 12px", padding: 14 }}>
+      <p style={{ fontSize: 15, fontWeight: 800, margin: "0 0 10px" }}>
+        {mine.length ? `動画で学ぶ ${POSITION_LABEL[pos as PositionId]}` : "動画で学ぶ（ほかのポジション）"}
+      </p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(130px,1fr))", gap: 10 }}>
+        {list.map((v) => (
+          <Link key={v.slug} href={videoPath(v)} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
+            <div style={{ position: "relative" }}>
+              <img src={v.poster} alt={v.title} style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", objectPosition: "center 35%", borderRadius: 10, display: "block" }} />
+              <span style={{ position: "absolute", left: 6, bottom: 6, fontSize: 11, fontWeight: 800, color: "#fff", background: "rgba(0,0,0,.6)", borderRadius: 6, padding: "2px 6px" }}>▶ {v.durationSec}秒</span>
+            </div>
+            <p style={{ fontSize: 11, fontWeight: 800, color: "#888", margin: "6px 0 0" }}>{POSITION_LABEL[v.pos]}</p>
+            <p style={{ fontSize: 13, fontWeight: 800, margin: "2px 0 0", lineHeight: 1.4 }}>{v.short}</p>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function PositionPage() {
   const [tab, setTab] = useState("gk");
   const [fmt, setFmt] = useState<"8"|"11">("8");
@@ -97,9 +122,11 @@ export default function PositionPage() {
           ))}
         </div>
 
+        <VideoCards pos={tab} />
+
         {tab !== "gk" && (
           <div className="kf-card" style={{ margin: "8px 16px", padding: 32, textAlign: "center", color: "#888" }}>
-            <p style={{ fontWeight: 700, marginBottom: 6 }}>{tab.toUpperCase()} ガイドは準備中です</p>
+            <p style={{ fontWeight: 700, marginBottom: 6 }}>{tab.toUpperCase()} の詳しいガイドは準備中です</p>
             <button onClick={() => setTab("gk")} style={{ marginTop: 12, padding: "8px 20px", borderRadius: 999, border: "none", background: C, color: "#fff", fontWeight: 700, cursor: "pointer" }}>GKを見る</button>
           </div>
         )}

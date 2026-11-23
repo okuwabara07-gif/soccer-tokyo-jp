@@ -1,0 +1,6 @@
+{
+  "name": "position-videos",
+  "private": true,
+  "description": "ポジション別解説動画（3D）の書き出し用。サイト本体のビルドには含まれない。",
+  "dependencies": { "three": "0.160.0" }
+}

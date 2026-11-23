@@ -46,3 +46,8 @@ page.tsx.oldbak*
 
 # サッカー人生シミュレーターの投稿素材（scripts/life-post の出力）
 /life-posts/
+
+# 解説動画の書き出し用（scripts/position-videos）
+scripts/position-videos/node_modules/
+scripts/position-videos/*.mp4
+scripts/position-videos/*.jpg

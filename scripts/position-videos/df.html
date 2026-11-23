@@ -1,0 +1,127 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="lib.css"></head>
+<body>
+<canvas id="c"></canvas>
+<div id="labs"></div>
+<div id="top" class="ov">
+  <div id="series"><span class="tag">DF</span>1対1の守り方</div>
+  <div id="bar"><div><i></i></div><div><i></i></div><div><i></i></div></div>
+  <div id="step"></div>
+</div>
+<div id="badge" class="ov"></div>
+<div id="cap" class="ov"><div class="box"></div></div>
+<div id="card" class="ov"><div></div></div>
+<div id="brand" class="ov">soccer-selection.jp</div>
+<div id="title" class="ov"><div class="k">ジュニアユースを目指す君へ</div><div class="t">DFの1対1<br><span>抜かれない</span><br>3つのコツ</div></div>
+<div id="end" class="ov">
+  <h2>まとめ</h2>
+  <div class="row"><div class="n">1</div><span>飛び込まず<em>1〜2m</em>をキープ</span></div>
+  <div class="row"><div class="n">2</div><span><em>半身</em>で外へ追い込む</span></div>
+  <div class="row"><div class="n">3</div><span><em>離れた瞬間</em>に寄せる</span></div>
+  <div class="foot">保存して次の練習で試そう</div>
+  <div class="site">soccer-selection.jp</div>
+</div>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js"}}</script>
+<script type="module">
+import {THREE,scene,cam,renderer,line,stand,goal,player,pose,face,makeBall,placeBall,decal,setOp,arrowGeo,aimArrow,crossGeo,cl,ss,lerp,fade,V,camKeys,ovOp,label,chapters,timed} from './lib.js';
+
+// field: DF defends goal at +z, touchline on the right (x=7.5)
+line(7.5,-40,7.5,40);line(-14,9,3.5,9);line(3.5,9,3.5,30);line(-14,-40,-14,40);
+stand(0,-36,0);stand(15,0,Math.PI/2);goal(22);
+const df=player(0x1f5fbf,0x0d2a4a,0x1f5fbf);
+const of=player(0xf2f2f2,0xd33b3b,0xf2f2f2);
+const ball=makeBall();
+const gap=decal(new THREE.PlaneGeometry(0.55,1),0xffd34d);
+const ring=decal(new THREE.RingGeometry(0.6,0.82,48),0x2ec4e6);
+const arL=decal(arrowGeo(2.6),0xe23b3b), arR=decal(arrowGeo(2.6),0xe23b3b), arOut=decal(arrowGeo(2.0,0.3,0.7),0x2ec4e6);
+const xIn=crossGeo(0.9);
+const flash=decal(new THREE.RingGeometry(0.25,0.5,48),0xffd34d);
+const lunge=decal(arrowGeo(1.6,0.25,0.55),0xe23b3b);
+
+const camAt=camKeys([
+ [0,V(9,9.5,13),V(0,0.5,-2)],[2.6,V(4,5.5,9.5),V(0,0.8,-3)],
+ [3.2,V(1.6,3.9,7.0),V(0,0.8,-3.5)],[8.6,V(1.4,3.6,6.4),V(0,0.8,-3)],[8.9,V(1.6,3.9,7.0),V(0,0.8,-3.5)],[15.2,V(1.4,3.6,6.2),V(0,0.8,-2.8)],
+ [16.0,V(1.6,13.5,6.0),V(1.6,0,0.0)],[25.4,V(2.3,13.0,6.0),V(2.3,0,0.2)],
+ [26.2,V(9.6,3.2,4.6),V(2.9,0.6,0.1)],[36,V(9.0,3.0,4.0),V(3.0,0.6,0.2)],[40,V(9.0,3.0,4.0),V(3.0,0.6,0.2)]]);
+
+window.render=function(t){
+ let ox=0.3,oz=-12,oRot=0,oRun=0,dx=0,dz=0.6,dRot=Math.PI,dRun=0,dCr=1,dLean=0,dStride=0,dKick=0;
+ let bx,bz,ballFree=false;
+ // ---------- ① NG ----------
+ if(t<8.75){
+  oz=lerp(-12,-3.2,ss(3.4,6.0,t));oRun=t>3.4&&t<6.0?0.7:0.1;
+  const lg=ss(6.0,6.45,t);dz=lerp(0.6,-2.0,lg);dLean=0.5*lg;dStride=-0.7*lg;dRun=t>6&&t<6.45?0.5:0;
+  ox=lerp(0.3,1.9,ss(6.05,6.55,t));
+  if(t>6.55){oz=lerp(-3.2,4.5,ss(6.55,8.6,t));ox=lerp(1.9,1.3,ss(6.55,8.6,t));oRun=0.75;}
+  dRot=Math.PI-1.6*ss(6.6,8.0,t);
+ }
+ // ---------- ① OK ----------
+ else if(t<15.4){
+  const k=ss(9.3,12.4,t);oz=lerp(-12,-2.6,k);oRun=t<12.4?0.7*(1-ss(11.9,12.4,t))+0.1:0.1;
+  dz=lerp(0.8,0.2,ss(10.6,12.6,t));dRun=t>10.6&&t<12.6?0.25:0;
+ }
+ // ---------- ② ----------
+ else if(t<25.8){
+  oz=-2.4;dz=0.2;
+  const turn=ss(19.0,19.9,t);dRot=Math.PI-0.75*turn;dx=lerp(0,-0.45,turn);
+  const k=ss(20.4,24.6,t);ox=lerp(0.3,3.0,k);oz=lerp(-2.4,-1.0,k);oRot=0.45*ss(20.4,21.4,t);oRun=t>20.4&&t<24.6?0.45:0.1;
+  dx=lerp(dx,2.2,ss(20.6,24.8,t));dz=lerp(0.2,1.1,ss(20.6,24.8,t));dRun=t>20.6&&t<24.8?0.3:0;
+ }
+ // ---------- ③ ----------
+ else{
+  ox=3.0;oz=lerp(-1.2,-0.4,ss(26.4,29.6,t));oRun=t>26.4&&t<29.6?0.35:0.1;
+  dx=2.4;dz=lerp(1.0,1.6,ss(26.4,29.4,t));dRot=Math.PI-0.75;dRun=t>26.4&&t<29.4?0.15:0;
+  // dribble touches: ball close
+  const touch=0.36+0.16*Math.abs(Math.sin((t-26.4)*Math.PI*1.2));
+  bx=ox+0.05;bz=oz+touch;
+  // slow motion big touch 29.6-32.6 (sim 0..1)
+  if(t>=29.6){ballFree=true;
+   const s=cl((t-29.6)/3.0);
+   const kb=ss(0,0.55,s);bx=lerp(ox+0.05,3.95,kb);bz=lerp(oz+0.4,1.15,kb);
+   const st=ss(0.35,0.85,s);dx=lerp(2.4,3.55,st);dz=lerp(1.6,1.55,st);dStride=-0.6*st*(1-ss(0.85,1,s));dKick=0.9*ss(0.6,0.85,s)*(1-ss(0.85,1,s));dRun=st>0&&st<1?0.4:0;dRot=lerp(Math.PI-0.75,Math.PI-1.3,st);
+   oz=lerp(-0.4,0.1,ss(0,0.6,s));oRun=0.2;
+   if(t>32.6){const c=ss(32.6,35.6,t);dx=lerp(3.55,5.0,c);dz=lerp(1.55,-1.6,c);dRot=face(0.45,-1);dRun=0.6;bx=dx+0.18;bz=dz-0.42;oRun=0.05;}
+  }
+ }
+ if(!ballFree&&bx===undefined){bx=ox+0.05+Math.sin(oRot)*0.42;bz=oz+Math.cos(oRot)*0.42;}
+ of.position.set(ox,0,oz);of.rotation.y=oRot;df.position.set(dx,0,dz);df.rotation.y=dRot;
+ pose(of,{run:oRun,phase:t*9,crouch:0.15,lean:0.05});
+ pose(df,{run:dRun,phase:t*8,crouch:dCr,lean:dLean,stride:dStride,kick:dKick});
+ placeBall(ball,bx,bz);
+
+ // decals
+ const gOn=fade(t,12.2,15.2);const mx=(ox+dx)/2,mz=(oz+dz)/2;const gl=Math.hypot(ox-dx,oz-dz)-0.7;
+ gap.position.set(mx,0,mz);gap.scale.set(1,1,Math.max(gl,0.1));gap.userData.m.rotation.z=Math.atan2(-(ox-dx),-(oz-dz));setOp(gap,0.85*gOn);
+ ring.position.set(dx,0,dz);setOp(ring,0.9*fade(t,3.2,36));
+ df.userData.wedge.material.opacity=0.9*fade(t,15.6,29.6);
+ const both=fade(t,16.4,19.0);aimArrow(arL,ox-0.3,oz+0.5,-0.7,1);aimArrow(arR,ox+0.3,oz+0.5,0.7,1);setOp(arL,0.8*both);setOp(arR,0.8*both);
+ const sB=fade(t,19.9,25.2);aimArrow(arOut,ox+0.5,oz+0.4,0.9,0.5);setOp(arOut,0.85*sB);
+ xIn.position.set(dx-1.5,0,dz+0.4);setOp(xIn,0.95*sB);
+ aimArrow(lunge,dx,dz-0.3,0,-1);setOp(lunge,0.85*fade(t,5.9,7.4));
+ const fl=fade(t,30.4,32.2,0.15);flash.position.set(bx,0,bz);flash.scale.setScalar(1+((t*2.5)%1)*1.4);setOp(flash,fl*(1-((t*2.5)%1)));
+
+ camAt(t);renderer.render(scene,cam);
+
+ // overlay
+ ovOp('title',fade(t,0,2.8,0.4));ovOp('top',ss(2.6,3.0,t)*(1-ss(36,36.4,t)));ovOp('end',ss(36,36.6,t));
+ chapters(t,[[2.8,15.4,'<b>①</b> 間合い'],[15.4,25.6,'<b>②</b> 体の向き'],[25.6,36,'<b>③</b> 奪う瞬間']]);
+ timed('card',t,[[15.3,16.2,'<small>STEP 2</small>体の向き'],[25.5,26.4,'<small>STEP 3</small>奪う瞬間']],'div');
+ timed('badge',t,[[3.4,8.5,'NG','ng'],[8.6,9.3,'もう一度','re'],[9.4,15.2,'OK','ok'],[29.6,32.6,'スロー','slow']]);
+ timed('cap',t,[[3.5,6.0,'よくある<em>失敗</em>'],[6.0,8.5,'<em>飛び込む</em>と<br>一瞬で抜かれる'],
+   [9.5,12.2,'飛び込まず<br><em>止まって構える</em>'],[12.2,15.2,'足が届く<em>1〜2m</em>を<br>キープ'],
+   [16.3,19.2,'<em>正面</em>を向くと<br>左右どちらにも行かれる'],[19.2,22.2,'体を斜めにして<br><em>半身</em>で構える'],[22.2,25.3,'中を切って<br><em>外へ追い込む</em>'],
+   [26.5,29.6,'ボールが近いうちは<br><em>まだ待つ</em>'],[29.6,32.7,'足から<em>離れた瞬間</em>に<br>一気に寄せる！'],[32.7,36,'<em>ボール奪取！</em>']],'.box');
+ label('of','w','相手',V(ox,2.5,oz),fade(t,3.4,15.2)+fade(t,26.4,29.6));
+ label('df','c','自分（DF）',V(dx,2.45,dz),fade(t,3.4,6.0)+fade(t,9.4,12.0)+fade(t,16.3,19.2));
+ label('lunge','r','飛び込む',V(dx-0.9,1.6,dz),fade(t,6.0,7.6));
+ label('gap','o','1〜2m',V(mx+1.0,0.3,mz),gOn);
+ label('L','r','こっちも',V(ox-2.0,0.2,oz+2.8),both);label('R','r','こっちも',V(ox+2.0,0.2,oz+2.8),both);
+ label('hanmi','c','半身',V(dx,0.1,dz+1.4),fade(t,19.6,22.4));
+ label('in','r','中は切る',V(dx-1.5,0.2,dz+1.9),sB);label('out','c','外へ',V(ox+1.5,0.2,oz+1.5),sB);
+ label('tl','w','タッチライン',V(7.5,0.1,-5),fade(t,20.4,25.2));
+ label('mada','y','まだ',V(bx,1.1,bz),fade(t,26.8,29.4));
+ label('ima','y','今！',V(bx,1.2,bz),fade(t,30.3,32.4,0.15));
+ label('win','g','ボール奪取',V(dx,2.5,dz),fade(t,32.8,36));
+};
+window.ready=true;
+</script></body></html>
