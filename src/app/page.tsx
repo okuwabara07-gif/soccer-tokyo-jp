@@ -10,6 +10,7 @@ import SiteFooter from "@/components/SiteFooter";
 import LifeBanner from "@/components/LifeBanner";
 import { createClient } from "@supabase/supabase-js";
 import { pageMeta } from "@/lib/seo";
+import { POSITION_VIDEOS, POSITION_LABEL, videoPath } from "@/lib/positionVideos";
 
 export const metadata = pageMeta(
   "/",
@@ -159,11 +160,39 @@ export default async function HomePage() {
         ...(reviewTotal > 0 ? [{ value: reviewTotal.toString(), label: "口コミ件数" }] : []),
       ]} /></section>
 
-      <section className="kf-container" style={{ padding:"48px 16px 0" }}>
-        <h2 style={{ margin:0, fontSize:24, fontWeight:800 }}>何をしたいですか？</h2>
-        <p style={{ margin:"6px 0 18px", fontSize:14, color:"var(--kf-muted)" }}>目的に合わせてコンテンツを選ぼう</p>
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:16 }}>
-          {BIG.map(p=><PanelCard key={p.label} p={p} big />)}
+      <section className="kf-container" style={{ padding:"36px 16px 0" }}>
+        <div style={{ display:"flex", alignItems:"baseline", justifyContent:"space-between", gap:12 }}>
+          <h2 style={{ margin:0, fontSize:22, fontWeight:800 }}>動画で学ぶ ポジション別のコツ</h2>
+          <Link href="/position" style={{ fontSize:13, fontWeight:700, color:"var(--kf-primary)", textDecoration:"none", whiteSpace:"nowrap" }}>すべて ›</Link>
+        </div>
+        <p style={{ margin:"6px 0 14px", fontSize:13, color:"var(--kf-muted)" }}>Instagramで紹介している3D解説。失敗例と良い例を40秒で見比べられます</p>
+        <div className="kf-video-rail" style={{ display:"grid", gridAutoFlow:"column", gridAutoColumns:"min(46%,220px)", gap:12, overflowX:"auto", paddingBottom:6, scrollSnapType:"x mandatory" }}>
+          {POSITION_VIDEOS.map(v=>(
+            <Link key={v.slug} href={videoPath(v)} className="kf-card" style={{ overflow:"hidden", textDecoration:"none", color:"var(--kf-text)", display:"block", scrollSnapAlign:"start" }}>
+              <div style={{ position:"relative", aspectRatio:"3/4", background:"#0b1a2a" }}>
+                <img src={v.poster} alt={v.title} style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 40%" }} />
+                <span style={{ position:"absolute", left:8, top:8, fontSize:11, fontWeight:800, color:"#fff", background:"rgba(0,0,0,.6)", borderRadius:6, padding:"2px 8px" }}>{POSITION_LABEL[v.pos]}</span>
+                <span style={{ position:"absolute", right:8, bottom:8, fontSize:11, fontWeight:800, color:"#fff", background:"rgba(0,0,0,.6)", borderRadius:6, padding:"2px 8px" }}>▶ {v.durationSec}秒</span>
+              </div>
+              <div style={{ padding:"10px 12px", fontWeight:800, fontSize:14, lineHeight:1.4 }}>{v.short}</div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="kf-container" style={{ padding:"36px 16px 0" }}>
+        <h2 style={{ margin:"0 0 14px", fontSize:22, fontWeight:800 }}>クラブ・セレクションを探す</h2>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:10 }}>
+          {BIG.map(p=>(
+            <Link key={p.label} href={p.href} className="kf-card" style={{ display:"flex", alignItems:"center", gap:14, padding:10, textDecoration:"none", color:"var(--kf-text)" }}>
+              <img src={p.img} alt="" style={{ width:72, height:72, objectFit:"cover", borderRadius:10, flexShrink:0 }} />
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ fontWeight:800, fontSize:16 }}>{p.label}</div>
+                <div style={{ fontSize:12, color:p.color||"var(--kf-muted)", fontWeight:600, marginTop:4 }}>{p.desc}</div>
+              </div>
+              <span style={{ color:"var(--kf-muted)", fontSize:18 }}>›</span>
+            </Link>
+          ))}
         </div>
       </section>
 
