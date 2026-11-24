@@ -35,5 +35,8 @@ html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#0b1a2a
 #end .row{display:flex;align-items:center;gap:30px;margin:24px 0;font-size:64px;font-weight:900;line-height:1.25}
 #end .n{width:100px;height:100px;border-radius:50%;background:var(--cyan);color:var(--navy);display:flex;align-items:center;justify-content:center;flex:none}
 #end .row span em{font-style:normal;color:var(--yellow)}
-#end .foot{margin-top:80px;font-size:46px;font-weight:700;opacity:.9}
-#end .site{margin-top:18px;font-size:62px;font-weight:900;color:var(--orange)}
+#end .foot{margin-top:56px;font-size:42px;font-weight:700;opacity:.85}
+#end .follow{margin-top:44px;background:linear-gradient(90deg,#f58529,#dd2a7b,#8134af);border-radius:28px;padding:30px 36px;text-align:center;font-size:58px;font-weight:900;line-height:1.3}
+#end .follow span{display:block;font-size:50px;margin-top:8px}
+#end .next{margin-top:26px;text-align:center;font-size:50px;font-weight:900;color:var(--yellow)}
+#end .site{margin-top:30px;font-size:48px;opacity:.9;font-weight:900;color:var(--orange)}

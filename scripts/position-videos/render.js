@@ -19,11 +19,11 @@ const PR = 2;
       console.log('t', t, (Date.now() - s) + 'ms');
     }
   } else {
-    const out = a3, tmp = out.replace(/\.mp4$/, '.tmp.mp4'), DUR = Number(a4), FPS = 30;
+    const out = a3, tmp = out.replace(/\.mp4$/, '.tmp.mp4'), DUR = Number(a4), FPS = 30, START = Number(process.argv[6] || 0);
     const ff = spawn('ffmpeg', ['-y', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
       '-c:v', 'libx264', '-crf', '17', '-preset', 'medium', '-tune', 'animation', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', tmp], { stdio: ['pipe', 'ignore', 'ignore'] });
     const t0 = Date.now();
-    for (let i = 0; i < DUR * FPS; i++) {
+    for (let i = Math.round(START * FPS); i < DUR * FPS; i++) {
       await p.evaluate(t => window.render(t), i / FPS);
       const buf = await p.screenshot({ type: 'jpeg', quality: 92 });
       if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r));
