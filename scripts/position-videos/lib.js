@@ -80,7 +80,7 @@ export function player(shirt, shorts, socks = shirt) {
   wedge.rotation.x = -Math.PI / 2; wedge.rotation.z = Math.PI; wedge.position.y = 0.022; root.add(wedge);
   root.userData = { hips, torso, head, legs, arms, wedge }; scene.add(root); return root;
 }
-export function pose(p, { run = 0, phase = 0, crouch = 0, lean = 0, stride = 0, head = 0, kick = 0 } = {}) {
+export function pose(p, { run = 0, phase = 0, crouch = 0, lean = 0, stride = 0, head = 0, kick = 0, armsUp = 0 } = {}) {
   const u = p.userData; u.hips.position.y = 0.92 - crouch * 0.16;
   u.torso.rotation.x = crouch * 0.32 + lean;
   u.head.rotation.y = head;
@@ -89,6 +89,7 @@ export function pose(p, { run = 0, phase = 0, crouch = 0, lean = 0, stride = 0, 
   u.legs[0].rotation.z = -crouch * 0.12; u.legs[1].rotation.z = crouch * 0.12;
   u.arms[0].rotation.x = -a * 0.8; u.arms[1].rotation.x = a * 0.8;
   u.arms[0].rotation.z = -0.18 - crouch * 0.35; u.arms[1].rotation.z = 0.18 + crouch * 0.35;
+  if (armsUp) { u.arms[0].rotation.x = -1.3 * armsUp; u.arms[1].rotation.x = -1.3 * armsUp; u.arms[0].rotation.z -= 0.5 * armsUp; u.arms[1].rotation.z += 0.5 * armsUp; }
 }
 // facing: rotation.y such that model +z points to direction (dx,dz)
 export const face = (dx, dz) => Math.atan2(dx, dz);
@@ -100,6 +101,8 @@ function ballTex() {
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t;
 }
 export function makeBall() { const b = new THREE.Mesh(new THREE.SphereGeometry(0.13, 32, 24), new THREE.MeshStandardMaterial({ map: ballTex(), roughness: 0.5 })); b.castShadow = true; scene.add(b); return b; }
+export function tri(color) { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(9), 3)); const m = new THREE.Mesh(g, dmat(color)); scene.add(m); m.renderOrder = 2; return m; }
+export function setTri(m, a, b, c, y = 0.03) { const p = m.geometry.attributes.position.array; p.set([a[0], y, a[1], b[0], y, b[1], c[0], y, c[1]]); m.geometry.attributes.position.needsUpdate = true; m.geometry.computeBoundingSphere(); }
 export function placeBall(b, x, z, y = 0.13) { b.position.set(x, y, z); b.rotation.set(z * 3.5, 0, -x * 3.5); }
 
 // ---------- ground decals ----------
