@@ -6,7 +6,7 @@ import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
 import RakutenItems from "@/components/RakutenItems";
 import MangaCover from "@/components/MangaCover";
-import { POSITION_VIDEOS, POSITION_LABEL, videoPath, type PositionId } from "@/lib/positionVideos";
+import { POSITION_VIDEOS, POSITION_LABEL, videoPath, INSTAGRAM_URL, type PositionId } from "@/lib/positionVideos";
 
 const POS_TABS = [
   { id: "gk", label: "GK", color: "#2b9348" },
@@ -88,6 +88,9 @@ function VideoCards({ pos }: { pos: string }) {
           </Link>
         ))}
       </div>
+      <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" style={{ display: "block", textAlign: "center", marginTop: 12, padding: "10px 14px", borderRadius: 10, background: "linear-gradient(90deg,#f58529,#dd2a7b,#8134af)", color: "#fff", fontWeight: 800, fontSize: 13, textDecoration: "none" }}>
+        新しい動画はInstagramで（@soccer_kanto_jp）
+      </a>
     </div>
   );
 }

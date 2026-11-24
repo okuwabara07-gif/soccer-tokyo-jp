@@ -19,6 +19,8 @@ export type PositionVideo = {
   parentNote: string;
 };
 
+export const INSTAGRAM_URL = "https://www.instagram.com/soccer_kanto_jp/";
+
 export const POSITION_LABEL: Record<PositionId, string> = { gk: "GK", df: "DF", mf: "MF", fw: "FW" };
 
 export const POSITION_VIDEOS: PositionVideo[] = [

@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import SiteFooter from "@/components/SiteFooter";
 import { pageMeta, SITE_URL } from "@/lib/seo";
-import { POSITION_VIDEOS, POSITION_LABEL, findVideo, videosByPos, videoPath } from "@/lib/positionVideos";
+import { POSITION_VIDEOS, POSITION_LABEL, findVideo, videosByPos, videoPath, INSTAGRAM_URL } from "@/lib/positionVideos";
 
 export const dynamicParams = false;
 
@@ -81,9 +81,12 @@ export default async function PositionVideoPage({ params }: { params: Promise<{ 
             style={{ width: "100%", maxWidth: 380, aspectRatio: "9/16", borderRadius: 16, background: "#0b1a2a", display: "block" }}
           />
         </div>
-        <p style={{ fontSize: 11, color: "#999", textAlign: "center", margin: "0 0 24px" }}>
+        <p style={{ fontSize: 11, color: "#999", textAlign: "center", margin: "0 0 12px" }}>
           {v.durationSec}秒・音声なし。3DのCGで動きを簡略化して表現しています。
         </p>
+        <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" style={{ display: "block", textAlign: "center", margin: "0 auto 24px", maxWidth: 380, padding: "10px 14px", borderRadius: 10, background: "linear-gradient(90deg,#f58529,#dd2a7b,#8134af)", color: "#fff", fontWeight: 800, fontSize: 13, textDecoration: "none" }}>
+          ほかの動画はInstagramで（@soccer_kanto_jp）
+        </a>
 
         <h2 style={{ fontSize: 19, fontWeight: 900, margin: "0 0 12px" }}>3つのポイント</h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>

@@ -10,7 +10,7 @@ import SiteFooter from "@/components/SiteFooter";
 import LifeBanner from "@/components/LifeBanner";
 import { createClient } from "@supabase/supabase-js";
 import { pageMeta } from "@/lib/seo";
-import { POSITION_VIDEOS, POSITION_LABEL, videoPath } from "@/lib/positionVideos";
+import { POSITION_VIDEOS, POSITION_LABEL, videoPath, INSTAGRAM_URL } from "@/lib/positionVideos";
 
 export const metadata = pageMeta(
   "/",
@@ -178,6 +178,9 @@ export default async function HomePage() {
             </Link>
           ))}
         </div>
+        <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, marginTop:12, padding:"12px 16px", borderRadius:12, background:"linear-gradient(90deg,#f58529,#dd2a7b,#8134af)", color:"#fff", fontWeight:800, fontSize:14, textDecoration:"none" }}>
+          Instagramでフォロー（@soccer_kanto_jp）
+        </a>
       </section>
 
       <section className="kf-container" style={{ padding:"36px 16px 0" }}>
