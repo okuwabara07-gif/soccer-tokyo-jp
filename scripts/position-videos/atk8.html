@@ -1,0 +1,140 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="lib.css"></head>
+<body>
+<canvas id="c"></canvas>
+<div id="labs"></div>
+<div id="top" class="ov">
+  <div id="series"><span class="tag">8人制</span>攻め方</div>
+  <div id="bar"><div><i></i></div><div><i></i></div><div><i></i></div></div>
+  <div id="step"></div>
+</div>
+<div id="badge" class="ov"></div>
+<div id="cap" class="ov"><div class="box"></div></div>
+<div id="card" class="ov"><div></div></div>
+<div id="brand" class="ov">soccer-selection.jp</div>
+<div id="title" class="ov"><div class="k">8人制で勝ちたい君へ</div><div class="t">8人制の攻め方<br><span>崩せる</span><br>3つのコツ</div></div>
+<div id="end" class="ov">
+  <h2>まとめ</h2>
+  <div class="row"><div class="n">1</div><span><em>サイドに広がる</em></span></div>
+  <div class="row"><div class="n">2</div><span><em>引きつけて</em>からパス</span></div>
+  <div class="row"><div class="n">3</div><span><em>逆サイド</em>へ展開</span></div>
+  <div class="foot">保存して次の練習で試そう</div>
+  <div class="follow">フォローで<br>全ポジションのコツが届く<span>@soccer_kanto_jp</span></div>
+  <div class="next">次回：カバーリング編</div>
+  <div class="site">soccer-selection.jp</div>
+</div>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js"}}</script>
+<script type="module">
+import {THREE,scene,cam,renderer,line,circleLine,stand,goal,player,pose,face,makeBall,placeBall,decal,setOp,arrowGeo,aimArrow,cl,ss,lerp,fade,V,camKeys,ovOp,label,chapters,timed} from './lib.js';
+
+// 相手ゴール z=+24。自分たち（青）は +z へ攻める
+line(-25,24,25,24);line(-25,-44,-25,24);line(25,-44,25,24);line(-25,-10,25,-10);circleLine(0,-10,7);
+line(-10,24,-10,12);line(10,24,10,12);line(-10,12,10,12);
+stand(0,36,0);stand(32,0,Math.PI/2);stand(-32,0,Math.PI/2);goal(24);
+const SX=0.42;
+const AT=[0,1,2,3].map(()=>player(0x1f5fbf,0x0d2a4a));
+const DF=[0,1,2].map(()=>player(0xf2f2f2,0xd33b3b));
+const gk=player(0xf0a020,0x111111,0xf0a020);
+const ball=makeBall();
+const gapA=decal(new THREE.PlaneGeometry(1,0.5),0xffd34d), gapB=decal(new THREE.PlaneGeometry(1,0.5),0xffd34d);
+const space=decal(new THREE.CircleGeometry(3.2,40),0x2ec4e6), crowd=decal(new THREE.CircleGeometry(3.6,40),0xe23b3b);
+const arW1=decal(arrowGeo(3,0.4,0.9),0x2ec4e6), arW2=decal(arrowGeo(3,0.4,0.9),0x2ec4e6);
+const rings=AT.map(()=>decal(new THREE.RingGeometry(0.75,1.0,40),0x2ec4e6));
+
+const camAt=camKeys([
+ [0,V(6,30,-22),V(0,0,4)],[2.6,V(2,26,-17),V(0,0,5)],
+ [3.2,V(0,27,-10),V(0,0,4.2)],[15.2,V(0,27,-10),V(0,0,4.2)],
+ [16.0,V(-2.6,18,-6),V(-2.6,0,6.5)],[25.4,V(-2.6,18,-6),V(-2.6,0,6.5)],
+ [26.2,V(0,27,-10),V(0,0,4.2)],[36,V(0,27,-10),V(0,0,4.2)],[40,V(0,27,-10),V(0,0,4.2)]]);
+
+function seg(g,a,b,op){const mx=(a[0]+b[0])/2,mz=(a[1]+b[1])/2,L=Math.hypot(b[0]-a[0],b[1]-a[1]);g.position.set(mx,0,mz);g.userData.m.scale.set(L,1,1);g.userData.m.rotation.z=-Math.atan2(b[1]-a[1],b[0]-a[0]);setOp(g,op);}
+
+window.render=function(t){
+ // A: 0=左ウイング 1=中央(ボール) 2=右ウイング 3=後ろの味方 / D: 0=左 1=中 2=右（相手の3バック）
+ let A=[[-4,2],[0,0],[4,2],[0,-6]],D=[[-5,10],[0,10],[5,10]],ar=[0,0,0,0],dr=[0,0,0];
+ let owner=1,bx,bz,by=0.13,free=false;
+ let gapOp=0,spaceOp=0,crowdOp=0,spaceP=[0,0],crowdP=[0,0],wOp=0;
+ // ---------- ① NG ----------
+ if(t<8.75){
+  const k=ss(3.6,6.0,t);A[1]=[0,lerp(0,5.5,k)];ar[1]=k>0&&k<1?0.5:0;
+  const c=ss(4.6,6.4,t);D=[[lerp(-5,-2.2,c),lerp(10,8.2,c)],[0,lerp(10,7.0,c)],[lerp(5,2.2,c),lerp(10,8.2,c)]];dr=[1,1,1].map(()=>c>0&&c<1?0.4:0);
+  crowdP=[0,7.5];crowdOp=fade(t,5.4,8.5);
+  if(t>6.6){owner=-1;free=true;const s=ss(6.6,7.6,t);bx=lerp(0.1,0.6,s);bz=lerp(5.95,7.2,s);}
+ }
+ // ---------- ① OK ----------
+ else if(t<15.4){
+  const w=ss(9.6,11.6,t);A[0]=[lerp(-4,-16,w),lerp(2,4,w)];A[2]=[lerp(4,16,w),lerp(2,4,w)];ar[0]=ar[2]=w>0&&w<1?0.7:0;
+  const f=ss(10.2,12.2,t);D=[[lerp(-5,-11,f),lerp(10,8.5,f)],[0,10],[lerp(5,11,f),lerp(10,8.5,f)]];dr=[f>0&&f<1?0.5:0,0,f>0&&f<1?0.5:0];
+  wOp=fade(t,9.6,11.8);gapOp=fade(t,12.0,15.2);
+ }
+ // ---------- ② ----------
+ else if(t<25.8){
+  const nok=t<20.0;A=[[-13,5],[-3,3],[12,4],[0,-6]];D=[[-7.5,9],[0,10],[6,9.5]];
+  if(nok){
+   if(t>16.8){owner=-1;free=true;const s=ss(16.8,17.9,t);bx=lerp(-2.9,-12.9,s);bz=lerp(3.45,5.4,s);
+    if(t>17.9){owner=0;free=false;}}
+   const sh=ss(17.0,18.2,t);D[0]=[lerp(-7.5,-11.6,sh),lerp(9,7.0,sh)];dr[0]=sh>0&&sh<1?0.6:0;
+   crowdP=[-12.3,6.2];crowdOp=fade(t,18.2,19.9);
+  }else{
+   const k=ss(20.6,22.4,t);A[1]=[lerp(-3,-5.6,k),lerp(3,6.0,k)];ar[1]=k>0&&k<1?0.5:0;
+   const st=ss(21.6,22.8,t);D[0]=[lerp(-7.5,-6.2,st),lerp(9,7.6,st)];dr[0]=st>0&&st<1?0.5:0;
+   if(t>22.9){owner=-1;free=true;const s=ss(22.9,23.8,t);bx=lerp(-5.5,-12.0,s);bz=lerp(6.45,9.0,s);
+    const r=ss(23.0,24.4,t);A[0]=[lerp(-13,-11.8,r),lerp(5,10.5,r)];ar[0]=r>0&&r<1?0.8:0;
+    if(t>23.8){owner=0;free=false;}}
+   spaceP=[-11.8,10.5];spaceOp=fade(t,22.6,25.3);
+  }
+ }
+ // ---------- ③ ----------
+ else{
+  const nok=t<30.5;owner=0;
+  A=[[-14,6],[-7,5],[15,6],[-2,-2]];D=[[-12,9],[-6,9.5],[0,10]];
+  if(nok){
+   if(t>27.6){owner=-1;free=true;const s=ss(27.6,28.6,t);bx=lerp(-13.9,-7.6,s);bz=lerp(6.45,6.6,s);}
+   const i=ss(27.8,28.6,t);D[1]=[lerp(-6,-7.3,i),lerp(9.5,6.9,i)];dr[1]=i>0&&i<1?0.6:0;
+   crowdP=[-9.5,7.5];crowdOp=fade(t,26.5,30.2);
+  }else{
+   // back pass then switch (slow)
+   if(t>31.4){owner=-1;free=true;
+    if(t<32.6){const s=ss(31.4,32.6,t);bx=lerp(-13.9,-2.1,s);bz=lerp(6.45,-1.55,s);}
+    else{const s=ss(32.9,35.0,t);bx=lerp(-1.9,14.9,s);bz=lerp(-1.55,6.5,s);by=0.13+3.2*Math.sin(Math.PI*s);if(t>35.0){owner=2;free=false;}}}
+   const sl=ss(33.4,35.4,t);D=[[lerp(-12,-8,sl),9],[lerp(-6,-1,sl),9.5],[lerp(0,6,sl),10]];dr=[1,1,1].map(()=>sl>0&&sl<1?0.6:0);
+   spaceP=[13.5,8];spaceOp=fade(t,31.2,35.8);
+  }
+ }
+ // ---------- place ----------
+ const As=A.map(q=>[q[0]*SX,q[1]]),Ds=D.map(q=>[q[0]*SX,q[1]]);
+ AT.forEach((p,i)=>{p.position.set(As[i][0],0,As[i][1]);p.rotation.y=face(0-As[i][0],24-As[i][1]);pose(p,{run:ar[i],phase:t*9+i,crouch:0.15});rings[i].position.set(As[i][0],0,As[i][1]);setOp(rings[i],i===owner?0.9*fade(t,3.2,36):0);});
+ const bref=owner>=0?As[owner]:[bx*SX,bz];
+ DF.forEach((p,i)=>{p.position.set(Ds[i][0],0,Ds[i][1]);p.rotation.y=face(bref[0]-Ds[i][0],bref[1]-Ds[i][1]);pose(p,{run:dr[i],phase:t*8+i,crouch:0.6});});
+ gk.position.set(0,0,22.5);gk.rotation.y=Math.PI;pose(gk,{crouch:0.8});
+ if(owner>=0&&!free){bx=As[owner][0]+0.1;bz=As[owner][1]+0.45;}else{bx=bx*SX;}
+ placeBall(ball,bx,bz,by);
+ seg(gapA,Ds[0],Ds[1],0.85*gapOp);seg(gapB,Ds[1],Ds[2],0.85*gapOp);
+ space.position.set(spaceP[0]*SX,0,spaceP[1]);setOp(space,0.4*spaceOp);
+ crowd.position.set(crowdP[0]*SX,0,crowdP[1]);setOp(crowd,0.4*crowdOp);
+ aimArrow(arW1,-4*SX,2,-1,0.15);aimArrow(arW2,4*SX,2,1,0.15);setOp(arW1,0.85*wOp);setOp(arW2,0.85*wOp);
+
+ camAt(t);renderer.render(scene,cam);
+
+ ovOp('title',fade(t,0,2.8,0.4));ovOp('top',ss(2.6,3.0,t)*(1-ss(36,36.4,t)));ovOp('end',ss(36,36.6,t));
+ chapters(t,[[2.8,15.4,'<b>①</b> 広がる'],[15.4,25.6,'<b>②</b> 引きつける'],[25.6,36,'<b>③</b> 逆サイド']]);
+ timed('card',t,[[15.3,16.2,'<small>STEP 2</small>引きつける'],[25.5,26.3,'<small>STEP 3</small>逆サイド']],'div');
+ timed('badge',t,[[3.4,8.5,'NG','ng'],[8.6,9.3,'もう一度','re'],[9.4,15.2,'OK','ok'],[16.3,19.9,'NG','ng'],[20.0,20.5,'もう一度','re'],[20.6,25.3,'OK','ok'],[26.4,30.2,'NG','ng'],[30.3,30.9,'もう一度','re'],[31.0,32.8,'OK','ok'],[32.9,35.0,'スロー','slow']]);
+ timed('cap',t,[[3.5,6.2,'みんなが<em>真ん中</em>に<br>集まると…'],[6.2,8.5,'守りも固まって<br><em>通らない</em>'],
+   [9.5,12.0,'両サイドに<br><em>大きく広がる</em>'],[12.0,15.2,'守る3人の<br><em>間が広がる</em>'],
+   [16.3,18.0,'相手が来る前に<br><em>パスを出す</em>と…'],[18.0,19.9,'DFが<em>ずれて</em><br>つかまる'],
+   [20.6,22.8,'まずドリブルで<br><em>DFを引きつける</em>'],[22.8,25.3,'DFが来たら<br><em>空いた味方</em>へ'],
+   [26.5,28.4,'混んでいる側で<br><em>攻め続ける</em>と…'],[28.4,30.2,'<em>囲まれて</em>取られる'],
+   [31.0,32.9,'一度<em>後ろに戻して</em>'],[32.9,35.0,'空いている<br><em>逆サイド</em>へ'],[35.0,36,'<em>フリーで</em>前へ！']],'.box');
+ label('narrow','r','せまい',V(0,0.4,9.6),fade(t,5.6,8.5));
+ label('wide','c','広がる',V(-9*SX,0.4,0.5),fade(t,9.8,12.0));
+ label('gap','y','間が広い',V((Ds[0][0]+Ds[1][0])/2,0.4,Ds[1][1]+1.8),fade(t,12.2,15.2));
+ label('early','r','早すぎるパス',V(-8*SX,2.4,4.2),fade(t,16.9,18.4));
+ label('caught','r','つかまった',V(-12.3*SX,3.0,6.2),fade(t,18.2,19.9));
+ label('draw','y','引きつける',V(As[1][0]+1.5,3.0,As[1][1]),fade(t,21.2,23.0));
+ label('freeA','c','フリー！',V(As[0][0],3.0,As[0][1]),fade(t,23.4,25.3));
+ label('crowded','r','囲まれた',V(-9.5*SX,3.0,7.5),fade(t,28.4,30.2));
+ label('open','c','空いている',V(13.5*SX,0.4,9),fade(t,31.2,35.8));
+};
+window.ready=true;
+</script></body></html>
