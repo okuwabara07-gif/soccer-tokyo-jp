@@ -1,0 +1,131 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="lib.css"></head>
+<body>
+<canvas id="c"></canvas>
+<div id="labs"></div>
+<div id="top" class="ov">
+  <div id="series"><span class="tag">FW</span>ポストプレー</div>
+  <div id="bar"><div><i></i></div><div><i></i></div><div><i></i></div></div>
+  <div id="step"></div>
+</div>
+<div id="badge" class="ov"></div>
+<div id="cap" class="ov"><div class="box"></div></div>
+<div id="card" class="ov"><div></div></div>
+<div id="brand" class="ov">soccer-selection.jp</div>
+<div id="title" class="ov"><div class="k">ジュニアユースを目指す君へ</div><div class="t">ポストプレー<br><span>収まる</span><br>3つのコツ</div></div>
+<div id="end" class="ov">
+  <h2>まとめ</h2>
+  <div class="row"><div class="n">1</div><span><em>体を当てて</em>受ける</span></div>
+  <div class="row"><div class="n">2</div><span>無理に回らず<em>落とす</em></span></div>
+  <div class="row"><div class="n">3</div><span>落としたら<em>裏へ走る</em></span></div>
+  <div class="foot">保存して次の練習で試そう</div>
+  <div class="follow">フォローで<br>全ポジションのコツが届く<span>@soccer_kanto_jp</span></div>
+  <div class="next">次回：8人制のGKからのつなぎ編</div>
+  <div class="site">soccer-selection.jp</div>
+</div>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js"}}</script>
+<script type="module">
+import {THREE,scene,cam,renderer,line,circleLine,stand,goal,player,pose,face,makeBall,placeBall,decal,setOp,arrowGeo,aimArrow,cl,ss,lerp,fade,V,camKeys,ovOp,label,chapters,timed} from './lib.js';
+
+// 相手ゴール z=-22。自分たちは -z へ攻める
+line(-30,-22,30,-22);line(-9,-22,-9,-6);line(9,-22,9,-6);line(-9,-6,9,-6);line(-30,8,30,8);circleLine(0,8,5);
+stand(0,-34,0);stand(20,0,Math.PI/2);stand(-20,0,Math.PI/2);goal(-22);
+const fw=player(0x1f5fbf,0x0d2a4a), mf=player(0x1f5fbf,0x0d2a4a), cb=player(0x1f5fbf,0x0d2a4a);
+const df=player(0xf2f2f2,0xd33b3b), gk=player(0xf0a020,0x111111,0xf0a020);
+const ball=makeBall();
+const ring=decal(new THREE.RingGeometry(0.6,0.82,48),0xffd34d);
+const contact=decal(new THREE.CircleGeometry(1.0,40),0x2ec4e6);
+const runA=decal(arrowGeo(4,0.4,0.9),0x2ec4e6);
+const flash=decal(new THREE.RingGeometry(0.25,0.5,48),0xffd34d);
+cam.fov=56;cam.updateProjectionMatrix();
+
+const camAt=camKeys([
+ [0,V(9,12,14),V(0,0,-5)],[2.6,V(6,10,10),V(0,0,-5)],
+ [3.2,V(-3.6,6.5,0.5),V(-0.3,0.6,-6.2)],[25.4,V(-3.6,6.5,0.5),V(-0.3,0.6,-6.2)],
+ [26.2,V(-4.5,9,1.5),V(-0.5,0.6,-7.6)],[36,V(-4.5,9,1.5),V(-0.5,0.6,-7.6)],[40,V(-4.5,9,1.5),V(-0.5,0.6,-7.6)]]);
+
+window.render=function(t){
+ let F=[0.2,-6.6],D=[0,-8.4],M=[-3,-1],C=[0,6],fR=0,dR=0,mR=0,fK=0,mK=0,cK=0,fCr=0.3,fRot=0,dRot=0;
+ let bx,bz,by=0.13,free=false,owner='c',contactOp=0,runOp=0,flOp=0;
+ const passIn=(t0,t1,tx,tz)=>{cK=0.9*fade(t,t0-0.2,t0+0.2,0.12);if(t>t0){free=true;const s=ss(t0,t1,t);bx=lerp(C[0],tx,s);bz=lerp(C[1]-0.42,tz,s);}};
+ // ---------- ① NG ----------
+ if(t<8.75){
+  passIn(5.0,6.0,0.2,-5.9);
+  const st=ss(5.3,6.0,t);D=[lerp(0,0.6,st),lerp(-8.4,-5.6,st)];dR=st>0&&st<1?0.8:0;
+  if(t>6.0){free=false;owner='d';const g=ss(6.2,7.6,t);D=[lerp(0.6,1.6,g),lerp(-5.6,-2.6,g)];dR=g>0&&g<1?0.6:0;dRot=face(0.3,1);}
+ }
+ // ---------- ① OK ----------
+ else if(t<15.4){
+  F=[0.1,lerp(-6.6,-7.7,ss(9.6,10.4,t))];fCr=0.7;contactOp=fade(t,10.2,15.2);
+  passIn(10.8,11.8,0.1,-7.25);if(t>11.8){free=false;owner='f';}
+ }
+ // ---------- ② ----------
+ else if(t<25.8){
+  F=[0.1,-7.7];fCr=0.7;const nok=t<20.2;
+  if(nok){passIn(16.4,17.3,0.1,-7.25);if(t>17.3){free=false;owner='f';}
+   const tr=ss(17.6,18.6,t);fRot=lerp(0,Math.PI*0.75,tr);
+   if(t>18.6){owner='d';const g=ss(18.6,19.8,t);D=[lerp(0,1.2,g),lerp(-8.4,-6.6,g)];dR=0.5;dRot=face(0.2,1);}
+  }else{
+   const r=ss(20.6,22.0,t);M=[lerp(-3,-1.6,r),lerp(-1,-4.8,r)];mR=r>0&&r<1?0.7:0;
+   passIn(20.8,21.8,0.1,-7.25);
+   fK=0.8*fade(t,21.9,22.3,0.12);
+   if(t>22.0){free=true;const s=ss(22.0,22.8,t);bx=lerp(0.1,-1.5,s);bz=lerp(-7.25,-5.3,s);if(t>22.8){free=false;owner='m';}}
+  }
+ }
+ // ---------- ③ ----------
+ else{
+  F=[0.1,-7.7];fCr=0.7;M=[-1.6,-4.8];owner='m';const nok=t<30.6;
+  if(nok){
+   const sh=ss(27.4,28.6,t);D=[lerp(0,-0.9,sh),lerp(-8.4,-7.0,sh)];dR=sh>0&&sh<1?0.5:0;
+   if(t>28.8){mK=0.8*fade(t,28.8,29.2,0.12);if(t>29.0){free=true;const s=ss(29.0,29.9,t);bx=lerp(-1.4,-6,s);bz=lerp(-5.2,-3.5,s);}}
+  }else{
+   const r=ss(31.4,33.6,t);const sx=0.1,sz=-7.7,cx=2.4,cz=-9.0,ex=1.4,ez=-13.4;
+   F=[(1-r)*(1-r)*sx+2*(1-r)*r*cx+r*r*ex,(1-r)*(1-r)*sz+2*(1-r)*r*cz+r*r*ez];fR=r>0&&r<1?0.8:0;fRot=r>0?face(ex-sx,ez-sz):0;
+   runOp=fade(t,31.2,33.8);
+   mK=0.8*fade(t,32.6,33.1,0.15);
+   if(t>32.8){free=true;const s=ss(32.8,34.4,t);bx=lerp(-1.4,1.5,s);bz=lerp(-5.2,-13.8,s);if(t>34.4){free=false;owner='f';}}
+   const dt=ss(32.4,34.4,t);D=[lerp(0,0.6,dt),lerp(-8.4,-11,dt)];dR=dt>0&&dt<1?0.6:0;dRot=dt>0?Math.PI:0;
+   flOp=fade(t,33.6,34.6,0.12);
+  }
+ }
+ // ---------- place ----------
+ fw.position.set(F[0],0,F[1]);fw.rotation.y=fRot;pose(fw,{run:fR,phase:t*9,crouch:fCr,kick:fK});
+ df.position.set(D[0],0,D[1]);df.rotation.y=dRot;pose(df,{run:dR,phase:t*9,crouch:0.6});
+ mf.position.set(M[0],0,M[1]);mf.rotation.y=Math.PI;pose(mf,{run:mR,phase:t*9,crouch:0.2,kick:mK});
+ cb.position.set(C[0],0,C[1]);cb.rotation.y=Math.PI;pose(cb,{crouch:0.2,kick:cK});
+ gk.position.set(0,0,-20.5);gk.rotation.y=0;pose(gk,{crouch:0.8});
+ if(!free){const o=owner==='c'?cb:owner==='d'?df:owner==='f'?fw:mf;bx=o.position.x+Math.sin(o.rotation.y)*0.42;bz=o.position.z+Math.cos(o.rotation.y)*0.42;}
+ placeBall(ball,bx,bz,by);
+ ring.position.set(F[0],0,F[1]);setOp(ring,0.9*fade(t,3.2,36));
+ contact.position.set(F[0],0,(F[1]+D[1])/2);setOp(contact,0.35*contactOp);
+ aimArrow(runA,0.6,-8.0,0.15,-1);setOp(runA,0.85*runOp);
+ flash.position.set(F[0],0,F[1]);flash.scale.setScalar(1+((t*2.5)%1)*1.4);setOp(flash,flOp*(1-((t*2.5)%1)));
+
+ camAt(t);renderer.render(scene,cam);
+
+ ovOp('title',fade(t,0,2.8,0.4));ovOp('top',ss(2.6,3.0,t)*(1-ss(36,36.4,t)));ovOp('end',ss(36,36.6,t));
+ chapters(t,[[2.8,15.4,'<b>①</b> 体を当てる'],[15.4,25.6,'<b>②</b> 落とす'],[25.6,36,'<b>③</b> 裏へ']]);
+ timed('card',t,[[15.3,16.2,'<small>STEP 2</small>落とす'],[25.5,26.3,'<small>STEP 3</small>裏へ']],'div');
+ timed('badge',t,[[3.4,8.5,'NG','ng'],[8.6,9.3,'もう一度','re'],[9.4,15.2,'OK','ok'],[16.3,20.1,'NG','ng'],[20.2,20.7,'もう一度','re'],[20.8,25.3,'OK','ok'],[26.4,30.5,'NG','ng'],[30.6,31.2,'もう一度','re'],[31.3,32.7,'OK','ok'],[32.8,34.4,'スロー','slow']]);
+ timed('cap',t,[[3.5,5.4,'DFと<em>離れて</em><br>待っていると…'],[5.4,8.5,'<em>前に入られて</em><br>カットされる'],
+   [9.5,11.8,'DFに<em>背中を当てて</em><br>相手を感じる'],[11.8,15.2,'体で守って<br><em>ボールが収まる</em>'],
+   [16.4,18.6,'DFを背負ったまま<br><em>無理に回る</em>と…'],[18.6,20.1,'<em>取られる</em>'],
+   [20.8,22.0,'前を向いた<br><em>味方を見る</em>'],[22.0,25.3,'ワンタッチで<br><em>落とす</em>'],
+   [26.5,28.8,'落としたあと<br><em>止まっている</em>と…'],[28.8,30.5,'パスの出し先がなく<br><em>横パス</em>だけ'],
+   [31.3,32.8,'落としたら<br>すぐ<em>裏へ走る</em>'],[32.8,34.4,'DFの<em>背中</em>を取る'],[34.4,36,'<em>裏で受けた！</em>']],'.box');
+ label('fw','c','自分（FW）',V(F[0],2.5,F[1]),fade(t,3.4,5.0)+fade(t,9.4,10.6)+fade(t,16.4,17.6));
+ label('dfL','w','DF',V(D[0],2.5,D[1]),fade(t,3.4,5.0)+fade(t,9.4,10.6));
+ label('gapL','r','離れている',V(1.6,0.4,-7.6),fade(t,3.8,5.4));
+ label('cutL','r','カット！',V(D[0],2.8,D[1]),fade(t,6.0,8.4));
+ label('back','c','背中で感じる',V(1.8,1.2,-8.0),fade(t,10.4,13.0));
+ label('keep','g','収まった',V(F[0],2.9,F[1]),fade(t,12.0,15.2));
+ label('lost','r','取られた',V(D[0],2.8,D[1]),fade(t,18.8,20.1));
+ label('mfL','c','前を向いた味方',V(M[0]-0.6,2.5,M[1]),fade(t,21.0,23.6));
+ label('drop','y','落とす',V(1.2,0.6,-6.2),fade(t,22.0,24.0));
+ label('stay','r','止まっている',V(F[0]+1.2,2.6,F[1]),fade(t,26.8,30.3));
+ label('side','r','横パス',V(-4,0.6,-4.6),fade(t,29.2,30.4));
+ label('runL','c','裏へ！',V(2.4,0.6,-10),fade(t,31.4,33.6));
+ label('got','g','裏で受けた！',V(F[0],2.9,F[1]),fade(t,34.4,36));
+};
+window.ready=true;
+</script></body></html>
