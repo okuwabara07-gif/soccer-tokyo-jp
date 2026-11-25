@@ -1,0 +1,147 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="lib.css"></head>
+<body>
+<canvas id="c"></canvas>
+<div id="labs"></div>
+<div id="top" class="ov">
+  <div id="series"><span class="tag">DF</span>カバーリング</div>
+  <div id="bar"><div><i></i></div><div><i></i></div><div><i></i></div></div>
+  <div id="step"></div>
+</div>
+<div id="badge" class="ov"></div>
+<div id="cap" class="ov"><div class="box"></div></div>
+<div id="card" class="ov"><div></div></div>
+<div id="brand" class="ov">soccer-selection.jp</div>
+<div id="title" class="ov"><div class="k">ジュニアユースを目指す君へ</div><div class="t">カバーリング<br><span>抜かれても守れる</span><br>3つのコツ</div></div>
+<div id="end" class="ov">
+  <h2>まとめ</h2>
+  <div class="row"><div class="n">1</div><span><em>ななめ後ろ</em>3〜5m</span></div>
+  <div class="row"><div class="n">2</div><span><em>ゴール側</em>に立つ</span></div>
+  <div class="row"><div class="n">3</div><span><em>声</em>で伝える</span></div>
+  <div class="foot">保存して次の練習で試そう</div>
+  <div class="follow">フォローで<br>全ポジションのコツが届く<span>@soccer_kanto_jp</span></div>
+  <div class="next">次回：SBの1対1編</div>
+  <div class="site">soccer-selection.jp</div>
+</div>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js"}}</script>
+<script type="module">
+import {THREE,scene,cam,renderer,line,stand,goal,player,pose,face,makeBall,placeBall,decal,setOp,arrowGeo,aimArrow,crossGeo,cl,ss,lerp,fade,V,camKeys,ovOp,label,chapters,timed} from './lib.js';
+
+// 自陣ゴール z=+20。右がタッチライン x=12
+line(-30,20,30,20);line(12,-40,12,20);line(-9,20,-9,4);line(9,20,9,4);line(-9,4,9,4);line(-3.5,20,-3.5,15);line(3.5,20,3.5,15);line(-3.5,15,3.5,15);
+stand(0,-36,0);stand(18,0,Math.PI/2);goal(20);
+const c1=player(0x1f5fbf,0x0d2a4a), c2=player(0x1f5fbf,0x0d2a4a);
+const at=player(0xf2f2f2,0xd33b3b);
+const gk=player(0x2bb35e,0x111111,0x2bb35e);
+const ball=makeBall();
+const ring1=decal(new THREE.RingGeometry(0.6,0.82,48),0x2ec4e6), ring2=decal(new THREE.RingGeometry(0.6,0.82,48),0xffd34d);
+const link=decal(new THREE.PlaneGeometry(1,0.22),0xffd34d);
+const lane=decal(new THREE.PlaneGeometry(1,0.18),0xffffff);
+const open=decal(new THREE.CircleGeometry(2.2,40),0xe23b3b);
+const arIn=decal(arrowGeo(4,0.4,0.9),0xe23b3b), arOut=decal(arrowGeo(3.4,0.4,0.9),0x2ec4e6);
+const xIn=crossGeo(0.9);
+
+cam.fov=62;cam.updateProjectionMatrix();
+const camAt=camKeys([
+ [0,V(10,15,24),V(3,0,0)],[2.6,V(7,13,20),V(3,0,1)],
+ [3.2,V(3.8,9.5,12.5),V(3.8,0,2.4)],[15.4,V(3.8,9.5,12.5),V(3.8,0,2.4)],[16.2,V(4.4,9.8,13),V(4.4,0,2.6)],[25.4,V(4.4,9.8,13),V(4.4,0,2.6)],
+ [26.2,V(3.6,6.2,13),V(3.4,0.6,2.0)],[36,V(3.6,6.2,13),V(3.4,0.6,2.0)],[40,V(3.6,6.2,13),V(3.4,0.6,2.0)]]);
+
+function seg(g,a,b,op){const mx=(a[0]+b[0])/2,mz=(a[1]+b[1])/2,L=Math.hypot(b[0]-a[0],b[1]-a[1]);g.position.set(mx,0,mz);g.userData.m.scale.set(L,1,1);g.userData.m.rotation.z=-Math.atan2(b[1]-a[1],b[0]-a[0]);setOp(g,op);}
+
+window.render=function(t){
+ let A=[4.5,-5],C1=[4.5,1.5],C2=[1.8,5.5],aR=0,r1=0,r2=0,cr1=1,lean1=0,st1=0,kick2=0;
+ let bx,bz,free=false,owner='a';
+ let linkOp=0,laneOp=0,openOp=0,inOp=0,outOp=0;
+ const beat=(t0,dirx,cover)=>{ // attacker beats C1 starting t0
+  const k=ss(t0,t0+0.5,t);A=[lerp(4.5,4.5+dirx*1.6,k),lerp(-0.6,0.4,k)];
+  const g=ss(t0+0.5,t0+2.4,t);A=[lerp(A[0],A[0]+dirx*0.6,g),lerp(A[1],A[1]+(cover?3.2:7.5),g)];aR=0.8;
+  lean1=0.4*ss(t0,t0+0.4,t);st1=-0.5*ss(t0,t0+0.4,t);C1=[lerp(4.5,4.6,k),lerp(1.5,0.6,k)];
+ };
+ // ---------- ① NG：横に並ぶ ----------
+ if(t<8.75){
+  C2=[1.6,1.6];
+  const k=ss(3.4,5.4,t);A=[4.5,lerp(-6,-0.6,k)];aR=k>0&&k<1?0.6:0;
+  if(t>5.6){beat(5.6,1,false);C2=[lerp(1.6,3.2,ss(6.0,7.6,t)),lerp(1.6,3.4,ss(6.0,7.6,t))];r2=t>6&&t<7.6?0.7:0;}
+  linkOp=fade(t,3.8,5.6);
+ }
+ // ---------- ① OK：ななめ後ろ ----------
+ else if(t<15.4){
+  C2=[1.8,5.5];
+  const k=ss(9.4,11.4,t);A=[4.5,lerp(-6,-0.6,k)];aR=k>0&&k<1?0.6:0;
+  linkOp=fade(t,9.8,12.0);
+  if(t>11.8){beat(11.8,1,true);const s=ss(12.4,13.6,t);C2=[lerp(1.8,5.2,s),lerp(5.5,4.3,s)];r2=s>0&&s<1?0.8:0;kick2=0.8*fade(t,13.4,14.0,0.15);
+   if(t>13.6){owner='c2';}}
+ }
+ // ---------- ② ----------
+ else if(t<25.8){
+  const nok=t<20.2;const t0=nok?16.4:20.8;
+  C2=nok?[7.2,5.5]:[1.8,5.5];
+  const k=ss(t0,t0+1.4,t);A=[4.5,lerp(-4,-0.6,k)];aR=k>0&&k<1?0.6:0;
+  laneOp=fade(t,t0+0.2,nok?20.0:25.3);
+  if(nok){
+   if(t>17.9){const kk=ss(17.9,18.4,t);A=[lerp(4.5,2.8,kk),lerp(-0.6,0.6,kk)];const g=ss(18.4,19.8,t);A=[lerp(A[0],1.0,g),lerp(A[1],7.0,g)];aR=0.8;lean1=0.4*ss(17.9,18.3,t);}
+   openOp=fade(t,17.0,20.0);inOp=fade(t,17.4,19.0);
+  }else{
+   outOp=fade(t,22.0,25.3);
+   if(t>22.6){const kk=ss(22.6,23.4,t);A=[lerp(4.5,6.6,kk),lerp(-0.6,2.2,kk)];aR=0.6;const s=ss(23.0,24.2,t);C2=[lerp(1.8,5.6,s),lerp(5.5,3.8,s)];r2=s>0&&s<1?0.7:0;}
+  }
+ }
+ // ---------- ③ ----------
+ else{
+  const nok=t<30.6;
+  if(nok){
+   // 声がない：C1は下がり続け、相手に時間を与える
+   const k=ss(26.4,29.8,t);A=[lerp(4.5,3.0,k),lerp(-4,6.5,k)];aR=k>0&&k<1?0.5:0;C1=[lerp(4.5,3.2,k),lerp(1.5,8.6,k)];r1=k>0&&k<1?0.3:0;C2=[lerp(1.8,1.2,k),lerp(5.5,10,k)];r2=r1;
+   if(t>29.6){free=true;const s=ss(29.6,30.4,t);bx=lerp(3.05,1.5,s);bz=lerp(6.95,19.8,s);}
+  }else{
+   const k=ss(30.8,31.8,t);A=[4.5,lerp(-4,-1.2,k)];aR=k>0&&k<1?0.5:0;
+   // slow 32.6-34.6
+   const pr=ss(31.6,32.5,t);C1=[4.5,lerp(1.5,0.3,pr)];r1=pr>0&&pr<1?0.6:0;
+   if(t>32.6){const s=cl((t-32.6)/2.0);const kk=ss(0,0.4,s);A=[lerp(4.5,6.0,kk),lerp(-1.2,0.6,kk)];aR=0.6;lean1=0.4*ss(0,0.3,s);
+     const g=ss(0.3,0.9,s);C2=[lerp(1.8,6.1,g),lerp(5.5,2.0,g)];r2=g>0&&g<1?0.8:0;kick2=0.8*ss(0.8,1,s);if(s>0.9)owner='c2';}
+  }
+ }
+ // ---------- place ----------
+ at.position.set(A[0],0,A[1]);at.rotation.y=face(0-A[0],20-A[1]);pose(at,{run:aR,phase:t*9,crouch:0.15});
+ c1.position.set(C1[0],0,C1[1]);c1.rotation.y=face(A[0]-C1[0],A[1]-C1[1]);pose(c1,{run:r1,phase:t*8,crouch:cr1,lean:lean1,stride:st1});
+ c2.position.set(C2[0],0,C2[1]);c2.rotation.y=face(A[0]-C2[0],A[1]-C2[1]);pose(c2,{run:r2,phase:t*8+1,crouch:0.7,kick:kick2});
+ gk.position.set(0,0,18.5);gk.rotation.y=Math.PI;pose(gk,{crouch:0.8});
+ if(!free){if(owner==='c2'){bx=C2[0]+0.2;bz=C2[1]-0.4;}else{bx=A[0]+Math.sin(at.rotation.y)*0.42;bz=A[1]+Math.cos(at.rotation.y)*0.42;}}
+ placeBall(ball,bx,bz);
+ ring1.position.set(C1[0],0,C1[1]);setOp(ring1,0.85*fade(t,3.2,36));ring2.position.set(C2[0],0,C2[1]);setOp(ring2,0.9*fade(t,3.2,36));
+ seg(link,C1,C2,0.85*linkOp);
+ seg(lane,[A[0],A[1]],[0,20],0.6*laneOp);
+ open.position.set(2.6,0,5.8);setOp(open,0.4*openOp);
+ aimArrow(arIn,A[0]-0.4,A[1]+0.6,-0.45,1);setOp(arIn,0.8*inOp);
+ aimArrow(arOut,A[0]+0.5,A[1]+0.5,0.8,0.6);setOp(arOut,0.85*outOp);
+ xIn.position.set(2.4,0,3.4);setOp(xIn,0.95*outOp);
+
+ camAt(t);renderer.render(scene,cam);
+
+ ovOp('title',fade(t,0,2.8,0.4));ovOp('top',ss(2.6,3.0,t)*(1-ss(36,36.4,t)));ovOp('end',ss(36,36.6,t));
+ chapters(t,[[2.8,15.4,'<b>①</b> 距離'],[15.4,25.6,'<b>②</b> 角度'],[25.6,36,'<b>③</b> 声']]);
+ timed('card',t,[[15.3,16.2,'<small>STEP 2</small>角度'],[25.5,26.3,'<small>STEP 3</small>声']],'div');
+ timed('badge',t,[[3.4,8.5,'NG','ng'],[8.6,9.3,'もう一度','re'],[9.4,15.2,'OK','ok'],[16.3,20.1,'NG','ng'],[20.2,20.7,'もう一度','re'],[20.8,25.3,'OK','ok'],[26.4,30.5,'NG','ng'],[30.6,31.2,'もう一度','re'],[31.2,32.5,'OK','ok'],[32.6,34.6,'スロー','slow']]);
+ timed('cap',t,[[3.5,5.6,'カバーが<em>横に並ぶ</em>と…'],[5.6,8.5,'<em>2人まとめて</em><br>抜かれる'],
+   [9.5,11.8,'<em>ななめ後ろ</em><br>3〜5mに立つ'],[11.8,15.2,'抜かれても<br><em>すぐ止められる</em>'],
+   [16.4,18.2,'カバーが<em>外側</em>にいると…'],[18.2,20.1,'<em>中を通って</em><br>ゴールに向かわれる'],
+   [20.8,22.6,'ボールとゴールを結ぶ<br>線の<em>ゴール側</em>に立つ'],[22.6,25.3,'中を消して<br><em>外へ追い出す</em>'],
+   [26.5,28.6,'<em>声がない</em>と<br>前の味方が寄せられない'],[28.6,30.5,'時間を与えて<br><em>シュートまで</em>'],
+   [31.2,32.6,'後ろから<em>「行け！」</em>'],[32.6,34.6,'安心して寄せられる<br><em>抜かれてもカバー</em>'],[34.6,36,'<em>ボール奪取！</em>']],'.box');
+ label('c1','c','前の味方',V(C1[0],2.5,C1[1]),fade(t,3.5,5.6)+fade(t,9.5,11.6));
+ label('c2','y','自分（カバー）',V(C2[0],2.5,C2[1]),fade(t,3.5,5.6)+fade(t,9.5,11.6)+fade(t,16.4,18.0)+fade(t,20.8,22.4));
+ label('side','r','横に並んでいる',V((C1[0]+C2[0])/2,0.4,C1[1]+1.2),fade(t,4.0,5.6));
+ label('dist','y','3〜5m',V((C1[0]+C2[0])/2-0.6,0.4,(C1[1]+C2[1])/2+0.4),fade(t,10.0,12.0));
+ label('both','r','2人とも抜かれた',V(A[0],2.8,A[1]),fade(t,7.0,8.5));
+ label('stop','g','カバー！',V(C2[0],2.8,C2[1]),fade(t,13.4,15.2));
+ label('openL','r','中が空いている',V(2.6,0.4,4.4),fade(t,17.0,20.0));
+ label('inL','r','中 ✕',V(2.4,0.4,4.8),fade(t,22.0,25.3));
+ label('outL','c','外へ',V(6.6,0.4,3.4),fade(t,22.0,25.3));
+ label('silent','r','……',V(C2[0],2.6,C2[1]),fade(t,26.6,29.4));
+ label('go','y','「行け！」',V(C2[0],2.7,C2[1]),fade(t,31.3,33.0,0.15));
+ label('ok','y','「カバーいる！」',V(C2[0]-0.5,2.7,C2[1]),fade(t,33.0,34.4,0.15));
+ label('win','g','ボール奪取',V(C2[0],2.8,C2[1]),fade(t,34.6,36));
+};
+window.ready=true;
+</script></body></html>
