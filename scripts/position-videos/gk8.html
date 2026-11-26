@@ -1,0 +1,132 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="lib.css"></head>
+<body>
+<canvas id="c"></canvas>
+<div id="labs"></div>
+<div id="top" class="ov">
+  <div id="series"><span class="tag">8人制</span>GKからのつなぎ</div>
+  <div id="bar"><div><i></i></div><div><i></i></div><div><i></i></div></div>
+  <div id="step"></div>
+</div>
+<div id="badge" class="ov"></div>
+<div id="cap" class="ov"><div class="box"></div></div>
+<div id="card" class="ov"><div></div></div>
+<div id="brand" class="ov">soccer-selection.jp</div>
+<div id="title" class="ov"><div class="k">8人制で勝ちたい君へ</div><div class="t">GKからのつなぎ<br><span>取られない</span><br>3つのコツ</div></div>
+<div id="end" class="ov">
+  <h2>まとめ</h2>
+  <div class="row"><div class="n">1</div><span>DFは<em>大きく広がる</em></span></div>
+  <div class="row"><div class="n">2</div><span>GKは<em>空いている方</em>へ</span></div>
+  <div class="row"><div class="n">3</div><span>詰まったら<em>GKに戻して逆へ</em></span></div>
+  <div class="foot">保存して次の練習で試そう</div>
+  <div class="follow">フォローで<br>全ポジションのコツが届く<span>@soccer_kanto_jp</span></div>
+  <div class="next">次回：8人制のコーナーキックの守り方編</div>
+  <div class="site">soccer-selection.jp</div>
+</div>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js"}}</script>
+<script type="module">
+import {THREE,scene,cam,renderer,line,circleLine,stand,goal,player,pose,face,makeBall,placeBall,decal,setOp,arrowGeo,aimArrow,cl,ss,lerp,fade,V,camKeys,ovOp,label,chapters,timed} from './lib.js';
+
+// 自陣ゴール z=+22（8人制コートを横0.6倍に詰めて表示）
+const SX=0.38;
+line(-25*SX,22,25*SX,22);line(-25*SX,-30,-25*SX,22);line(25*SX,-30,25*SX,22);line(-25*SX,-12,25*SX,-12);circleLine(0,-12,4);
+line(-10*SX,22,-10*SX,10);line(10*SX,22,10*SX,10);line(-10*SX,10,10*SX,10);
+stand(0,-38,0);stand(22,0,Math.PI/2);stand(-22,0,Math.PI/2);goal(22);
+const gk=player(0x2bb35e,0x111111,0x2bb35e);
+const B=[0,1,2].map(()=>player(0x1f5fbf,0x0d2a4a)), mf=player(0x1f5fbf,0x0d2a4a);
+const P=[0,1].map(()=>player(0xf2f2f2,0xd33b3b));
+const ball=makeBall();
+const rings=[0,1,2].map(()=>decal(new THREE.RingGeometry(0.6,0.82,48),0x2ec4e6));
+const press=decal(new THREE.CircleGeometry(2.0,40),0xe23b3b), freeC=decal(new THREE.CircleGeometry(2.2,40),0x2ec4e6);
+const look=decal(arrowGeo(3,0.35,0.8),0xffd34d);
+const wide1=decal(arrowGeo(2.4,0.35,0.8),0x2ec4e6), wide2=decal(arrowGeo(2.4,0.35,0.8),0x2ec4e6);
+
+const camAt=camKeys([
+ [0,V(6,24,40),V(0,0,8)],[2.6,V(2,22,36),V(0,0,10)],
+ [3.2,V(0,18,32),V(0,0,15.8)],[36,V(0,18,32),V(0,0,15.8)],[40,V(0,18,32),V(0,0,15.8)]]);
+
+window.render=function(t){
+ let G=[0,20],L=[-4,14],C=[0,13],R=[4,14],M=[0,4],P1=[-3,8],P2=[3,8],rr=[0,0,0],pr=[0,0],gK=0,lK=0;
+ let bx,bz,by=0.13,free=false,owner='g',pressP=null,pressOp=0,freeP=null,freeOp=0,lookOp=0,wideOp=0,lookDir=[1,0];
+ const pass=(from,to,t0,t1,arc=0)=>{if(t>t0){free=true;const s=ss(t0,t1,t);bx=lerp(from[0],to[0],s);bz=lerp(from[1],to[1],s);by=0.13+arc*Math.sin(Math.PI*s);return s>=1;}return false;};
+ // ---------- ① NG ----------
+ if(t<8.75){
+  gK=0.9*fade(t,4.8,5.2,0.12);
+  if(pass([0,19.6],[-4,13.6],5.0,5.8)){free=false;owner='l';}
+  const p=ss(5.4,6.6,t);P1=[lerp(-3,-3.8,p),lerp(8,13.0,p)];pr[0]=p>0&&p<1?0.8:0;
+  if(t>6.8){owner='p1';}
+  pressP=[-4,13.6];pressOp=fade(t,5.8,8.4);
+ }
+ // ---------- ① OK ----------
+ else if(t<15.4){
+  const w=ss(9.6,11.2,t);L=[lerp(-4,-9.5,w),lerp(14,15.5,w)];R=[lerp(4,9.5,w),lerp(14,15.5,w)];C=[0,lerp(13,12,w)];rr=[w>0&&w<1?0.7:0,0,w>0&&w<1?0.7:0];
+  wideOp=fade(t,9.6,11.6);
+  gK=0.9*fade(t,11.8,12.2,0.12);
+  if(pass([0,19.6],[-9.4,15.1],12.0,12.9)){free=false;owner='l';}
+  const p=ss(12.2,14.6,t);P1=[lerp(-3,-6,p),lerp(8,11,p)];pr[0]=p>0&&p<1?0.6:0;
+  freeP=[-9.5,15.5];freeOp=fade(t,12.9,15.2);
+ }
+ // ---------- ② ----------
+ else if(t<25.8){
+  L=[-9.5,15.5];R=[9.5,15.5];C=[0,12];P1=[-8,12.4];P2=[2,8];const nok=t<20.2;
+  if(nok){gK=0.9*fade(t,16.8,17.2,0.12);if(pass([0,19.6],[-9.4,15.1],17.0,17.9)){free=false;owner='l';}
+   const p=ss(17.6,18.6,t);P1=[lerp(-8,-9.0,p),lerp(12.4,14.6,p)];pr[0]=p>0&&p<1?0.7:0;if(t>18.8)owner='p1';
+   pressP=[-9.3,15.2];pressOp=fade(t,17.9,20.0);
+  }else{
+   lookOp=fade(t,20.6,22.2);lookDir=[1,-0.4];
+   gK=0.9*fade(t,21.6,22.0,0.12);if(pass([0,19.6],[9.4,15.1],21.8,22.9)){free=false;owner='r';}
+   freeP=[9.5,15.5];freeOp=fade(t,22.6,25.3);
+  }
+ }
+ // ---------- ③ ----------
+ else{
+  L=[-9.5,15.5];R=[9.5,15.5];C=[0,12];P1=[-8.6,13.4];P2=[-5,12];owner='l';const nok=t<30.6;
+  pressP=[-9,14.6];pressOp=fade(t,26.4,nok?30.4:31.6);
+  if(nok){const k=ss(26.8,28.6,t);L=[lerp(-9.5,-7.4,k),lerp(15.5,12.8,k)];rr[0]=k>0&&k<1?0.5:0;
+   const c=ss(27.4,28.6,t);P1=[lerp(-8.6,-7.6,c),lerp(13.4,12.2,c)];P2=[lerp(-5,-6.6,c),lerp(12,12.6,c)];pr=[c>0&&c<1?0.6:0,c>0&&c<1?0.6:0];
+   if(t>28.8)owner='p1';
+  }else{
+   lK=0.9*fade(t,31.2,31.6,0.12);
+   if(t>31.4&&t<32.6){free=true;const s=ss(31.4,32.4,t);bx=lerp(-9.1,-0.3,s);bz=lerp(15.3,19.5,s);}
+   if(t>=32.4&&t<32.6){free=false;owner='g';}
+   gK=0.9*fade(t,32.6,33.1,0.15);
+   if(t>32.8){free=true;const s=ss(32.8,34.6,t);bx=lerp(0.3,9.3,s);bz=lerp(19.5,15.2,s);by=0.13+1.2*Math.sin(Math.PI*s);if(t>34.6){free=false;owner='r';}}
+   freeP=[9.5,15.5];freeOp=fade(t,32.6,35.8);
+  }
+ }
+ // ---------- place ----------
+ const S=q=>[q[0]*SX,q[1]];
+ const own={g:gk,l:B[0],c:B[1],r:B[2],p1:P[0]};
+ [L,C,R].forEach((q,i)=>{const s=S(q);B[i].position.set(s[0],0,s[1]);B[i].rotation.y=face(0.001,-1);pose(B[i],{run:rr[i],phase:t*9+i,crouch:0.2,kick:i===0?lK:0});rings[i].position.set(s[0],0,s[1]);setOp(rings[i],0.8*fade(t,3.2,36));});
+ const g=S(G);gk.position.set(g[0],0,g[1]);gk.rotation.y=Math.PI;pose(gk,{kick:gK,crouch:0.2});
+ const m=S(M);mf.position.set(m[0],0,m[1]);mf.rotation.y=Math.PI;pose(mf,{crouch:0.2});
+ [P1,P2].forEach((q,i)=>{const s=S(q);P[i].position.set(s[0],0,s[1]);P[i].rotation.y=face(0.001,1);pose(P[i],{run:pr[i],phase:t*9+i,crouch:0.3});});
+ if(free){bx*=SX;}else{const o=own[owner];bx=o.position.x+Math.sin(o.rotation.y)*0.42;bz=o.position.z+Math.cos(o.rotation.y)*0.42;}
+ placeBall(ball,bx,bz,by);
+ if(pressP){const s=S(pressP);press.position.set(s[0],0,s[1]);}setOp(press,0.4*pressOp);
+ if(freeP){const s=S(freeP);freeC.position.set(s[0],0,s[1]);}setOp(freeC,0.4*freeOp);
+ aimArrow(look,g[0],g[1]-0.8,lookDir[0],lookDir[1]);setOp(look,0.85*lookOp);
+ aimArrow(wide1,-4*SX,13.5,-1,0.25);aimArrow(wide2,4*SX,13.5,1,0.25);setOp(wide1,0.85*wideOp);setOp(wide2,0.85*wideOp);
+
+ camAt(t);renderer.render(scene,cam);
+
+ ovOp('title',fade(t,0,2.8,0.4));ovOp('top',ss(2.6,3.0,t)*(1-ss(36,36.4,t)));ovOp('end',ss(36,36.6,t));
+ chapters(t,[[2.8,15.4,'<b>①</b> 広がる'],[15.4,25.6,'<b>②</b> 空いている方へ'],[25.6,36,'<b>③</b> やり直す']]);
+ timed('card',t,[[15.3,16.2,'<small>STEP 2</small>空いている方へ'],[25.5,26.3,'<small>STEP 3</small>やり直す']],'div');
+ timed('badge',t,[[3.4,8.5,'NG','ng'],[8.6,9.3,'もう一度','re'],[9.4,15.2,'OK','ok'],[16.3,20.1,'NG','ng'],[20.2,20.7,'もう一度','re'],[20.8,25.3,'OK','ok'],[26.4,30.5,'NG','ng'],[30.6,31.2,'もう一度','re'],[31.3,32.5,'OK','ok'],[32.6,34.6,'スロー','slow']]);
+ timed('cap',t,[[3.5,5.6,'DFが<em>GKの近く</em>で<br>待っていると…'],[5.6,8.5,'すぐ寄せられて<br><em>ゴール前で取られる</em>'],
+   [9.5,11.8,'DFは<em>大きく広がって</em><br>受ける'],[11.8,15.2,'相手が遠いので<br><em>時間ができる</em>'],
+   [16.4,18.4,'相手が<em>近い方</em>に<br>出すと…'],[18.4,20.1,'<em>寄せられて</em>取られる'],
+   [20.8,22.4,'GKは<em>空いている方</em>を<br>見てから出す'],[22.4,25.3,'<em>フリー</em>で<br>前を向ける'],
+   [26.5,28.6,'詰まっているのに<br><em>無理に前へ</em>運ぶと…'],[28.6,30.5,'<em>ゴール前</em>で<br>取られて大ピンチ'],
+   [31.3,32.6,'詰まったら<br><em>GKに戻す</em>'],[32.6,34.6,'空いている<br><em>逆サイドへ</em>'],[34.6,36,'<em>やり直し成功！</em>']],'.box');
+ label('gkL','c','GK',V(g[0],2.5,g[1]),fade(t,3.4,5.6));
+ label('close','r','近すぎる',V(-4*SX,2.6,14),fade(t,3.8,5.6));
+ label('taken','r','取られた',V(S(P1)[0],2.7,P1[1]),fade(t,6.8,8.4)+fade(t,18.8,20.0)+fade(t,28.8,30.4));
+ label('time','g','時間がある',V(-9.5*SX,2.6,15.5),fade(t,13.0,15.2));
+ label('lookL','y','空いている方を見る',V(g[0]+2.2,0.6,g[1]-2.6),fade(t,20.6,22.4));
+ label('freeR','g','フリー',V(9.5*SX,2.6,15.5),fade(t,22.8,25.3)+fade(t,34.6,36));
+ label('back','c','GKへ戻す',V(-4.5*SX,0.6,18.2),fade(t,31.4,32.6));
+};
+window.ready=true;
+</script></body></html>
